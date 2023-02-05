@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>blueberry-leaf-isolated-white-background-clipping-path-84283705_jpg.rf.28a1b7bf118cf5e3da7fa8d4a1d7f6de.jpg</filename>
+	<path>blueberry-leaf-isolated-white-background-clipping-path-84283705_jpg.rf.28a1b7bf118cf5e3da7fa8d4a1d7f6de.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Blueberry leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>14</xmin>
+			<xmax>401</xmax>
+			<ymin>45</ymin>
+			<ymax>332</ymax>
+		</bndbox>
+	</object>
+</annotation>

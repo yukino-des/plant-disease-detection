@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>16629068955_3092aa68a5_b_jpg.rf.cd7f3e3235b611c91c7f7725a5adca82.jpg</filename>
+	<path>16629068955_3092aa68a5_b_jpg.rf.cd7f3e3235b611c91c7f7725a5adca82.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Squash Powdery mildew leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>4</xmin>
+			<xmax>410</xmax>
+			<ymin>0</ymin>
+			<ymax>389</ymax>
+		</bndbox>
+	</object>
+</annotation>

@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>4825902504_5fa80b65b8_z_jpg.rf.77ce97612382f85d740238fab37a566b.jpg</filename>
+	<path>4825902504_5fa80b65b8_z_jpg.rf.77ce97612382f85d740238fab37a566b.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Bell_pepper leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>47</xmin>
+			<xmax>372</xmax>
+			<ymin>65</ymin>
+			<ymax>387</ymax>
+		</bndbox>
+	</object>
+</annotation>

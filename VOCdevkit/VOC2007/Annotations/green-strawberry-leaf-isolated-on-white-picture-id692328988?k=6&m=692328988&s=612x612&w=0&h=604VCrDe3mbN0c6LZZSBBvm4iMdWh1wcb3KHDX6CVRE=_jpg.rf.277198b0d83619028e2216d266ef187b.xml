@@ -1,0 +1,53 @@
+<annotation>
+	<folder></folder>
+	<filename>green-strawberry-leaf-isolated-on-white-picture-id692328988?k&#x3D;6&amp;m&#x3D;692328988&amp;s&#x3D;612x612&amp;w&#x3D;0&amp;h&#x3D;604VCrDe3mbN0c6LZZSBBvm4iMdWh1wcb3KHDX6CVRE&#x3D;_jpg.rf.277198b0d83619028e2216d266ef187b.jpg</filename>
+	<path>green-strawberry-leaf-isolated-on-white-picture-id692328988?k&#x3D;6&amp;m&#x3D;692328988&amp;s&#x3D;612x612&amp;w&#x3D;0&amp;h&#x3D;604VCrDe3mbN0c6LZZSBBvm4iMdWh1wcb3KHDX6CVRE&#x3D;_jpg.rf.277198b0d83619028e2216d266ef187b.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Strawberry leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>90</xmin>
+			<xmax>259</xmax>
+			<ymin>13</ymin>
+			<ymax>308</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Strawberry leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>207</xmin>
+			<xmax>415</xmax>
+			<ymin>156</ymin>
+			<ymax>403</ymax>
+		</bndbox>
+	</object>
+	<object>
+		<name>Strawberry leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>12</xmin>
+			<xmax>205</xmax>
+			<ymin>185</ymin>
+			<ymax>399</ymax>
+		</bndbox>
+	</object>
+</annotation>

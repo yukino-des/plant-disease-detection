@@ -1,0 +1,14 @@
+<annotation>
+	<folder></folder>
+	<filename>squashsilver2_JPG_jpg.rf.02bdb1c8a5c8bdf6f689f2fda33af990.jpg</filename>
+	<path>squashsilver2_JPG_jpg.rf.02bdb1c8a5c8bdf6f689f2fda33af990.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+</annotation>

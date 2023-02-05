@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>N_-Corn-Leaf-Blight-20lx3t9_jpg.rf.a40bf217776e5a22246eda070e4a60d0.jpg</filename>
+	<path>N_-Corn-Leaf-Blight-20lx3t9_jpg.rf.a40bf217776e5a22246eda070e4a60d0.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Corn leaf blight</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>2</xmin>
+			<xmax>415</xmax>
+			<ymin>40</ymin>
+			<ymax>411</ymax>
+		</bndbox>
+	</object>
+</annotation>

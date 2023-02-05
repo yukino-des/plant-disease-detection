@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>PLPATH-FRU-02-cedar-apple-rust-figure-1_jpg.rf.be813eae618ccf2af28f8f7bac681d92.jpg</filename>
+	<path>PLPATH-FRU-02-cedar-apple-rust-figure-1_jpg.rf.be813eae618ccf2af28f8f7bac681d92.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>416</width>
+		<height>416</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Apple rust leaf</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>1</xmin>
+			<xmax>412</xmax>
+			<ymin>0</ymin>
+			<ymax>415</ymax>
+		</bndbox>
+	</object>
+</annotation>
