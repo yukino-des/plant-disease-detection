@@ -9,8 +9,7 @@ from PIL import ImageDraw, ImageFont
 from torch import nn
 
 from nets.yolo import YoloBody
-from utils.utils import (cvtColor, get_anchors, get_classes, preprocess_input,
-                         resize_image, show_config)
+from utils.utils import (cvtColor, get_anchors, get_classes, preprocess_input, resize_image, show_config)
 from utils.utils_bbox import DecodeBox
 
 
@@ -57,7 +56,6 @@ class YOLO(object):
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
         self.net = self.net.eval()
-        print('{} model, anchors, and classes loaded.'.format(self.model_path))
         if not onnx:
             if self.cuda:
                 self.net = nn.DataParallel(self.net)
@@ -95,7 +93,7 @@ class YOLO(object):
             for i in range(self.num_classes):
                 num = np.sum(top_label == i)
                 if num > 0:
-                    print(self.class_names[i], " : ", num)
+                    print(self.class_names[i], ":", num)
                 classes_nums[i] = num
             print("classes_nums:", classes_nums)
         if crop:
@@ -221,7 +219,7 @@ class YOLO(object):
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches='tight', pad_inches=-0.1)
-        print("Save to the " + heatmap_save_path)
+        print("Save heatmap to " + heatmap_save_path)
         plt.show()
 
     def convert_to_onnx(self, simplify, model_path):
@@ -229,7 +227,7 @@ class YOLO(object):
         im = torch.zeros(1, 3, *self.input_shape).to('cpu')
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        print(f'Starting export with onnx {onnx.__version__}.')
+        print(f'Onnx {onnx.__version__}.')
         torch.onnx.export(self.net,
                           im,
                           f=model_path,
@@ -244,14 +242,14 @@ class YOLO(object):
         onnx.checker.check_model(model_onnx)
         if simplify:
             import onnxsim
-            print(f'Simplifying with onnx-simplifier {onnxsim.__version__}.')
+            print(f'Onnx-simplifier {onnxsim.__version__}.')
             model_onnx, check = onnxsim.simplify(
                 model_onnx,
                 dynamic_input_shape=False,
                 input_shapes=None)
             assert check, 'assert check failed'
             onnx.save(model_onnx, model_path)
-        print('Onnx model save as {}'.format(model_path))
+        print('Save onnx-model to {}'.format(model_path))
 
     def get_map_txt(self, image_id, image, class_names, map_out_path):
         f = open(os.path.join(map_out_path, "detection-results/" + image_id + ".txt"), "w")

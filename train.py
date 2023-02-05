@@ -78,7 +78,7 @@ if __name__ == "__main__":
         device = torch.device("cuda", local_rank)
         if local_rank == 0:
             print(f"[{os.getpid()}] (rank = {rank}, local_rank = {local_rank}) training...")
-            print("Gpu Device Count : ", ngpus_per_node)
+            print("Gpu Device Count:", ngpus_per_node)
     else:
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         local_rank = 0
@@ -109,12 +109,17 @@ if __name__ == "__main__":
         model_dict.update(temp_dict)
         model.load_state_dict(model_dict)
         if local_rank == 0:
-            print("\nSuccessful Load Key:", str(load_key)[:500], "……\nSuccessful Load Key Num:", len(load_key))
-            print("\nFail To Load Key:", str(no_load_key)[:500], "……\nFail To Load Key num:", len(no_load_key))
-            print(
-                "\n\033[1;33;44mTips, it is normal that the head part is not loaded, and it is an error that the Backbone part is not loaded. \033[0m")
-    yolo_loss = YOLOLoss(anchors, num_classes, input_shape, Cuda, anchors_mask, label_smoothing, focal_loss,
-                         focal_alpha, focal_gamma)
+            print("\nSuccess:", str(load_key)[:500], "\nSuccess Num:", len(load_key))
+            print("\nFail:", str(no_load_key)[:500], "\nFail Num:", len(no_load_key))
+    yolo_loss = YOLOLoss(anchors,
+                         num_classes,
+                         input_shape,
+                         Cuda,
+                         anchors_mask,
+                         label_smoothing,
+                         focal_loss,
+                         focal_alpha,
+                         focal_gamma)
     if local_rank == 0:
         time_str = datetime.datetime.strftime(datetime.datetime.now(), '%Y_%m_%d_%H_%M_%S')
         log_dir = os.path.join(save_dir, "loss_" + str(time_str))
@@ -131,7 +136,7 @@ if __name__ == "__main__":
     if sync_bn and ngpus_per_node > 1 and distributed:
         model_train = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model_train)
     elif sync_bn:
-        print("Sync_bn is not support in one gpu or not distributed.")
+        print("Sync_bn is not supported.")
     if Cuda:
         if distributed:
             model_train = model_train.cuda(local_rank)
@@ -174,17 +179,7 @@ if __name__ == "__main__":
         total_step = num_train // Unfreeze_batch_size * UnFreeze_Epoch
         if total_step <= wanted_step:
             if num_train // Unfreeze_batch_size == 0:
-                raise ValueError('The dataset is too small to continue training, please expand the dataset')
-            wanted_epoch = wanted_step // (num_train // Unfreeze_batch_size) + 1
-            print(
-                "\n\033[1;33;44m[Warning]When using the %s optimizer, it is recommended to set the total training step to above %d.\033[0m" % (
-                    optimizer_type, wanted_step))
-            print(
-                "\033[1;33;44m[Warning]The total amount of training data for this run is %d, the Unfreeze_batch_size is %d, a total of %d Epochs are trained, and the total training step is calculated as %d.\033[0m" % (
-                    num_train, Unfreeze_batch_size, UnFreeze_Epoch, total_step))
-            print(
-                "\033[1;33;44m[Warning]Since the total training step is %d, which is less than the recommended step %d, it is recommended to set the total generation to %d.\033[0m" % (
-                    total_step, wanted_step, wanted_epoch))
+                raise ValueError('The dataset is too small.')
     if True:
         UnFreeze_flag = False
         if Freeze_Train:
@@ -215,7 +210,7 @@ if __name__ == "__main__":
         epoch_step = num_train // batch_size
         epoch_step_val = num_val // batch_size
         if epoch_step == 0 or epoch_step_val == 0:
-            raise ValueError("The dataset is too small to continue training, please expand the dataset")
+            raise ValueError("The dataset is too small.")
         train_dataset = YoloDataset(train_lines,
                                     input_shape,
                                     num_classes,
@@ -289,7 +284,7 @@ if __name__ == "__main__":
                 epoch_step = num_train // batch_size
                 epoch_step_val = num_val // batch_size
                 if epoch_step == 0 or epoch_step_val == 0:
-                    raise ValueError("The dataset is too small to continue training, please expand the dataset")
+                    raise ValueError("The dataset is too small.")
                 if distributed:
                     batch_size = batch_size // ngpus_per_node
                 gen = DataLoader(train_dataset,

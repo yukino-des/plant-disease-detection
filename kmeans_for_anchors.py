@@ -38,7 +38,7 @@ def kmeans(box, k):
                 box[near == j], axis=0)
         last_clu = near
         if iter % 5 == 0:
-            print('iter: {:d}. avg_iou:{:.2f}'.format(iter, avg_iou(box, cluster)))
+            print('iter: {:d} avg_iou: {:.2f}'.format(iter, avg_iou(box, cluster)))
         iter += 1
     return cluster, near
 
@@ -82,9 +82,9 @@ if __name__ == '__main__':
         plt.scatter(cluster[j][0], cluster[j][1], marker='x', c='black')
     plt.savefig("kmeans_for_anchors.jpg")
     plt.show()
-    print('Save kmeans_for_anchors.jpg in root dir.')
+    print('kmeans_for_anchors.jpg saved.')
     cluster = cluster[np.argsort(cluster[:, 0] * cluster[:, 1])]
-    print('avg_ratio:{:.2f}'.format(avg_iou(data, cluster)))
+    print('avg_ratio: {:.2f}'.format(avg_iou(data, cluster)))
     print(cluster)
     f = open("yolo_anchors.txt", 'w')
     row = np.shape(cluster)[0]

@@ -1,5 +1,5 @@
 import os
-from xml.etree import ElementTree as ET
+import xml.etree.ElementTree as ET
 
 from PIL import Image
 from tqdm import tqdm

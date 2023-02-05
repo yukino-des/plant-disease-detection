@@ -66,8 +66,7 @@ class MobileNetV2(nn.Module):
                 [6, 320, 1, 1],
             ]
         if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
-            raise ValueError("inverted_residual_setting should be non-empty or a 4-element list, got {}"
-                             .format(inverted_residual_setting))
+            raise ValueError("len of inverted_residual_setting ERROR!")
         input_channel = _make_divisible(input_channel * width_mult, round_nearest)
         self.last_channel = _make_divisible(last_channel * max(1.0, width_mult), round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]

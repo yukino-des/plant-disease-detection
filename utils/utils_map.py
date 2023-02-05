@@ -8,10 +8,10 @@ import sys
 
 import cv2
 import matplotlib
-import numpy as np
-from matplotlib import pyplot as plt
 
 matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+import numpy as np
 
 
 def log_average_miss_rate(precision, fp_cumsum, num_images):
@@ -40,7 +40,7 @@ def error(msg):
 def is_float_between_0_and_1(value):
     try:
         val = float(value)
-        if val > 0.0 and val < 1.0:
+        if 0.0 < val < 1.0:
             return True
         else:
             return False
@@ -293,7 +293,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
     ap_dictionary = {}
     lamr_dictionary = {}
     with open(RESULTS_FILES_PATH + "/results.txt", 'w') as results_file:
-        results_file.write("# AP and precision/recall per class\n")
+        results_file.write("AP and precision/recall per class\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0
@@ -337,8 +337,8 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
                         iw = bi[2] - bi[0] + 1
                         ih = bi[3] - bi[1] + 1
                         if iw > 0 and ih > 0:
-                            ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (bbgt[2] - bbgt[0]
-                                                                              + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
+                            ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (
+                                    bbgt[2] - bbgt[0] + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
                             ov = iw * ih / ua
                             if ov > ovmax:
                                 ovmax = ov
@@ -501,10 +501,9 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
         if show_animation:
             cv2.destroyAllWindows()
         if n_classes == 0:
-            print(
-                "No category is detected, please check whether the label names and classes_path in get_map.py have been modified.")
+            print("../model_data/voc_classes.txt ERROR!")
             return 0
-        results_file.write("\n# mAP of all classes\n")
+        results_file.write("\nmAP of all classes\n")
         mAP = sum_AP / n_classes
         text = "mAP = {0:.2f}%".format(mAP * 100)
         results_file.write(text + "\n")
@@ -521,14 +520,14 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
                 det_counter_per_class[class_name] = 1
     dr_classes = list(det_counter_per_class.keys())
     with open(RESULTS_FILES_PATH + "/results.txt", 'a') as results_file:
-        results_file.write("\n# Number of ground-truth objects per class\n")
+        results_file.write("\nNumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
             results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
     with open(RESULTS_FILES_PATH + "/results.txt", 'a') as results_file:
-        results_file.write("\n# Number of detected objects per class\n")
+        results_file.write("\nNumber of detected objects per class\n")
         for class_name in sorted(dr_classes):
             n_det = det_counter_per_class[class_name]
             text = class_name + ": " + str(n_det)
@@ -591,91 +590,3 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
             ""
         )
     return mAP
-
-
-def preprocess_gt(gt_path, class_names):
-    image_ids = os.listdir(gt_path)
-    results = {}
-    images = []
-    bboxes = []
-    for i, image_id in enumerate(image_ids):
-        lines_list = file_lines_to_list(os.path.join(gt_path, image_id))
-        boxes_per_image = []
-        image = {}
-        image_id = os.path.splitext(image_id)[0]
-        image['file_name'] = image_id + '.jpg'
-        image['width'] = 1
-        image['height'] = 1
-        image['id'] = str(image_id)
-        for line in lines_list:
-            difficult = 0
-            if "difficult" in line:
-                line_split = line.split()
-                left, top, right, bottom, _difficult = line_split[-5:]
-                class_name = ""
-                for name in line_split[:-5]:
-                    class_name += name + " "
-                class_name = class_name[:-1]
-                difficult = 1
-            else:
-                line_split = line.split()
-                left, top, right, bottom = line_split[-4:]
-                class_name = ""
-                for name in line_split[:-4]:
-                    class_name += name + " "
-                class_name = class_name[:-1]
-            left, top, right, bottom = float(left), float(top), float(right), float(bottom)
-            if class_name not in class_names:
-                continue
-            cls_id = class_names.index(class_name) + 1
-            bbox = [left, top, right - left, bottom - top, difficult, str(image_id), cls_id,
-                    (right - left) * (bottom - top) - 10.0]
-            boxes_per_image.append(bbox)
-        images.append(image)
-        bboxes.extend(boxes_per_image)
-    results['images'] = images
-    categories = []
-    for i, cls in enumerate(class_names):
-        category = {}
-        category['supercategory'] = cls
-        category['name'] = cls
-        category['id'] = i + 1
-        categories.append(category)
-    results['categories'] = categories
-    annotations = []
-    for i, box in enumerate(bboxes):
-        annotation = {}
-        annotation['area'] = box[-1]
-        annotation['category_id'] = box[-2]
-        annotation['image_id'] = box[-3]
-        annotation['iscrowd'] = box[-4]
-        annotation['bbox'] = box[:4]
-        annotation['id'] = i
-        annotations.append(annotation)
-    results['annotations'] = annotations
-    return results
-
-
-def preprocess_dr(dr_path, class_names):
-    image_ids = os.listdir(dr_path)
-    results = []
-    for image_id in image_ids:
-        lines_list = file_lines_to_list(os.path.join(dr_path, image_id))
-        image_id = os.path.splitext(image_id)[0]
-        for line in lines_list:
-            line_split = line.split()
-            confidence, left, top, right, bottom = line_split[-5:]
-            class_name = ""
-            for name in line_split[:-5]:
-                class_name += name + " "
-            class_name = class_name[:-1]
-            left, top, right, bottom = float(left), float(top), float(right), float(bottom)
-            result = {}
-            result["image_id"] = str(image_id)
-            if class_name not in class_names:
-                continue
-            result["category_id"] = class_names.index(class_name) + 1
-            result["bbox"] = [left, top, right - left, bottom - top]
-            result["score"] = float(confidence)
-            results.append(result)
-    return results

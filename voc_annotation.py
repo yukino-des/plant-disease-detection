@@ -39,8 +39,7 @@ def convert_annotation(year, image_id, list_file):
 if __name__ == "__main__":
     random.seed(416)
     if " " in os.path.abspath(VOCdevkit_path):
-        raise ValueError("""There must be no spaces in the folder path and image name where the data set is stored, 
-otherwise it will affect the normal model training, please pay attention to modification.""")
+        raise ValueError("Image path cannot contain spaces.")
     if annotation_mode == 0 or annotation_mode == 1:
         print("Generate txt in ImageSets.")
         xmlfilepath = os.path.join(VOCdevkit_path, 'VOC2007/Annotations')
@@ -56,8 +55,6 @@ otherwise it will affect the normal model training, please pay attention to modi
         tr = int(tv * train_percent)
         trainval = random.sample(list, tv)
         train = random.sample(trainval, tr)
-        print("train and val size", tv)
-        print("train size", tr)
         ftrainval = open(os.path.join(saveBasePath, 'trainval.txt'), 'w')
         ftest = open(os.path.join(saveBasePath, 'test.txt'), 'w')
         ftrain = open(os.path.join(saveBasePath, 'train.txt'), 'w')
@@ -78,7 +75,7 @@ otherwise it will affect the normal model training, please pay attention to modi
         ftest.close()
         print("Generate txt in ImageSets done.")
     if annotation_mode == 0 or annotation_mode == 2:
-        print("Generate 2007_train.txt and 2007_val.txt for train.")
+        print("Generate 2007_train.txt and 2007_val.txt.")
         type_index = 0
         for year, image_set in VOCdevkit_sets:
             image_ids = open(os.path.join(VOCdevkit_path, 'VOC%s/ImageSets/Main/%s.txt' % (year, image_set)),
@@ -91,7 +88,7 @@ otherwise it will affect the normal model training, please pay attention to modi
             photo_nums[type_index] = len(image_ids)
             type_index += 1
             list_file.close()
-        print("Generate 2007_train.txt and 2007_val.txt for train done.")
+        print("Generate 2007_train.txt and 2007_val.txt done.")
 
 
         def printTable(List1, List2):
@@ -115,8 +112,6 @@ otherwise it will affect the normal model training, please pay attention to modi
                     colWidths[i] = len(tableData[i][j])
         printTable(tableData, colWidths)
         if photo_nums[0] <= 500:
-            print(
-                "The number of training sets is less than 500, which belongs to a small amount of data. Please pay attention to setting a larger training generation (Epoch) to meet sufficient gradient descent times (Step).")
+            print("The dataset is too small.")
         if np.sum(nums) == 0:
-            print(
-                "Did not get any target in the dataset, please pay attention to modify the classes_path to correspond to your own dataset, and ensure that the label names are correct, otherwise the training will have no effect.")
+            print("model_data/voc_class.txt ERROR!")
