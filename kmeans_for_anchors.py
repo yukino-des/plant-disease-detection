@@ -1,9 +1,12 @@
 import glob
 from xml.etree import ElementTree as ET
 
+import matplotlib
 import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
+
+matplotlib.use('Agg')
 
 
 def cas_iou(box, cluster):
@@ -64,6 +67,7 @@ def load_data(path):
     return np.array(data)
 
 
+# Generate yolo_anchors.txt
 if __name__ == '__main__':
     np.random.seed(0)
     input_shape = [416, 416]
@@ -78,7 +82,7 @@ if __name__ == '__main__':
     data = data * np.array([input_shape[1], input_shape[0]])
     cluster = cluster * np.array([input_shape[1], input_shape[0]])
     for j in range(anchors_num):
-        plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
+        plt.scatter(data[near == j][:, 0], data[near == j][:, 1], 1)
         plt.scatter(cluster[j][0], cluster[j][1], marker='x', c='black')
     plt.savefig("kmeans_for_anchors.jpg")
     plt.show()

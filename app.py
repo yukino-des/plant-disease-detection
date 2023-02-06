@@ -41,7 +41,7 @@ def upload_file():
         image_path = os.path.join('./tmp/ct', file.filename)
 
         # update
-        r_image, image_info = yolo.detect_image(Image.open(image_path), crop=crop, count=count)
+        r_image, image_info = yolo.detect_image(Image.open(image_path), crop=crop, count=count, web=True)
         img_name = r_image.filename.split('/')[-1]
         r_image.save(os.path.join('./tmp/draw', img_name), quality=95, subsampling=0)
         ########

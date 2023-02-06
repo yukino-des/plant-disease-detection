@@ -37,9 +37,7 @@ if __name__ == "__main__":
     Init_Epoch = 0
     Freeze_Epoch = 50
     Freeze_batch_size = 16
-
     UnFreeze_Epoch = 300
-
     Unfreeze_batch_size = 8
     Freeze_Train = True
 
@@ -64,10 +62,7 @@ if __name__ == "__main__":
     save_dir = 'logs'
     eval_flag = True
     eval_period = 10
-
-    # num_workers = 2
     num_workers = 4
-
     train_annotation_path = '2007_train.txt'
     val_annotation_path = '2007_val.txt'
     ngpus_per_node = torch.cuda.device_count()

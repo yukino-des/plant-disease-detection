@@ -11,27 +11,27 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "video"
+    mode = "predict"
     # predict
     crop = True
     count = True
 
     # video
-    # video_path = 0  # camera
-    video_path = "out01.mp4"
-    video_save_path = "video_out/"
+    # video_path = 0  # CAMERA
+    video_path = "videos/01.mp4"
+    video_save_path = "videos_out/01.mp4v"
     video_fps = 25.0
 
     # fps
     test_interval = 100
-    fps_image_path = "img/fps.png"
+    fps_image_path = "imgs/1a529239e1068120254b893fff125832.jpg"
 
     # dir_predict
-    dir_origin_path = "img/"
-    dir_save_path = "img_out/"
+    dir_origin_path = "imgs/"
+    dir_save_path = "imgs_out/"
 
     # heatmap
-    heatmap_save_path = "model_data/heatmap.png"
+    heatmap_save_path = "imgs_out/heatmap.png"
 
     # export_onnx
     simplify = True
@@ -45,7 +45,7 @@ def predict():
                 print('Open error!')
                 continue
             else:
-                r_image, _ = yolo.detect_image(image, crop=crop, count=count)
+                r_image = yolo.detect_image(image, crop=crop, count=count)
                 r_image.show()
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
@@ -64,8 +64,7 @@ def predict():
                 break
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(np.uint8(frame))
-            r_image, image_info = yolo.detect_image(frame)
-            print(type(r_image), image_info)
+            r_image = yolo.detect_image(frame)
             frame = np.array(r_image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
@@ -87,7 +86,7 @@ def predict():
     elif mode == "fps":
         img = Image.open(fps_image_path)
         tact_time = yolo.get_FPS(img, test_interval)
-        print(str(tact_time) + 'seconds, ' + str(1 / tact_time) + 'FPS, @batch_size 1')
+        print(str(tact_time) + ' seconds, ' + str(1 / tact_time) + ' FPS, @batch_size 1')
     elif mode == "dir_predict":
         img_names = os.listdir(dir_origin_path)
         for img_name in tqdm(img_names):
@@ -95,7 +94,7 @@ def predict():
                     ('.bmp', '.dib', '.png', '.jpg', '.jpeg', '.pbm', '.pgm', '.ppm', '.tif', '.tiff')):
                 image_path = os.path.join(dir_origin_path, img_name)
                 image = Image.open(image_path)
-                r_image, _ = yolo.detect_image(image)
+                r_image = yolo.detect_image(image)
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)

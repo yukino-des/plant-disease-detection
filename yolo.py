@@ -4,6 +4,7 @@ import time
 
 import numpy as np
 import onnx
+import onnxsim
 import torch
 from PIL import ImageDraw, ImageFont
 from torch import nn
@@ -35,6 +36,7 @@ class YOLO(object):
             return "Unrecognized attribute name '" + n + "'"
 
     def __init__(self, **kwargs):
+
         # append
         self.anchors_mask = None
         self.anchors_path = None
@@ -74,7 +76,7 @@ class YOLO(object):
                 self.net = nn.DataParallel(self.net)
                 self.net = self.net.cuda()
 
-    def detect_image(self, image, crop=False, count=False):
+    def detect_image(self, image, crop=False, count=False, web=False):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
@@ -159,9 +161,9 @@ class YOLO(object):
             del draw
 
         # update
-        return image, image_info
-        ########
-        # return image
+        if web:
+            return image, image_info
+        return image
 
     def get_FPS(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])
@@ -250,7 +252,6 @@ class YOLO(object):
         model_onnx = onnx.load(model_path)
         onnx.checker.check_model(model_onnx)
         if simplify:
-            import onnxsim
             print(f'Onnx-simplifier {onnxsim.__version__}.')
             model_onnx, check = onnxsim.simplify(
                 model_onnx,

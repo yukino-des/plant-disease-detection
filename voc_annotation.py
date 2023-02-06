@@ -37,7 +37,7 @@ def convert_annotation(year, image_id, list_file):
 
 
 if __name__ == "__main__":
-    random.seed(416)
+    random.seed(0)
     if " " in os.path.abspath(VOCdevkit_path):
         raise ValueError("Image path cannot contain spaces.")
     if annotation_mode == 0 or annotation_mode == 1:
