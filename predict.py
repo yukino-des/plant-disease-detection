@@ -11,17 +11,29 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "predict"
+    mode = "video"
+    # predict
     crop = True
     count = True
-    video_path = 0
-    video_save_path = ""
+
+    # video
+    # video_path = 0  # camera
+    video_path = "out01.mp4"
+    video_save_path = "video_out/"
     video_fps = 25.0
+
+    # fps
     test_interval = 100
-    fps_image_path = "img/.jpg"
+    fps_image_path = "img/fps.png"
+
+    # dir_predict
     dir_origin_path = "img/"
     dir_save_path = "img_out/"
-    heatmap_save_path = "model_data/heatmap_vision.png"
+
+    # heatmap
+    heatmap_save_path = "model_data/heatmap.png"
+
+    # export_onnx
     simplify = True
     onnx_save_path = "model_data/models.onnx"
     if mode == "predict":
@@ -45,17 +57,19 @@ def predict():
         if not ref:
             raise ValueError("Failed to read the camera/video!")
         fps = 0.0
-        while (True):
+        while True:
             t1 = time.time()
             ref, frame = capture.read()
             if not ref:
                 break
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(np.uint8(frame))
-            frame = np.array(yolo.detect_image(frame)[0])
+            r_image, image_info = yolo.detect_image(frame)
+            print(type(r_image), image_info)
+            frame = np.array(r_image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
-            print("fps= %.2f" % (fps))
+            print("fps= %.2f" % fps)
             frame = cv2.putText(frame, "fps= %.2f" % (fps), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow("video", frame)
             c = cv2.waitKey(1) & 0xff
@@ -67,7 +81,7 @@ def predict():
         print("Video detection done.")
         capture.release()
         if video_save_path != "":
-            print("Save processed video to " + video_save_path)
+            print("Save to " + video_save_path)
             out.release()
         cv2.destroyAllWindows()
     elif mode == "fps":

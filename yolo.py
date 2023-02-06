@@ -35,6 +35,19 @@ class YOLO(object):
             return "Unrecognized attribute name '" + n + "'"
 
     def __init__(self, **kwargs):
+        # append
+        self.anchors_mask = None
+        self.anchors_path = None
+        self.backbone = None
+        self.classes_path = None
+        self.confidence = None
+        self.cuda = None
+        self.input_shape = []
+        self.letterbox_image = None
+        self.model_path = None
+        self.nms_iou = None
+        ########
+
         self.__dict__.update(self._defaults)
         for name, value in kwargs.items():
             setattr(self, name, value)
@@ -135,24 +148,20 @@ class YOLO(object):
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
             label = label.encode('utf-8')
-            print(label, top, left, bottom, right)
             if top - label_size[1] >= 0:
                 text_origin = np.array([left, top - label_size[1]])
             else:
                 text_origin = np.array([left, top + 1])
             for i in range(thickness):
-                draw.rectangle([left + i, top + i, right - i, bottom - i], outline=self.colors[c])
-            draw.rectangle([tuple(text_origin), tuple(text_origin + label_size)], fill=self.colors[c])
-            draw.text(text_origin, str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
+                draw.rectangle((left + i, top + i, right - i, bottom - i), outline=self.colors[c])
+            draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
+            draw.text(tuple(text_origin), str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
 
-        # modify
+        # update
         return image, image_info
         ########
-
-        # original
         # return image
-        ##########
 
     def get_FPS(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])
@@ -219,7 +228,7 @@ class YOLO(object):
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches='tight', pad_inches=-0.1)
-        print("Save heatmap to " + heatmap_save_path)
+        print("Save to " + heatmap_save_path)
         plt.show()
 
     def convert_to_onnx(self, simplify, model_path):
@@ -249,7 +258,7 @@ class YOLO(object):
                 input_shapes=None)
             assert check, 'assert check failed'
             onnx.save(model_onnx, model_path)
-        print('Save onnx-model to {}'.format(model_path))
+        print('Save to {}'.format(model_path))
 
     def get_map_txt(self, image_id, image, class_names, map_out_path):
         f = open(os.path.join(map_out_path, "detection-results/" + image_id + ".txt"), "w")
