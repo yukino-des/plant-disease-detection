@@ -48,7 +48,6 @@ class YOLO(object):
         self.letterbox_image = None
         self.model_path = None
         self.nms_iou = None
-        ########
 
         self.__dict__.update(self._defaults)
         for name, value in kwargs.items():
@@ -76,7 +75,7 @@ class YOLO(object):
                 self.net = nn.DataParallel(self.net)
                 self.net = self.net.cuda()
 
-    def detect_image(self, image, crop=False, count=False, web=False):
+    def detect_image(self, image, crop=False, count=False, api=False):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
@@ -128,7 +127,6 @@ class YOLO(object):
         # append
         image_info = {}
         count = 0
-        ########
 
         for i, c in list(enumerate(top_label)):
             predicted_class = self.class_names[int(c)]
@@ -145,7 +143,6 @@ class YOLO(object):
             count += 1
             key = '{}-{:02}'.format(predicted_class, count)
             image_info[key] = ['{}×{}'.format(right - left, bottom - top), np.round(float(score), 3)]
-            ########
 
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
@@ -161,7 +158,7 @@ class YOLO(object):
             del draw
 
         # update
-        if web:
+        if api:
             return image, image_info
         return image
 
