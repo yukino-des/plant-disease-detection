@@ -47,7 +47,7 @@ if __name__ == "__main__":
                 root = ET.parse(os.path.join(VOCdevkit_path, "VOC2007/Annotations/" + image_id + ".xml")).getroot()
                 for obj in root.findall('object'):
                     difficult_flag = False
-                    if obj.find('difficult') != None:
+                    if obj.find('difficult') is not None:
                         difficult = obj.find('difficult').text
                         if int(difficult) == 1:
                             difficult_flag = True

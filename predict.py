@@ -11,14 +11,14 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "video"
+    mode = "dir_predict"
     # predict
-    crop = False
-    count = False
+    crop = True
+    count = True
 
     # video
-    video_path = 0  # Use camera, press ESC to exit.
-    # video_path = "videos/01.mp4"
+    # video_path = 0  # Use camera, press ESC to exit.
+    video_path = "videos/01.mp4"
     video_save_path = "videos_out/01.avi"
     video_fps = 25.0
 
@@ -64,11 +64,12 @@ def predict():
                 break
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(np.uint8(frame))
-            frame = np.array(yolo.detect_image(frame))
+            image = yolo.detect_image(frame)
+            frame = np.array(image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
             print("fps= %.2f" % fps)
-            frame = cv2.putText(frame, "fps= %.2f" % (fps), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow("video", frame)
             c = cv2.waitKey(1) & 0xff
             if video_save_path != "":

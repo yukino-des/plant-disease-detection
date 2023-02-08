@@ -2,6 +2,8 @@ import colorsys
 import os
 import time
 
+import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 import onnx
 import onnxsim
@@ -36,19 +38,17 @@ class YOLO(object):
             return "Unrecognized attribute name '" + n + "'"
 
     def __init__(self, **kwargs):
-
         # append
-        self.anchors_mask = None
-        self.anchors_path = None
-        self.backbone = None
-        self.classes_path = None
-        self.confidence = None
-        self.cuda = None
+        self.classes_path = ''
+        self.anchors_path = ''
         self.input_shape = []
-        self.letterbox_image = None
-        self.model_path = None
-        self.nms_iou = None
-
+        self.anchors_mask = []
+        self.backbone = ''
+        self.model_path = ''
+        self.cuda = False
+        self.letterbox_image = False
+        self.confidence = 0
+        self.nms_iou = 0
         self.__dict__.update(self._defaults)
         for name, value in kwargs.items():
             setattr(self, name, value)
@@ -75,7 +75,7 @@ class YOLO(object):
                 self.net = nn.DataParallel(self.net)
                 self.net = self.net.cuda()
 
-    def detect_image(self, image, crop=False, count=False, api=False):
+    def detect_image(self, image, crop=False, count=False, info=False):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
@@ -117,13 +117,12 @@ class YOLO(object):
                 left = max(0, np.floor(left).astype('int32'))
                 bottom = min(image.size[1], np.floor(bottom).astype('int32'))
                 right = min(image.size[0], np.floor(right).astype('int32'))
-                dir_save_path = "img_crop"
+                dir_save_path = "imgs_out"
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 crop_image = image.crop([left, top, right, bottom])
                 crop_image.save(os.path.join(dir_save_path, "crop_" + str(i) + ".png"), quality=95, subsampling=0)
                 print("save crop_" + str(i) + ".png to " + dir_save_path)
-
         # append
         image_info = {}
         count = 0
@@ -151,14 +150,14 @@ class YOLO(object):
                 text_origin = np.array([left, top - label_size[1]])
             else:
                 text_origin = np.array([left, top + 1])
-            for i in range(thickness):
-                draw.rectangle((left + i, top + i, right - i, bottom - i), outline=self.colors[c])
+            for d in range(thickness):
+                draw.rectangle((left + d, top + d, right - d, bottom - d), outline=self.colors[c])
             draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
             draw.text(tuple(text_origin), str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
 
         # update
-        if api:
+        if info:
             return image, image_info
         return image
 
@@ -197,12 +196,6 @@ class YOLO(object):
         return tact_time
 
     def detect_heatmap(self, image, heatmap_save_path):
-        import cv2
-        import matplotlib.pyplot as plt
-        def sigmoid(x):
-            y = 1.0 / (1.0 + np.exp(-x))
-            return y
-
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
@@ -214,6 +207,7 @@ class YOLO(object):
         plt.imshow(image, alpha=1)
         plt.axis('off')
         mask = np.zeros((image.size[1], image.size[0]))
+        sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
         for sub_output in outputs:
             sub_output = sub_output.cpu().numpy()
             b, c, h, w = np.shape(sub_output)

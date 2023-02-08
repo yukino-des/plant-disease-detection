@@ -29,7 +29,7 @@ def kmeans(box, k):
     last_clu = np.zeros((row,))
     np.random.seed()
     cluster = box[np.random.choice(row, k, replace=False)]
-    iter = 0
+    iternum = 0
     while True:
         for i in range(row):
             distance[i] = 1 - cas_iou(box[i], cluster)
@@ -40,9 +40,9 @@ def kmeans(box, k):
             cluster[j] = np.median(
                 box[near == j], axis=0)
         last_clu = near
-        if iter % 5 == 0:
+        if iternum % 5 == 0:
             print('iter: {:d} avg_iou: {:.2f}'.format(iter, avg_iou(box, cluster)))
-        iter += 1
+        iternum += 1
     return cluster, near
 
 

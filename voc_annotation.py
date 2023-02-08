@@ -50,16 +50,16 @@ if __name__ == "__main__":
             if xml.endswith(".xml"):
                 total_xml.append(xml)
         num = len(total_xml)
-        list = range(num)
+        num_list = range(num)
         tv = int(num * trainval_percent)
         tr = int(tv * train_percent)
-        trainval = random.sample(list, tv)
+        trainval = random.sample(num_list, tv)
         train = random.sample(trainval, tr)
         ftrainval = open(os.path.join(saveBasePath, 'trainval.txt'), 'w')
         ftest = open(os.path.join(saveBasePath, 'test.txt'), 'w')
         ftrain = open(os.path.join(saveBasePath, 'train.txt'), 'w')
         fval = open(os.path.join(saveBasePath, 'val.txt'), 'w')
-        for i in list:
+        for i in num_list:
             name = total_xml[i][:-4] + '\n'
             if i in trainval:
                 ftrainval.write(name)
