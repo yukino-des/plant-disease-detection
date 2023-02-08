@@ -59,7 +59,7 @@ class YoloDataset(Dataset):
             box[:, 0:2] = box[:, 0:2] + box[:, 2:4] / 2
         return image, box
 
-    def rand(self, a=0, b=1):
+    def rand(self, a=0.0, b=1.0):
         return np.random.rand() * (b - a) + a
 
     def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=0.7, val=0.4, random=True):
@@ -78,6 +78,7 @@ class YoloDataset(Dataset):
             image = image.resize((nw, nh), Image.BICUBIC)
             new_image = Image.new('RGB', (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
+            # TODO
             image_data = np.array(new_image, np.float32)
             if len(box) > 0:
                 np.random.shuffle(box)
@@ -106,6 +107,7 @@ class YoloDataset(Dataset):
         image = new_image
         flip = self.rand() < .5
         if flip: image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        # TODO
         image_data = np.array(image, np.uint8)
         r = np.random.uniform(-1, 1, 3) * [hue, sat, val] + 1
         hue, sat, val = cv2.split(cv2.cvtColor(image_data, cv2.COLOR_RGB2HSV))
@@ -210,6 +212,7 @@ class YoloDataset(Dataset):
                 dx = int(w * min_offset_x)
                 dy = int(h * min_offset_y) - nh
             new_image = Image.new('RGB', (w, h), (128, 128, 128))
+            # TODO
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)
             index = index + 1

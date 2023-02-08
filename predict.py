@@ -11,7 +11,7 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "dir_predict"
+    mode = "video"
     # predict
     crop = True
     count = True
@@ -50,9 +50,10 @@ def predict():
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
         if video_save_path != "":
-            fourcc = cv2.VideoWriter_fourcc(*'XVID')
-            size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-            out = cv2.VideoWriter(video_save_path, fourcc, video_fps, size)
+            video_save_path = "videos_out/01.avi"
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        out = cv2.VideoWriter(video_save_path, fourcc, video_fps, size)
         ref, frame = capture.read()
         if not ref:
             raise ValueError("Failed to read the camera/video!")
@@ -72,16 +73,14 @@ def predict():
             frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow("video", frame)
             c = cv2.waitKey(1) & 0xff
-            if video_save_path != "":
-                out.write(frame)
+            out.write(frame)
             if c == 27:
                 capture.release()
                 break
         print("Video detection done.")
         capture.release()
-        if video_save_path != "":
-            print("Save to " + video_save_path)
-            out.release()
+        print("Save to " + video_save_path)
+        out.release()
         cv2.destroyAllWindows()
     elif mode == "fps":
         img = Image.open(fps_image_path)

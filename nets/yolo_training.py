@@ -39,6 +39,7 @@ class YOLOLoss(nn.Module):
 
     def clip_by_tensor(self, t, t_min, t_max):
         t = t.float()
+        # TODO
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         result = (result <= t_max).float() * result + (result > t_max).float() * t_max
         return result
@@ -76,7 +77,7 @@ class YOLOLoss(nn.Module):
         enclose_maxes = torch.max(b1_maxes, b2_maxes)
         enclose_wh = torch.max(enclose_maxes - enclose_mins, torch.zeros_like(intersect_maxes))
         enclose_diagonal = torch.sum(torch.pow(enclose_wh, 2), dim=-1)
-        ciou = iou - 1.0 * (center_distance) / torch.clamp(enclose_diagonal, min=1e-6)
+        ciou = iou - 1.0 * center_distance / torch.clamp(enclose_diagonal, min=1e-6)
         v = (4 / (math.pi ** 2)) * torch.pow((torch.atan(
             b1_wh[..., 0] / torch.clamp(b1_wh[..., 1], min=1e-6)) - torch.atan(
             b2_wh[..., 0] / torch.clamp(b2_wh[..., 1], min=1e-6))), 2)
@@ -87,15 +88,18 @@ class YOLOLoss(nn.Module):
     def smooth_labels(self, y_true, label_smoothing, num_classes):
         return y_true * (1.0 - label_smoothing) + label_smoothing / num_classes
 
-    def forward(self, l, input, targets=None):
-        bs = input.size(0)
-        in_h = input.size(2)
-        in_w = input.size(3)
+    def forward(self, l, _input, targets=None):
+        bs = _input.size(0)
+        in_h = _input.size(2)
+        in_w = _input.size(3)
         stride_h = self.input_shape[0] / in_h
         stride_w = self.input_shape[1] / in_w
         scaled_anchors = [(a_w / stride_w, a_h / stride_h) for a_w, a_h in self.anchors]
-        prediction = input.view(bs, len(self.anchors_mask[l]), self.bbox_attrs, in_h, in_w).permute(0, 1, 3, 4,
-                                                                                                    2).contiguous()
+        prediction = _input.view(bs,
+                                 len(self.anchors_mask[l]),
+                                 self.bbox_attrs,
+                                 in_h,
+                                 in_w).permute(0, 1, 3, 4, 2).contiguous()
         x = torch.sigmoid(prediction[..., 0])
         y = torch.sigmoid(prediction[..., 1])
         w = prediction[..., 2]

@@ -259,6 +259,7 @@ if __name__ == "__main__":
                                          class_names,
                                          num_classes,
                                          val_lines,
+                                         # TODO
                                          log_dir,
                                          Cuda,
                                          eval_flag=eval_flag,

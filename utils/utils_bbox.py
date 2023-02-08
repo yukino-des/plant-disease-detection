@@ -3,7 +3,7 @@ import torch
 from torchvision.ops import nms
 
 
-class DecodeBox():
+class DecodeBox:
     def __init__(self, anchors, num_classes, input_shape, anchors_mask=None):
         super(DecodeBox, self).__init__()
         if anchors_mask is None:
@@ -16,19 +16,19 @@ class DecodeBox():
 
     def decode_box(self, inputs):
         outputs = []
-        for i, input in enumerate(inputs):
-            batch_size = input.size(0)
-            input_height = input.size(2)
-            input_width = input.size(3)
+        for i, _input in enumerate(inputs):
+            batch_size = _input.size(0)
+            input_height = _input.size(2)
+            input_width = _input.size(3)
             stride_h = self.input_shape[0] / input_height
             stride_w = self.input_shape[1] / input_width
             scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
                               self.anchors[self.anchors_mask[i]]]
-            prediction = input.view(batch_size,
-                                    len(self.anchors_mask[i]),
-                                    self.bbox_attrs,
-                                    input_height,
-                                    input_width).permute(0, 1, 3, 4, 2).contiguous()
+            prediction = _input.view(batch_size,
+                                     len(self.anchors_mask[i]),
+                                     self.bbox_attrs,
+                                     input_height,
+                                     input_width).permute(0, 1, 3, 4, 2).contiguous()
             x = torch.sigmoid(prediction[..., 0])
             y = torch.sigmoid(prediction[..., 1])
             w = prediction[..., 2]
@@ -109,8 +109,9 @@ class DecodeBox():
                     nms_thres
                 )
                 max_detections = detections_class[keep]
-                output[i] = max_detections if output[i] is None else torch.cat((output[i], max_detections))
+                output[i] = max_detections if output[i] is None else torch.cat([output[i], max_detections])
             if output[i] is not None:
+                # TODO
                 output[i] = output[i].cpu().numpy()
                 box_xy, box_wh = (output[i][:, 0:2] + output[i][:, 2:4]) / 2, output[i][:, 2:4] - output[i][:, 0:2]
                 output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape, letterbox_image)

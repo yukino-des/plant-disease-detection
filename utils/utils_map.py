@@ -187,7 +187,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
         os.makedirs(os.path.join(RESULTS_FILES_PATH, "Recall"))
         os.makedirs(os.path.join(RESULTS_FILES_PATH, "Precision"))
     if show_animation:
-        os.makedirs(os.path.join(RESULTS_FILES_PATH, "images", "detections_one_by_one"))
+        os.makedirs(os.path.join(RESULTS_FILES_PATH, "images", "detections"))
     ground_truth_files_list = glob.glob(GT_PATH + '/*.txt')
     if len(ground_truth_files_list) == 0:
         error("Error: No ground-truth files found!")
@@ -306,6 +306,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
             score_threhold_idx = 0
             for idx, detection in enumerate(dr_data):
                 file_id = detection["file_id"]
+                # TODO
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threhold:
                     score_threhold_idx = idx
@@ -408,8 +409,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
                     cv2.putText(img_cumulative, class_name, (bb[0], bb[1] - 5), font, 0.6, color, 1, cv2.LINE_AA)
                     cv2.imshow("Animation", img)
                     cv2.waitKey(20)
-                    output_img_path = RESULTS_FILES_PATH + "/images/detections_one_by_one/" + class_name + "_detection" + str(
-                        idx) + ".jpg"
+                    output_img_path = f"{RESULTS_FILES_PATH}/images/detections/{class_name}_detection{str(idx)}.jpg"
                     cv2.imwrite(output_img_path, img)
                     cv2.imwrite(img_cumulative_path, img_cumulative)
             cumsum = 0
