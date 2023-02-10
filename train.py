@@ -17,7 +17,8 @@ from utils.utils import download_weights, get_anchors, get_classes, show_config
 from utils.utils_fit import fit_one_epoch
 
 if __name__ == "__main__":
-    Cuda = False
+    # TODO
+    Cuda = True
     distributed = False
     sync_bn = False
     fp16 = False
@@ -259,7 +260,7 @@ if __name__ == "__main__":
                                          class_names,
                                          num_classes,
                                          val_lines,
-                                         # TODO
+                                         # FIXME
                                          log_dir,
                                          Cuda,
                                          eval_flag=eval_flag,

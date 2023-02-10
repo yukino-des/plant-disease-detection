@@ -39,7 +39,7 @@ class YOLOLoss(nn.Module):
 
     def clip_by_tensor(self, t, t_min, t_max):
         t = t.float()
-        # TODO
+        # FIXME
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         result = (result <= t_max).float() * result + (result > t_max).float() * t_max
         return result

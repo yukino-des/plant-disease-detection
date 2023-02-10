@@ -27,7 +27,8 @@ class YOLO(object):
         "confidence": 0.5,
         "nms_iou": 0.3,
         "letterbox_image": False,
-        "cuda": False,  # True
+        # TODO
+        "cuda": True,
     }
 
     @classmethod
@@ -45,7 +46,8 @@ class YOLO(object):
         self.anchors_mask = []
         self.backbone = ''
         self.model_path = ''
-        self.cuda = False
+        # TODO
+        self.cuda = True
         self.letterbox_image = False
         self.confidence = 0
         self.nms_iou = 0

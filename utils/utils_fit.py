@@ -46,7 +46,7 @@ def fit_one_epoch(model_train,
                 loss_item = yolo_loss(l, outputs[l], targets)
                 loss_value_all += loss_item
             loss_value = loss_value_all
-            # TODO
+            # FIXME
             loss_value.backward()
             optimizer.step()
         else:
@@ -61,10 +61,10 @@ def fit_one_epoch(model_train,
             scaler.scale(loss_value).backward()
             scaler.step(optimizer)
             scaler.update()
-        # TODO
+        # FIXME
         loss += loss_value.item()
         if local_rank == 0:
-            # TODO
+            # FIXME
             pbar.set_postfix(**{'loss': loss / (iteration + 1),
                                 'lr': get_lr(optimizer)})
             pbar.update(1)
@@ -89,7 +89,7 @@ def fit_one_epoch(model_train,
                 loss_item = yolo_loss(l, outputs[l], targets)
                 loss_value_all += loss_item
             loss_value = loss_value_all
-        # TODO
+        # FIXME
         val_loss += loss_value.item()
         if local_rank == 0:
             pbar.set_postfix(**{'val_loss': val_loss / (iteration + 1)})
