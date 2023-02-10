@@ -92,9 +92,7 @@ def show_photo(path):
 
 
 if __name__ == '__main__':
-    # append
     os.chdir(sys.path[0])
-
     dirs = ['tmp/ori/', 'tmp/det/']
     for dire in dirs:
         if not os.path.exists(dire):

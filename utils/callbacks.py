@@ -114,7 +114,9 @@ class EvalCallback:
         self.MINOVERLAP = MINOVERLAP
         self.eval_flag = eval_flag
         self.period = period
-        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
+        self.bbox_util = DecodeBox(self.anchors,
+                                   self.num_classes,
+                                   (self.input_shape[0], self.input_shape[1]),
                                    self.anchors_mask)
         self.maps = [0]
         self.epoches = [0]

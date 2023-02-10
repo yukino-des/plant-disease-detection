@@ -39,7 +39,6 @@ class YOLO(object):
             return "Unrecognized attribute name '" + n + "'"
 
     def __init__(self, **kwargs):
-        # append
         self.classes_path = ''
         self.anchors_path = ''
         self.input_shape = []
@@ -139,7 +138,6 @@ class YOLO(object):
             bottom = min(image.size[1], np.floor(bottom).astype('int32'))
             right = min(image.size[0], np.floor(right).astype('int32'))
             label = '{} {:.2f}'.format(predicted_class, score)
-
             # append
             count += 1
             key = '{}-{:02}'.format(predicted_class, count)
@@ -157,7 +155,6 @@ class YOLO(object):
             draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
             draw.text(tuple(text_origin), str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
-
         # update
         if info:
             return image, image_info
