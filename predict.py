@@ -11,7 +11,7 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "video"
+    mode = "predict"
     # predict
     crop = True
     count = True
