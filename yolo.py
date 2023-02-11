@@ -28,7 +28,7 @@ class YOLO(object):
         "nms_iou": 0.3,
         "letterbox_image": False,
         # TODO
-        "cuda": True,
+        "cuda": False,
     }
 
     @classmethod
@@ -45,8 +45,7 @@ class YOLO(object):
         self.anchors_mask = []
         self.backbone = ''
         self.model_path = ''
-        # TODO
-        self.cuda = True
+        self.cuda = False
         self.letterbox_image = False
         self.confidence = 0
         self.nms_iou = 0
@@ -124,10 +123,8 @@ class YOLO(object):
                 crop_image = image.crop([left, top, right, bottom])
                 crop_image.save(os.path.join(dir_save_path, "crop_" + str(i) + ".png"), quality=95, subsampling=0)
                 print("save crop_" + str(i) + ".png to " + dir_save_path)
-        # append
         image_info = {}
         count = 0
-
         for i, c in list(enumerate(top_label)):
             predicted_class = self.class_names[int(c)]
             box = top_boxes[i]
@@ -138,11 +135,9 @@ class YOLO(object):
             bottom = min(image.size[1], np.floor(bottom).astype('int32'))
             right = min(image.size[0], np.floor(right).astype('int32'))
             label = '{} {:.2f}'.format(predicted_class, score)
-            # append
             count += 1
             key = '{}-{:02}'.format(predicted_class, count)
             image_info[key] = ['{}×{}'.format(right - left, bottom - top), np.round(float(score), 3)]
-
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
             label = label.encode('utf-8')
@@ -155,7 +150,6 @@ class YOLO(object):
             draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
             draw.text(tuple(text_origin), str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
-        # update
         if info:
             return image, image_info
         return image

@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-matplotlib.use('Agg')
+matplotlib.use('Agg')  # matplotlib.use('TkAgg')
 
 
 def cas_iou(box, cluster):
@@ -37,11 +37,10 @@ def kmeans(box, k):
         if (last_clu == near).all():
             break
         for j in range(k):
-            cluster[j] = np.median(
-                box[near == j], axis=0)
+            cluster[j] = np.median(box[near == j], axis=0)
         last_clu = near
         if iternum % 5 == 0:
-            print('iter: {:d} avg_iou: {:.2f}'.format(iter, avg_iou(box, cluster)))
+            print('iter: {:d} avg_iou: {:.2f}'.format(iternum, avg_iou(box, cluster)))
         iternum += 1
     return cluster, near
 
@@ -67,7 +66,6 @@ def load_data(path):
     return np.array(data)
 
 
-# Generate yolo_anchors.txt
 if __name__ == '__main__':
     np.random.seed(0)
     input_shape = [416, 416]
@@ -82,10 +80,9 @@ if __name__ == '__main__':
     data = data * np.array([input_shape[1], input_shape[0]])
     cluster = cluster * np.array([input_shape[1], input_shape[0]])
     for j in range(anchors_num):
-        plt.scatter(data[near == j][:, 0], data[near == j][:, 1], 1)
+        plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
         plt.scatter(cluster[j][0], cluster[j][1], marker='x', c='black')
     plt.savefig("kmeans_for_anchors.jpg")
-    plt.show()
     print('kmeans_for_anchors.jpg saved.')
     cluster = cluster[np.argsort(cluster[:, 0] * cluster[:, 1])]
     print('avg_ratio: {:.2f}'.format(avg_iou(data, cluster)))

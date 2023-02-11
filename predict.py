@@ -15,24 +15,18 @@ def predict():
     # predict
     crop = True
     count = True
-
-    # video
-    # video_path = 0  # Use camera, press ESC to exit.
+    # video (`video_path = 0`: Use camera, press ESC to exit.)
     video_path = "videos/01.mp4"
     video_save_path = "videos_out/01.avi"
     video_fps = 25.0
-
     # fps
     test_interval = 100
     fps_image_path = "imgs/01.jpg"
-
     # dir_predict
     dir_origin_path = "imgs/"
     dir_save_path = "imgs_out/"
-
     # heatmap
     heatmap_save_path = "imgs_out/heatmap.png"
-
     # export_onnx
     simplify = True
     onnx_save_path = "model_data/models.onnx"

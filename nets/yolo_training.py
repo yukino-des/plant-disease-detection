@@ -39,7 +39,6 @@ class YOLOLoss(nn.Module):
 
     def clip_by_tensor(self, t, t_min, t_max):
         t = t.float()
-        # FIXME
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         result = (result <= t_max).float() * result + (result > t_max).float() * t_max
         return result
@@ -233,6 +232,7 @@ def weights_init(net, init_type='normal', init_gain=0.02):
         elif classname.find('BatchNorm2d') != -1:
             torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
             torch.nn.init.constant_(m.bias.data, 0.0)
+
     print('Init Type: %s' % init_type)
     net.apply(init_func)
 

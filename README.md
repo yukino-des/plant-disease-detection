@@ -1,8 +1,11 @@
 # backend
+Backend project for plant disease detection (Python 3.9.6)
+1. download requirements
 ```shell
-python  # Python 3.9.6
+# see requirements.txt
+pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 ```
-Backend project for plant disease detection
+2. run
 ```shell
 python app.py
 ```

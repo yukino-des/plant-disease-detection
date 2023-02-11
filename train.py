@@ -18,9 +18,8 @@ from utils.utils_fit import fit_one_epoch
 
 if __name__ == "__main__":
     # TODO
-    Cuda = True
+    Cuda = False
     distributed = False
-    sync_bn = False
     fp16 = False
     classes_path = 'model_data/voc_classes.txt'
     anchors_path = 'model_data/yolo_anchors.txt'
@@ -35,29 +34,34 @@ if __name__ == "__main__":
     mixup_prob = 0.5
     special_aug_ratio = 0.7
     label_smoothing = 0
+    # `optimizer_type = "adam"`
+    Init_Epoch = 0
+    Freeze_Epoch = 50
+    Freeze_batch_size = 16
+    UnFreeze_Epoch = 100
+    Unfreeze_batch_size = 8
+    Freeze_Train = True
+    Init_lr = 1e-3
+    Min_lr = Init_lr * 0.01
+    optimizer_type = "adam"
+    momentum = 0.937
+    weight_decay = 0
+    lr_decay_type = "cos"  # "step"
+    # `optimizer_type = "sgd"`
+    """
     Init_Epoch = 0
     Freeze_Epoch = 50
     Freeze_batch_size = 16
     UnFreeze_Epoch = 300
     Unfreeze_batch_size = 8
     Freeze_Train = True
-
-    #########################
-    # Init_lr = 1e-2
-    # Min_lr = Init_lr * 0.01
-    # optimizer_type = "sgd"
-    # momentum = 0.937
-    # weight_decay = 5e-4
-    # lr_decay_type = "step"
-    #########################
-
-    Init_lr = 1e-3
+    Init_lr = 1e-2
     Min_lr = Init_lr * 0.01
-    optimizer_type = "adam"
+    optimizer_type = "sgd"
     momentum = 0.937
-    weight_decay = 0
-    lr_decay_type = "cos"
-
+    weight_decay = 5e-4
+    lr_decay_type = "cos"  # "step"
+    """
     focal_loss = False
     focal_alpha = 0.25
     focal_gamma = 2
@@ -131,10 +135,6 @@ if __name__ == "__main__":
     else:
         scaler = None
     model_train = model.train()
-    if sync_bn and ngpus_per_node > 1 and distributed:
-        model_train = torch.nn.SyncBatchNorm.convert_sync_batchnorm(model_train)
-    elif sync_bn:
-        print("Sync_bn is not supported.")
     if Cuda:
         if distributed:
             model_train = model_train.cuda(local_rank)
