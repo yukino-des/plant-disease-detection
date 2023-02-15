@@ -12,7 +12,7 @@ from PIL import ImageDraw, ImageFont
 from torch import nn
 
 from nets.yolo import YoloBody
-from utils.utils import (cvtColor, get_anchors, get_classes, preprocess_input, resize_image, show_config)
+from utils.utils import cvtColor, get_anchors, get_classes, preprocess_input, resize_image, show_config
 from utils.utils_bbox import DecodeBox
 
 
@@ -75,7 +75,7 @@ class YOLO(object):
                 self.net = nn.DataParallel(self.net)
                 self.net = self.net.cuda()
 
-    def detect_image(self, image, crop=False, count=False, info=False):
+    def detect_image(self, image, crop=False, count=False):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
@@ -94,7 +94,7 @@ class YOLO(object):
                                                          conf_thres=self.confidence,
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
-                return image
+                return image, {}
             top_label = np.array(results[0][:, 6], dtype='int32')
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
@@ -150,9 +150,7 @@ class YOLO(object):
             draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
             draw.text(tuple(text_origin), str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
             del draw
-        if info:
-            return image, image_info
-        return image
+        return image, image_info
 
     def get_FPS(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])

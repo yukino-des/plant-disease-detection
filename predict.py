@@ -11,7 +11,7 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "export_onnx"
+    mode = "dir_predict"
     # predict
     crop = True
     count = True
@@ -24,8 +24,8 @@ def predict():
     test_interval = 100
     fps_image_path = "imgs/01.jpg"
     # dir_predict
-    dir_origin_path = "imgs/"
-    dir_save_path = "imgs_out/"
+    dir_origin_path = "tmp/ori"
+    dir_save_path = "tmp/det"
     # heatmap
     heatmap_save_path = "imgs_out/heatmap.png"
     # export_onnx
@@ -40,7 +40,7 @@ def predict():
                 print('Open error!')
                 continue
             else:
-                r_image = yolo.detect_image(image, crop=crop, count=count)
+                r_image, _ = yolo.detect_image(image, crop=crop, count=count)
                 r_image.show()
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
@@ -60,7 +60,7 @@ def predict():
                 break
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = Image.fromarray(np.uint8(frame))
-            image = yolo.detect_image(frame)
+            image, _ = yolo.detect_image(frame)
             frame = np.array(image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
@@ -88,7 +88,7 @@ def predict():
                     ('.bmp', '.dib', '.png', '.jpg', '.jpeg', '.pbm', '.pgm', '.ppm', '.tif', '.tiff')):
                 image_path = os.path.join(dir_origin_path, img_name)
                 image = Image.open(image_path)
-                r_image = yolo.detect_image(image)
+                r_image, _ = yolo.detect_image(image)
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
