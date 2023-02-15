@@ -1,10 +1,11 @@
-### backend
-Backend project for plant disease detection (Python 3.9.6)
+# backend
+### Backend project for plant disease detection (Python 3.9.6)
 
-1. install requirements
+1. install requirements (GPU version)
 ```shell
-# see requirements.txt
+# pip
 pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+# conda
 conda install pytorch torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
 ```
 
@@ -18,3 +19,11 @@ python app.py
 lsof -i:8081
 kill -9 {PID}
 ```
+### class blance
+<img src="VOCdevkit/class_balance.png" alt="class balance">
+
+### size distribution
+<img src="VOCdevkit/size_distribution.png" alt="size distribution">
+
+### aspect radio distribution
+<img src="VOCdevkit/aspect_ratio_distribution.png" alt="aspect ratio distribution">

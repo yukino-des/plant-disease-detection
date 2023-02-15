@@ -11,12 +11,13 @@ from yolo import YOLO
 
 def predict():
     yolo = YOLO()
-    mode = "predict"
+    mode = "export_onnx"
     # predict
     crop = True
     count = True
-    # video (`video_path = 0`: Use camera, press ESC to exit.)
+    # video
     video_path = "videos/01.mp4"
+    video_path = 0  # Use camera, press ESC to exit.
     video_save_path = "videos_out/01.avi"
     video_fps = 25.0
     # fps
