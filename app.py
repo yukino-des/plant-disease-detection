@@ -1,53 +1,53 @@
 import os
+import shutil
 import sys
-from datetime import timedelta
+from typing import Union
 
+import uvicorn
 from PIL import Image
-from flask import *
-from gevent import pywsgi
+from fastapi import FastAPI, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import FileResponse
 
 from yolo import YOLO
 
-app = Flask(__name__)
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = timedelta(seconds=1)
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "X-Requested-With"],
+)
 
 
-@app.after_request
-def after_request(response):
-    response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, X-Requested-With"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST"
-    response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
-
-
-@app.route("/upload", methods=["GET", "POST"])
-def upload():
-    file = request.files["file"]
+@app.post('/upload', response_model=dict)
+def upload(file: Union[UploadFile, None] = None):
     if file is None:
-        return jsonify({"status": 0})
+        return {'status': 0}
     file_name, extend_name = file.filename.split(".")
     src_path = os.path.join("tmp/src", file.filename)
-    file.save(src_path)
+    dest_path = os.path.join("tmp/dest", f"{file_name}.png")
+    try:
+        with open(src_path, "wb+") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+    finally:
+        file.file.close()
     if extend_name.lower() in ("bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"):
-        dest_path = os.path.join("tmp/dest", f"{file_name}.png")
         r_image, image_info = yolo.detect_image(Image.open(src_path))
         r_image.save(dest_path, quality=95, subsampling=0)
-        return jsonify({"status": 1,
-                        "image_url": "http://127.0.0.1:8081/show/" + src_path,
-                        "draw_url": "http://127.0.0.1:8081/show/" + dest_path,
-                        "image_info": image_info})
+        return {"status": 1,
+                "image_url": "http://127.0.0.1:8081/show/" + src_path,
+                "draw_url": "http://127.0.0.1:8081/show/" + dest_path,
+                "image_info": image_info}
 
 
-@app.route("/show/<path:img_path>", methods=["GET"])
-def show(img_path):
-    image = open(img_path, "rb").read()
-    response = make_response(image)
-    response.headers["Content-Type"] = "image/png"
-    return response
+@app.get('/show/{fpath:path}', response_class=FileResponse)
+def show(fpath):
+    return FileResponse(path=fpath, headers={'Content-Type': 'image/png'})
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     os.chdir(sys.path[0])
     dirs = ["tmp/src", "tmp/dest"]
     for _dir in dirs:
@@ -56,5 +56,4 @@ if __name__ == "__main__":
         for file in os.listdir(_dir):
             os.remove(os.path.join(_dir, file))
     yolo = YOLO()
-    server = pywsgi.WSGIServer(listener=('0.0.0.0', 8081), application=app)
-    server.serve_forever()
+    uvicorn.run(app, host="0.0.0.0", port=8081)

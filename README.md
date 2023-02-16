@@ -1,6 +1,6 @@
 # backend
 
-### Backend project for plant disease detection (Python 3.9.6)
+### Backend project for plant disease detection (FastAPI)
 
 1. install requirements (GPU version)
 
