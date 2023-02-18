@@ -5,8 +5,9 @@ matplotlib==3.7.0
 tqdm==4.64.1
 opencv-python==4.7.0.68
 torchvision==0.14.1
-Flask==2.2.2
-gevent==22.10.2
+uvicorn==0.20.0
+fastapi==0.92.0
+starlette==0.25.0
 onnx==1.13.0
 onnxsim==0.4.17
 thop==0.1.1.post2209072238
