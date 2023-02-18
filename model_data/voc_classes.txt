@@ -9,11 +9,9 @@ Corn Gray leaf spot
 Corn leaf blight
 Corn rust leaf
 Peach leaf
-Potato leaf
 Potato leaf early blight
 Potato leaf late blight
 Raspberry leaf
-Soyabean leaf
 Soybean leaf
 Squash Powdery mildew leaf
 Strawberry leaf
@@ -25,6 +23,5 @@ Tomato leaf late blight
 Tomato leaf mosaic virus
 Tomato leaf yellow virus
 Tomato mold leaf
-Tomato two spotted spider mites leaf
 grape leaf
 grape leaf black rot
