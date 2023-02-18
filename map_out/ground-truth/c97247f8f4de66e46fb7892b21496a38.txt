@@ -1,2 +1,0 @@
-Raspberry leaf 0 114 334 302
-Raspberry leaf 261 289 401 416

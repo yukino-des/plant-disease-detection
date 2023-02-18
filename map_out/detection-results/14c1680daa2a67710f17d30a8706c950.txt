@@ -1,8 +1,0 @@
-Bell_pepper leaf 0.0025 368 308 416 412
-Potato leaf late blight 0.0044 362 301 416 410
-Soyabean leaf 0.0017 347 299 415 414
-Tomato Early blight leaf 0.4871 4 4 366 353
-Tomato Early blight leaf 0.0017 102 64 412 406
-Tomato Septoria leaf spot 0.0129 3 23 310 386
-Tomato Septoria leaf spot 0.0012 409 -1 415 9
-Tomato leaf bacterial spot 0.4735 6 30 408 383

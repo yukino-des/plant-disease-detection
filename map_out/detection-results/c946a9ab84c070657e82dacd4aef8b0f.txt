@@ -1,2 +1,0 @@
-Raspberry leaf 0.0100 44 96 430 418
-Squash Powdery mildew leaf 0.8425 49 36 422 381

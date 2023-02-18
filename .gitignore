@@ -1,3 +1,8 @@
 .idea/
-tmp/
 *.docx
+tmp/
+map_out/
+img/
+img_out/
+video/
+video_out/

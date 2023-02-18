@@ -1,5 +1,0 @@
-Peach leaf 0.9970 132 33 308 140
-Peach leaf 0.0023 236 0 347 7
-Strawberry leaf 0.0106 411 394 415 415
-Strawberry leaf 0.0019 409 405 415 416
-grape leaf 0.0012 0 410 23 415

@@ -1,6 +1,0 @@
-Apple Scab Leaf 80 166 209 328
-Apple Scab Leaf 122 86 218 183
-Apple Scab Leaf 202 73 268 165
-Apple Scab Leaf 232 118 385 224
-Apple Scab Leaf 183 162 268 240
-Apple Scab Leaf 277 193 370 263

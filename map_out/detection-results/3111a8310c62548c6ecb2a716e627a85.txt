@@ -1,4 +1,0 @@
-Apple rust leaf 0.0050 13 180 407 400
-Potato leaf early blight 0.7475 0 -1 414 411
-Potato leaf early blight 0.0011 7 94 286 380
-Tomato Early blight leaf 0.0130 3 -11 407 255

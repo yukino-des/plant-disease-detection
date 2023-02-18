@@ -1,9 +1,0 @@
-Apple leaf 0.9861 56 87 315 376
-Strawberry leaf 0.0035 410 390 415 416
-Strawberry leaf 0.0022 386 390 408 403
-Strawberry leaf 0.0020 409 405 415 416
-Strawberry leaf 0.0015 382 411 410 415
-Strawberry leaf 0.0015 278 0 399 8
-Strawberry leaf 0.0014 393 409 415 415
-Strawberry leaf 0.0014 396 387 413 405
-grape leaf black rot 0.0022 394 381 414 409

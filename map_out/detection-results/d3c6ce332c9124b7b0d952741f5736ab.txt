@@ -1,2 +1,0 @@
-Tomato leaf late blight 0.9232 -1 13 414 395
-Tomato leaf late blight 0.0013 -8 254 220 408

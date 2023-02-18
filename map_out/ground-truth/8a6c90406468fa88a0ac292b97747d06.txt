@@ -1,4 +1,0 @@
-Tomato leaf bacterial spot 152 3 331 178
-Tomato leaf bacterial spot 189 189 414 336
-Tomato leaf bacterial spot 130 192 309 411
-Tomato leaf bacterial spot 37 196 150 379

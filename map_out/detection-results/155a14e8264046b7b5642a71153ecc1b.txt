@@ -1,4 +1,0 @@
-Apple leaf 0.0027 253 373 434 415
-Apple rust leaf 0.9330 18 28 399 316
-Corn leaf blight 0.0072 -37 308 455 422
-Squash Powdery mildew leaf 0.0010 57 2 418 90

@@ -1,3 +1,0 @@
-Corn leaf blight 0.0010 0 -21 103 431
-Corn rust leaf 0.9695 15 0 412 409
-Corn rust leaf 0.0012 59 -3 413 158

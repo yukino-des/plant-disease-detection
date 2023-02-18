@@ -1,6 +1,0 @@
-Soybean leaf 178 123 240 225
-Soybean leaf 313 132 359 229
-Soybean leaf 211 211 276 299
-Soybean leaf 146 211 207 295
-Soybean leaf 279 200 335 288
-Soybean leaf 341 199 398 291

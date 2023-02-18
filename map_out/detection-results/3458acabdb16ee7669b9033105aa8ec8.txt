@@ -1,5 +1,0 @@
-Corn Gray leaf spot 0.0061 62 4 340 302
-Corn leaf blight 0.8081 64 10 352 402
-Corn leaf blight 0.0015 197 8 337 408
-Corn leaf blight 0.0014 315 5 413 417
-Tomato Septoria leaf spot 0.0016 -18 0 90 8

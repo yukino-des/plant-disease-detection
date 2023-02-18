@@ -1,7 +1,0 @@
-Peach leaf 0.9909 22 59 255 178
-Peach leaf 0.0051 16 45 152 185
-Peach leaf 0.0042 0 10 17 193
-Peach leaf 0.0030 32 44 243 293
-Peach leaf 0.0012 0 12 47 193
-Peach leaf 0.0011 14 42 227 135
-Peach leaf 0.0011 0 -26 24 230

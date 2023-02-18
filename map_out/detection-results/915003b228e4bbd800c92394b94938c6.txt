@@ -1,3 +1,0 @@
-Apple leaf 0.9780 21 42 337 361
-grape leaf 0.0048 0 409 24 415
-grape leaf 0.0014 7 410 31 415

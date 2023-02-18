@@ -1,2 +1,0 @@
-Corn rust leaf 0.9603 1 -1 421 364
-Corn rust leaf 0.0012 29 -7 253 421

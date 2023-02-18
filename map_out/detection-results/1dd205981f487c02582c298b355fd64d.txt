@@ -1,8 +1,0 @@
-Potato leaf late blight 0.1411 21 80 331 350
-Potato leaf late blight 0.0022 56 175 294 309
-Potato leaf late blight 0.0019 128 2 357 52
-Tomato leaf late blight 0.5108 14 149 335 344
-Tomato leaf late blight 0.0143 107 56 374 312
-Tomato leaf late blight 0.0079 95 173 316 307
-Tomato leaf late blight 0.0036 302 55 385 248
-Tomato leaf late blight 0.0020 335 0 413 48

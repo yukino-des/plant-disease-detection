@@ -1,6 +1,0 @@
-Apple Scab Leaf 0.5680 30 38 333 375
-Apple rust leaf 0.6597 48 48 360 324
-Apple rust leaf 0.0037 -7 0 296 49
-Apple rust leaf 0.0019 123 0 425 53
-Apple rust leaf 0.0011 186 -2 416 93
-Corn leaf blight 0.0019 401 187 416 404

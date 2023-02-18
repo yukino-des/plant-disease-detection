@@ -1,3 +1,0 @@
-Apple leaf 0.9922 23 33 397 373
-Strawberry leaf 0.0032 411 390 415 416
-Strawberry leaf 0.0027 412 380 416 411

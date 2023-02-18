@@ -1,3 +1,0 @@
-Potato leaf early blight 0.7073 5 5 409 397
-Strawberry leaf 0.0026 411 394 416 415
-Tomato Early blight leaf 0.6650 14 -10 399 315

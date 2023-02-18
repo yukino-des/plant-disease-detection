@@ -1,3 +1,0 @@
-Peach leaf 0.0010 0 0 8 7
-Peach leaf 0.0010 -2 0 24 6
-Tomato leaf late blight 0.7585 1 12 416 402

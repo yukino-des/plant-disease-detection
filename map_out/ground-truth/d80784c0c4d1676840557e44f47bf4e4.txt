@@ -1,7 +1,0 @@
-Tomato leaf 97 113 236 205
-Tomato leaf 136 253 240 348
-Tomato leaf 20 242 135 355
-Tomato leaf 58 13 136 130
-Tomato leaf 174 36 282 115
-Tomato leaf 282 15 402 113
-Tomato leaf 296 154 375 304

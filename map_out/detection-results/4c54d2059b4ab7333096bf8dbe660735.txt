@@ -1,6 +1,0 @@
-Potato leaf early blight 0.5560 -1 -2 415 351
-Potato leaf late blight 0.0046 63 39 345 373
-Raspberry leaf 0.0015 372 201 414 426
-Squash Powdery mildew leaf 0.0010 374 220 414 432
-Tomato Early blight leaf 0.0584 2 -9 410 255
-Tomato leaf yellow virus 0.0011 0 288 6 312

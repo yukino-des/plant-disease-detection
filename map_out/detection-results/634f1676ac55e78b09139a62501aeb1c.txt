@@ -1,3 +1,0 @@
-Apple leaf 0.9841 68 47 406 356
-Squash Powdery mildew leaf 0.0014 0 199 18 390
-Squash Powdery mildew leaf 0.0010 2 176 45 415

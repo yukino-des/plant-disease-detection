@@ -1,7 +1,0 @@
-Bell_pepper leaf spot 0.0018 379 0 415 78
-Corn leaf blight 0.9886 20 17 404 402
-Corn leaf blight 0.0089 51 -1 227 422
-Corn leaf blight 0.0047 3 1 102 419
-Corn leaf blight 0.0010 3 1 72 265
-Potato leaf early blight 0.0012 360 84 415 277
-Potato leaf late blight 0.0029 361 86 414 249

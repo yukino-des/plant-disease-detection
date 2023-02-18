@@ -1,6 +1,0 @@
-Apple leaf 0.0448 148 30 292 221
-Soyabean leaf 0.9852 215 202 386 332
-Soyabean leaf 0.9813 30 209 197 317
-Soyabean leaf 0.9475 175 37 302 233
-Soyabean leaf 0.0013 4 181 184 362
-Soyabean leaf 0.0011 232 301 285 389

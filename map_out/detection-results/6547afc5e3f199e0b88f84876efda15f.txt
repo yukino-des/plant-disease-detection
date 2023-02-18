@@ -1,2 +1,0 @@
-Corn rust leaf 0.9934 -5 3 421 401
-Strawberry leaf 0.0022 -17 0 159 23

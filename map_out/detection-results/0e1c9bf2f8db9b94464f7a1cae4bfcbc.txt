@@ -1,7 +1,0 @@
-Apple rust leaf 0.4929 10 8 407 352
-Apple rust leaf 0.0031 187 6 417 416
-Apple rust leaf 0.0016 1 -12 222 427
-grape leaf 0.0051 8 41 354 414
-grape leaf 0.0015 0 -1 81 51
-grape leaf black rot 0.1943 3 4 295 407
-grape leaf black rot 0.0207 163 8 416 408

@@ -1,3 +1,0 @@
-Tomato Early blight leaf 0.0526 7 80 389 411
-Tomato leaf late blight 0.1300 4 116 393 418
-Tomato mold leaf 0.5379 5 127 292 412

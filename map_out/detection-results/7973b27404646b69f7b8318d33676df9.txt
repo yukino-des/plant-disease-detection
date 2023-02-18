@@ -1,3 +1,0 @@
-Corn rust leaf 0.9980 -11 6 426 408
-Tomato leaf mosaic virus 0.0013 -17 0 72 8
-Tomato leaf mosaic virus 0.0010 0 -10 8 64

@@ -1,3 +1,0 @@
-Blueberry leaf 0.0011 307 0 419 8
-Tomato leaf late blight 0.8638 0 57 414 407
-Tomato leaf late blight 0.0351 11 1 215 408

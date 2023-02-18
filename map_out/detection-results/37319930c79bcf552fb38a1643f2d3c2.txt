@@ -1,9 +1,0 @@
-Apple leaf 0.9776 148 6 262 108
-Apple leaf 0.0018 162 0 293 8
-Apple leaf 0.0017 117 0 226 9
-Blueberry leaf 0.0162 275 190 318 244
-Blueberry leaf 0.0042 187 175 369 370
-Peach leaf 0.0028 161 28 257 108
-Peach leaf 0.0025 146 11 257 159
-Peach leaf 0.0019 277 196 322 239
-Peach leaf 0.0013 195 -1 262 116

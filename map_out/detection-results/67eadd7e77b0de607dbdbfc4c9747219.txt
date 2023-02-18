@@ -1,3 +1,0 @@
-Tomato Early blight leaf 0.3354 121 54 342 261
-Tomato Septoria leaf spot 0.5321 120 63 339 284
-Tomato Septoria leaf spot 0.0086 40 22 371 378

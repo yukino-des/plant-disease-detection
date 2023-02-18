@@ -1,5 +1,0 @@
-Raspberry leaf 213 173 408 331
-Raspberry leaf 115 190 226 416
-Raspberry leaf 175 80 334 161
-Raspberry leaf 62 0 159 165
-Raspberry leaf 1 129 137 202

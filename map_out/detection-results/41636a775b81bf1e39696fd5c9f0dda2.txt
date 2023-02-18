@@ -1,6 +1,0 @@
-Raspberry leaf 0.9945 26 239 203 320
-Raspberry leaf 0.9913 202 230 388 320
-Raspberry leaf 0.9835 114 40 278 268
-Raspberry leaf 0.0127 211 133 276 260
-Raspberry leaf 0.0019 18 190 208 356
-Raspberry leaf 0.0010 113 123 194 270

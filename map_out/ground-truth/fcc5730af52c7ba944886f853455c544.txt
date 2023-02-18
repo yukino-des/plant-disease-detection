@@ -1,5 +1,0 @@
-Corn leaf blight 106 184 170 349
-Corn leaf blight 110 136 349 310
-Corn leaf blight 172 124 350 306
-Corn leaf blight 64 37 326 174
-Corn leaf blight 245 59 398 107

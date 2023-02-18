@@ -1,6 +1,0 @@
-Tomato mold leaf 366 104 403 196
-Tomato mold leaf 324 46 363 92
-Tomato mold leaf 277 59 317 105
-Tomato mold leaf 287 113 312 158
-Tomato mold leaf 328 115 369 159
-Tomato mold leaf 314 173 342 255

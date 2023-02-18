@@ -1,5 +1,0 @@
-Tomato leaf yellow virus 212 3 356 108
-Tomato leaf yellow virus 104 91 163 218
-Tomato leaf yellow virus 158 220 233 354
-Tomato leaf yellow virus 189 113 265 227
-Tomato leaf yellow virus 227 199 387 316

@@ -1,3 +1,0 @@
-Apple rust leaf 162 95 302 369
-Apple rust leaf 51 54 212 372
-Apple rust leaf 8 148 91 371

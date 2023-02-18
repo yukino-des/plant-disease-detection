@@ -1,4 +1,0 @@
-Cherry leaf 1 38 59 276
-Cherry leaf 162 38 240 288
-Cherry leaf 240 41 309 226
-Cherry leaf 309 26 413 247

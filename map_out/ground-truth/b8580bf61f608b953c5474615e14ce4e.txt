@@ -1,2 +1,0 @@
-Peach leaf 180 50 312 161
-Peach leaf 242 38 381 127

@@ -1,4 +1,0 @@
-Squash Powdery mildew leaf 173 139 313 310
-Squash Powdery mildew leaf 26 41 151 119
-Squash Powdery mildew leaf 258 86 311 164
-Squash Powdery mildew leaf 215 0 359 108

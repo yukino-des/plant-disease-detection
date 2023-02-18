@@ -1,3 +1,0 @@
-grape leaf 66 63 285 415
-grape leaf 245 4 353 174
-grape leaf 261 177 390 349

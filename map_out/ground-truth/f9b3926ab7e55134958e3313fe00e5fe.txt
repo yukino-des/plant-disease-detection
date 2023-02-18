@@ -1,7 +1,0 @@
-Tomato leaf mosaic virus 231 73 300 114
-Tomato leaf mosaic virus 79 44 148 131
-Tomato leaf mosaic virus 252 4 351 69
-Tomato leaf mosaic virus 339 60 408 141
-Tomato leaf mosaic virus 274 117 359 202
-Tomato leaf mosaic virus 252 256 339 372
-Tomato leaf mosaic virus 172 214 270 314

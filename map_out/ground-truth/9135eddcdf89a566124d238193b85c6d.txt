@@ -1,8 +1,0 @@
-Blueberry leaf 1 67 175 221
-Blueberry leaf 255 76 328 206
-Blueberry leaf 4 182 164 262
-Blueberry leaf 303 304 415 354
-Blueberry leaf 141 6 235 123
-Blueberry leaf 43 1 173 116
-Blueberry leaf 58 354 151 415
-Blueberry leaf 203 333 282 409

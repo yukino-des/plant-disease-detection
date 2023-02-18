@@ -1,3 +1,0 @@
-Blueberry leaf 6 131 70 247
-Blueberry leaf 71 138 140 251
-Blueberry leaf 127 1 268 136

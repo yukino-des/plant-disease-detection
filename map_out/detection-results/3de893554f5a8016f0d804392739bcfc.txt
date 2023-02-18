@@ -1,7 +1,0 @@
-Tomato Early blight leaf 0.0069 8 4 302 344
-Tomato Early blight leaf 0.0023 2 141 50 416
-Tomato leaf bacterial spot 0.0014 1 144 51 327
-Tomato leaf bacterial spot 0.0011 0 139 17 326
-Tomato leaf late blight 0.8293 58 11 404 331
-Tomato leaf yellow virus 0.0022 28 50 90 162
-Tomato leaf yellow virus 0.0021 84 2 155 172

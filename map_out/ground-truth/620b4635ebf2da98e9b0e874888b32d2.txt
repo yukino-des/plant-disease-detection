@@ -1,6 +1,0 @@
-Bell_pepper leaf spot 1 143 112 315
-Bell_pepper leaf spot 223 213 289 281
-Bell_pepper leaf spot 175 265 271 339
-Bell_pepper leaf spot 290 213 401 316
-Bell_pepper leaf spot 163 322 223 401
-Bell_pepper leaf spot 116 172 200 209

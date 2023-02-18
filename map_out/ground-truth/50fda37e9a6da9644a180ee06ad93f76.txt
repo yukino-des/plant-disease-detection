@@ -1,9 +1,0 @@
-Peach leaf 90 22 305 141
-Peach leaf 86 113 281 186
-Peach leaf 24 234 96 348
-Peach leaf 97 240 198 370
-Peach leaf 20 211 98 249
-Peach leaf 42 155 100 216
-Peach leaf 114 222 140 263
-Peach leaf 252 221 400 333
-Peach leaf 152 195 385 284
