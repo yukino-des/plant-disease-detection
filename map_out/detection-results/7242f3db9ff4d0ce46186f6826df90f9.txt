@@ -1,0 +1,22 @@
+Potato leaf early blight 0.0012 398 110 417 288
+Potato leaf late blight 0.0031 250 346 416 413
+Squash Powdery mildew leaf 0.9709 177 24 353 242
+Squash Powdery mildew leaf 0.9459 4 147 206 351
+Squash Powdery mildew leaf 0.1367 1 0 129 163
+Squash Powdery mildew leaf 0.1010 326 -5 415 155
+Squash Powdery mildew leaf 0.0087 0 147 25 253
+Squash Powdery mildew leaf 0.0040 234 109 358 247
+Squash Powdery mildew leaf 0.0031 0 131 47 304
+Squash Powdery mildew leaf 0.0029 0 199 274 389
+Squash Powdery mildew leaf 0.0026 0 187 19 343
+Squash Powdery mildew leaf 0.0025 143 219 264 340
+Squash Powdery mildew leaf 0.0021 3 188 76 314
+Squash Powdery mildew leaf 0.0019 99 -1 255 98
+Squash Powdery mildew leaf 0.0015 319 -12 416 288
+Squash Powdery mildew leaf 0.0014 0 159 22 213
+Squash Powdery mildew leaf 0.0014 0 145 8 229
+Squash Powdery mildew leaf 0.0011 0 123 37 213
+Squash Powdery mildew leaf 0.0011 -1 4 163 358
+Squash Powdery mildew leaf 0.0010 55 193 96 229
+Squash Powdery mildew leaf 0.0010 397 124 416 306
+Strawberry leaf 0.0054 1 0 117 108

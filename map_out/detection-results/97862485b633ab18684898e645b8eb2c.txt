@@ -1,0 +1,5 @@
+Corn rust leaf 0.9974 37 31 379 374
+Tomato Septoria leaf spot 0.0018 409 405 415 417
+Tomato Septoria leaf spot 0.0013 410 389 416 417
+Tomato Septoria leaf spot 0.0012 407 362 415 427
+Tomato Septoria leaf spot 0.0012 367 405 423 416

@@ -1,0 +1,14 @@
+Corn leaf blight 0.9126 -1 5 422 406
+Corn leaf blight 0.0026 4 2 96 420
+Corn leaf blight 0.0022 370 404 420 415
+Corn leaf blight 0.0013 379 410 411 416
+Corn leaf blight 0.0012 197 -10 406 420
+Corn leaf blight 0.0011 2 -17 70 288
+Tomato Septoria leaf spot 0.0101 385 389 418 415
+Tomato Septoria leaf spot 0.0049 404 368 416 421
+Tomato Septoria leaf spot 0.0046 407 405 416 416
+Tomato Septoria leaf spot 0.0044 407 394 416 415
+Tomato Septoria leaf spot 0.0034 393 407 414 415
+Tomato Septoria leaf spot 0.0016 379 338 413 411
+Tomato Septoria leaf spot 0.0012 409 384 416 409
+Tomato leaf yellow virus 0.0031 366 124 415 337

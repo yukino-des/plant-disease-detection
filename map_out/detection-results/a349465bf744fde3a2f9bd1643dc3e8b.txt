@@ -1,0 +1,6 @@
+Bell_pepper leaf spot 0.9567 33 -1 367 358
+Blueberry leaf 0.0015 273 -1 409 88
+Strawberry leaf 0.0013 408 407 415 415
+grape leaf 0.0075 393 409 414 415
+grape leaf 0.0066 384 410 409 415
+grape leaf 0.0012 386 400 405 411

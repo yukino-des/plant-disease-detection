@@ -1,0 +1,81 @@
+Bell_pepper leaf spot 0.0021 0 210 78 357
+Corn leaf blight 0.0109 0 190 77 429
+Raspberry leaf 0.0027 6 -1 46 38
+Raspberry leaf 0.0010 58 -1 108 38
+Squash Powdery mildew leaf 0.8656 259 -2 360 92
+Squash Powdery mildew leaf 0.4886 164 97 391 316
+Squash Powdery mildew leaf 0.3533 152 8 235 128
+Squash Powdery mildew leaf 0.2918 78 211 224 412
+Squash Powdery mildew leaf 0.1522 352 -1 418 74
+Squash Powdery mildew leaf 0.1442 202 -1 288 39
+Squash Powdery mildew leaf 0.1200 165 136 269 294
+Squash Powdery mildew leaf 0.0658 207 276 344 416
+Squash Powdery mildew leaf 0.0602 0 29 160 178
+Squash Powdery mildew leaf 0.0239 118 256 362 415
+Squash Powdery mildew leaf 0.0227 126 140 201 220
+Squash Powdery mildew leaf 0.0226 392 1 416 75
+Squash Powdery mildew leaf 0.0125 207 0 347 27
+Squash Powdery mildew leaf 0.0104 235 1 284 34
+Squash Powdery mildew leaf 0.0103 350 0 426 11
+Squash Powdery mildew leaf 0.0093 356 0 418 20
+Squash Powdery mildew leaf 0.0090 275 -4 370 57
+Squash Powdery mildew leaf 0.0079 259 97 404 252
+Squash Powdery mildew leaf 0.0076 197 0 274 24
+Squash Powdery mildew leaf 0.0072 81 45 160 120
+Squash Powdery mildew leaf 0.0065 167 4 293 137
+Squash Powdery mildew leaf 0.0061 241 -2 352 43
+Squash Powdery mildew leaf 0.0060 22 41 89 110
+Squash Powdery mildew leaf 0.0051 168 182 265 251
+Squash Powdery mildew leaf 0.0041 7 133 410 405
+Squash Powdery mildew leaf 0.0037 400 62 416 206
+Squash Powdery mildew leaf 0.0031 217 2 269 35
+Squash Powdery mildew leaf 0.0029 382 0 421 11
+Squash Powdery mildew leaf 0.0027 201 38 285 158
+Squash Powdery mildew leaf 0.0026 256 305 412 415
+Squash Powdery mildew leaf 0.0023 230 0 306 10
+Squash Powdery mildew leaf 0.0023 77 43 165 193
+Squash Powdery mildew leaf 0.0023 306 -2 419 48
+Squash Powdery mildew leaf 0.0023 174 0 297 9
+Squash Powdery mildew leaf 0.0023 231 168 374 308
+Squash Powdery mildew leaf 0.0022 369 1 420 36
+Squash Powdery mildew leaf 0.0022 267 -1 395 143
+Squash Powdery mildew leaf 0.0022 190 134 269 241
+Squash Powdery mildew leaf 0.0022 146 0 247 42
+Squash Powdery mildew leaf 0.0021 72 17 215 128
+Squash Powdery mildew leaf 0.0019 339 117 413 189
+Squash Powdery mildew leaf 0.0019 -2 9 88 168
+Squash Powdery mildew leaf 0.0019 399 1 415 137
+Squash Powdery mildew leaf 0.0019 406 101 415 177
+Squash Powdery mildew leaf 0.0018 202 202 391 414
+Squash Powdery mildew leaf 0.0017 84 207 157 386
+Squash Powdery mildew leaf 0.0017 241 248 321 309
+Squash Powdery mildew leaf 0.0017 360 1 415 142
+Squash Powdery mildew leaf 0.0017 245 0 309 22
+Squash Powdery mildew leaf 0.0016 267 0 349 20
+Squash Powdery mildew leaf 0.0016 391 0 416 6
+Squash Powdery mildew leaf 0.0015 150 0 209 22
+Squash Powdery mildew leaf 0.0015 160 0 232 9
+Squash Powdery mildew leaf 0.0014 59 0 108 24
+Squash Powdery mildew leaf 0.0014 406 0 416 8
+Squash Powdery mildew leaf 0.0014 224 229 267 302
+Squash Powdery mildew leaf 0.0014 182 0 245 22
+Squash Powdery mildew leaf 0.0013 336 0 395 24
+Squash Powdery mildew leaf 0.0013 382 0 412 5
+Squash Powdery mildew leaf 0.0012 405 -6 416 46
+Squash Powdery mildew leaf 0.0012 395 279 415 407
+Squash Powdery mildew leaf 0.0012 320 54 364 122
+Squash Powdery mildew leaf 0.0011 138 257 223 401
+Squash Powdery mildew leaf 0.0011 245 0 355 9
+Squash Powdery mildew leaf 0.0011 129 124 287 353
+Squash Powdery mildew leaf 0.0011 103 0 192 9
+Squash Powdery mildew leaf 0.0011 31 32 105 149
+Squash Powdery mildew leaf 0.0011 244 95 411 382
+Squash Powdery mildew leaf 0.0010 197 215 355 320
+Squash Powdery mildew leaf 0.0010 205 151 280 313
+Squash Powdery mildew leaf 0.0010 -2 75 112 195
+Strawberry leaf 0.0018 2 -1 40 38
+grape leaf 0.0032 50 0 119 44
+grape leaf 0.0012 394 309 415 352
+grape leaf black rot 0.0036 36 0 109 46
+grape leaf black rot 0.0011 1 0 73 45
+grape leaf black rot 0.0010 14 -2 56 40

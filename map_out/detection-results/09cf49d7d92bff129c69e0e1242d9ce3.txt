@@ -1,0 +1,9 @@
+Apple Scab Leaf 0.8464 35 161 293 375
+Apple Scab Leaf 0.0119 2 17 284 406
+Apple Scab Leaf 0.0011 267 -1 414 104
+Apple rust leaf 0.0016 223 38 326 229
+Potato leaf early blight 0.4604 215 26 350 280
+Potato leaf early blight 0.0170 392 163 415 299
+Potato leaf early blight 0.0039 374 139 413 314
+Potato leaf early blight 0.0011 218 32 311 208
+Potato leaf late blight 0.0149 215 11 351 240

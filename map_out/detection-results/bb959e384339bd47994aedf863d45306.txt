@@ -1,0 +1,29 @@
+Corn leaf blight 0.0147 145 32 261 188
+Corn leaf blight 0.0041 39 9 108 198
+Corn leaf blight 0.0016 144 31 199 175
+Corn leaf blight 0.0016 163 86 199 184
+Corn leaf blight 0.0012 153 59 215 211
+Tomato Early blight leaf 0.0055 314 151 348 256
+Tomato Early blight leaf 0.0011 306 38 413 315
+Tomato Early blight leaf 0.0010 311 207 343 291
+Tomato leaf bacterial spot 0.0013 307 6 414 288
+Tomato leaf bacterial spot 0.0010 348 86 408 244
+Tomato leaf mosaic virus 0.0559 338 4 407 52
+Tomato leaf mosaic virus 0.0185 324 42 361 95
+Tomato leaf mosaic virus 0.0139 277 52 316 113
+Tomato leaf mosaic virus 0.0110 318 112 372 166
+Tomato leaf mosaic virus 0.0062 357 108 399 195
+Tomato leaf mosaic virus 0.0051 276 90 315 153
+Tomato leaf mosaic virus 0.0029 394 38 410 95
+Tomato leaf mosaic virus 0.0019 280 121 316 156
+Tomato leaf mosaic virus 0.0019 291 0 402 50
+Tomato leaf mosaic virus 0.0012 347 76 367 121
+Tomato leaf mosaic virus 0.0011 325 65 365 139
+Tomato mold leaf 0.0920 322 48 362 86
+Tomato mold leaf 0.0449 277 45 316 104
+Tomato mold leaf 0.0403 322 110 362 165
+Tomato mold leaf 0.0329 315 170 348 259
+Tomato mold leaf 0.0026 347 78 408 224
+Tomato mold leaf 0.0016 336 256 359 298
+Tomato mold leaf 0.0015 388 39 407 93
+Tomato mold leaf 0.0012 312 234 333 286

@@ -1,0 +1,5 @@
+Tomato Early blight leaf 0.5059 12 129 355 348
+Tomato Early blight leaf 0.0027 134 114 410 315
+Tomato Septoria leaf spot 0.0021 123 123 415 354
+Tomato leaf bacterial spot 0.1906 3 134 409 382
+Tomato leaf late blight 0.0083 29 163 106 335

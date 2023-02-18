@@ -1,0 +1,15 @@
+Apple Scab Leaf 0.0082 338 2 417 106
+Apple rust leaf 0.7310 26 4 388 358
+Apple rust leaf 0.0055 305 -1 413 104
+Apple rust leaf 0.0034 45 11 232 409
+Apple rust leaf 0.0022 1 6 95 418
+Apple rust leaf 0.0021 197 -2 413 92
+Apple rust leaf 0.0012 68 116 349 415
+Blueberry leaf 0.0013 335 337 418 415
+Cherry leaf 0.0025 32 358 135 415
+Potato leaf early blight 0.0020 338 11 416 96
+Potato leaf early blight 0.0015 341 149 414 382
+Potato leaf early blight 0.0011 343 93 407 235
+Raspberry leaf 0.0017 17 327 144 415
+Squash Powdery mildew leaf 0.0025 1 269 82 389
+Strawberry leaf 0.0024 33 346 135 416

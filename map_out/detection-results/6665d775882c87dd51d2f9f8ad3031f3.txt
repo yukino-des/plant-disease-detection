@@ -1,0 +1,7 @@
+Raspberry leaf 0.0032 392 -4 415 83
+Raspberry leaf 0.0012 407 -3 415 71
+Strawberry leaf 0.0017 283 0 411 8
+Tomato Early blight leaf 0.0494 10 13 349 300
+Tomato Septoria leaf spot 0.3157 43 12 359 357
+Tomato leaf bacterial spot 0.4266 23 8 348 407
+grape leaf 0.0018 393 -9 415 116

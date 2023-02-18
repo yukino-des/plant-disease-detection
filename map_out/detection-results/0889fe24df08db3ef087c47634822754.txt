@@ -1,0 +1,12 @@
+Apple Scab Leaf 0.0011 364 260 414 421
+Apple rust leaf 0.0011 363 210 414 446
+Blueberry leaf 0.0132 -1 241 72 404
+Potato leaf early blight 0.0096 0 179 72 385
+Potato leaf early blight 0.0038 -1 364 77 415
+Potato leaf early blight 0.0023 63 318 211 416
+Potato leaf late blight 0.0364 0 206 71 389
+Tomato Septoria leaf spot 0.8806 11 78 345 267
+Tomato Septoria leaf spot 0.0215 184 21 405 193
+Tomato Septoria leaf spot 0.0115 179 246 409 416
+Tomato Septoria leaf spot 0.0040 276 0 415 154
+Tomato Septoria leaf spot 0.0027 90 121 318 247

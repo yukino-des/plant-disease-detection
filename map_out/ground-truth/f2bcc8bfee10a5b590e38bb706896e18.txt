@@ -1,0 +1,6 @@
+Soyabean leaf 178 123 240 225
+Soyabean leaf 313 132 359 229
+Soyabean leaf 211 211 276 299
+Soyabean leaf 146 211 207 295
+Soyabean leaf 279 200 335 288
+Soyabean leaf 341 199 398 291

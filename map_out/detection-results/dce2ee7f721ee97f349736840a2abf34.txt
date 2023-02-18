@@ -1,0 +1,18 @@
+Raspberry leaf 0.9934 191 71 297 192
+Raspberry leaf 0.9821 55 161 171 379
+Raspberry leaf 0.9797 94 32 211 167
+Raspberry leaf 0.9688 223 157 392 347
+Raspberry leaf 0.9341 163 178 246 385
+Raspberry leaf 0.0866 91 49 155 158
+Raspberry leaf 0.0284 58 153 156 290
+Raspberry leaf 0.0061 157 184 218 346
+Raspberry leaf 0.0038 98 180 258 420
+Raspberry leaf 0.0031 87 105 157 162
+Raspberry leaf 0.0028 97 152 165 347
+Raspberry leaf 0.0024 155 178 303 422
+Raspberry leaf 0.0024 187 87 220 185
+Raspberry leaf 0.0013 0 4 7 82
+Raspberry leaf 0.0011 157 155 201 189
+Raspberry leaf 0.0010 119 62 290 174
+Raspberry leaf 0.0010 0 16 19 219
+Squash Powdery mildew leaf 0.0010 0 213 16 408

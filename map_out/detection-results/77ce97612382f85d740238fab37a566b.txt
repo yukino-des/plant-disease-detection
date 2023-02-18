@@ -1,0 +1,2 @@
+Bell_pepper leaf 0.6202 29 72 380 357
+Peach leaf 0.0012 16 94 347 425

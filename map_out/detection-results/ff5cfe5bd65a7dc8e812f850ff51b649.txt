@@ -1,0 +1,23 @@
+Corn Gray leaf spot 0.9117 -10 135 428 413
+Corn Gray leaf spot 0.0270 273 78 413 161
+Corn Gray leaf spot 0.0024 48 87 364 344
+Corn Gray leaf spot 0.0012 90 184 329 292
+Corn leaf blight 0.3792 24 1 387 140
+Corn leaf blight 0.0136 5 -1 273 105
+Corn leaf blight 0.0038 -1 -8 19 148
+Corn leaf blight 0.0025 225 7 303 139
+Corn leaf blight 0.0023 264 1 391 46
+Corn leaf blight 0.0022 0 -1 48 148
+Corn leaf blight 0.0022 396 -4 416 117
+Corn leaf blight 0.0020 0 0 278 207
+Corn leaf blight 0.0019 22 0 186 44
+Corn leaf blight 0.0017 0 99 48 357
+Corn leaf blight 0.0016 5 -2 280 51
+Corn leaf blight 0.0015 0 6 159 145
+Corn leaf blight 0.0014 212 0 347 45
+Corn leaf blight 0.0013 -1 0 43 82
+Corn leaf blight 0.0012 0 -5 419 304
+Corn leaf blight 0.0012 331 1 420 47
+Corn leaf blight 0.0011 252 0 402 22
+Corn leaf blight 0.0010 137 0 402 105
+Corn leaf blight 0.0010 337 1 382 74

@@ -1,0 +1,10 @@
+Potato leaf early blight 111 165 186 233
+Potato leaf early blight 53 159 120 188
+Potato leaf early blight 270 292 315 363
+Potato leaf 155 155 233 218
+Potato leaf 171 133 265 168
+Potato leaf 208 97 272 137
+Potato leaf 297 232 401 294
+Potato leaf 207 259 283 333
+Potato leaf 137 74 224 118
+Potato leaf 226 54 307 98

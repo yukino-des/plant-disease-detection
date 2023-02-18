@@ -1,0 +1,13 @@
+Tomato leaf late blight 0.8893 114 8 310 410
+Tomato leaf late blight 0.0102 0 278 169 416
+Tomato leaf mosaic virus 0.0031 -3 1 46 25
+Tomato leaf mosaic virus 0.0028 0 0 81 46
+Tomato leaf mosaic virus 0.0025 0 4 22 140
+Tomato leaf mosaic virus 0.0018 -21 0 77 9
+Tomato leaf mosaic virus 0.0016 0 0 9 8
+Tomato leaf mosaic virus 0.0015 0 6 105 151
+Tomato leaf mosaic virus 0.0011 0 -6 8 47
+Tomato leaf mosaic virus 0.0011 0 0 7 23
+Tomato leaf mosaic virus 0.0011 -2 0 25 6
+Tomato leaf mosaic virus 0.0010 0 -19 6 74
+Tomato leaf yellow virus 0.0010 408 407 416 416

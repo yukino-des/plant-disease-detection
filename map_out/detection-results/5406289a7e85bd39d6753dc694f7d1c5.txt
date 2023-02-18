@@ -1,0 +1,43 @@
+Apple Scab Leaf 0.1075 192 215 272 432
+Blueberry leaf 0.0090 1 211 56 419
+Blueberry leaf 0.0018 196 188 273 352
+Potato leaf early blight 0.6048 259 105 417 232
+Potato leaf early blight 0.3985 275 228 351 397
+Potato leaf early blight 0.3517 165 137 241 238
+Potato leaf early blight 0.2789 194 202 276 396
+Potato leaf early blight 0.1757 69 228 169 392
+Potato leaf early blight 0.0486 57 34 168 163
+Potato leaf early blight 0.0406 66 124 143 270
+Potato leaf early blight 0.0211 186 1 247 80
+Potato leaf early blight 0.0051 143 74 191 158
+Potato leaf early blight 0.0041 0 3 70 138
+Potato leaf early blight 0.0028 16 0 144 95
+Potato leaf early blight 0.0019 106 53 242 156
+Potato leaf early blight 0.0016 277 9 345 131
+Potato leaf early blight 0.0015 1 112 53 288
+Potato leaf early blight 0.0015 133 0 277 88
+Potato leaf early blight 0.0014 277 175 410 225
+Potato leaf early blight 0.0014 44 1 128 70
+Potato leaf early blight 0.0013 226 67 268 145
+Potato leaf early blight 0.0013 337 193 417 396
+Potato leaf early blight 0.0012 398 210 416 379
+Potato leaf early blight 0.0011 398 -10 416 153
+Potato leaf early blight 0.0010 46 6 238 163
+Potato leaf early blight 0.0010 366 -17 414 192
+Potato leaf late blight 0.3140 59 226 181 396
+Potato leaf late blight 0.1841 156 130 254 240
+Potato leaf late blight 0.1661 198 206 283 389
+Potato leaf late blight 0.1506 53 24 164 151
+Potato leaf late blight 0.1313 192 5 240 79
+Potato leaf late blight 0.0546 60 118 169 248
+Potato leaf late blight 0.0097 0 7 57 136
+Potato leaf late blight 0.0076 42 0 133 43
+Potato leaf late blight 0.0068 66 114 170 378
+Potato leaf late blight 0.0019 43 0 163 24
+Potato leaf late blight 0.0014 241 0 383 20
+Tomato Early blight leaf 0.0014 270 0 419 20
+Tomato Early blight leaf 0.0013 398 1 417 172
+Tomato Septoria leaf spot 0.0054 284 0 412 9
+Tomato Septoria leaf spot 0.0038 306 0 390 18
+Tomato Septoria leaf spot 0.0022 340 0 435 9
+Tomato Septoria leaf spot 0.0010 353 0 422 19

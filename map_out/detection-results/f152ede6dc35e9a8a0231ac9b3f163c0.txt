@@ -1,0 +1,5 @@
+Strawberry leaf 0.0012 408 303 416 391
+Tomato Septoria leaf spot 0.4421 40 6 426 410
+Tomato Septoria leaf spot 0.0026 -2 -27 415 206
+Tomato Septoria leaf spot 0.0022 -7 140 357 397
+Tomato Septoria leaf spot 0.0020 12 42 343 310

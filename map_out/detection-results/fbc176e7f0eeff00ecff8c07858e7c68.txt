@@ -1,0 +1,11 @@
+Potato leaf early blight 0.8902 1 1 412 406
+Potato leaf early blight 0.0270 27 16 283 334
+Potato leaf early blight 0.0039 141 30 373 371
+Potato leaf early blight 0.0022 26 141 388 372
+Potato leaf early blight 0.0014 60 5 417 217
+Strawberry leaf 0.0044 410 392 416 416
+Strawberry leaf 0.0021 408 406 416 417
+Strawberry leaf 0.0013 393 409 416 416
+Strawberry leaf 0.0011 407 383 415 424
+Tomato Early blight leaf 0.0313 1 14 413 226
+Tomato leaf yellow virus 0.0010 0 329 4 350

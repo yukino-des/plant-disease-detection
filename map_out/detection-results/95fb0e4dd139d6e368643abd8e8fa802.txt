@@ -1,0 +1,6 @@
+Corn Gray leaf spot 0.9073 -8 6 425 409
+Corn Gray leaf spot 0.0010 159 -14 376 428
+Corn leaf blight 0.0587 -3 -10 420 322
+Corn leaf blight 0.0032 1 -7 105 429
+Corn leaf blight 0.0014 0 112 15 314
+Tomato leaf yellow virus 0.0011 0 212 7 322

@@ -1,0 +1,31 @@
+Bell_pepper leaf spot 0.0025 0 371 80 413
+Blueberry leaf 0.2249 0 -17 54 225
+Blueberry leaf 0.0018 72 26 171 155
+Blueberry leaf 0.0010 0 0 7 8
+Peach leaf 0.0060 33 0 107 48
+Peach leaf 0.0020 71 0 107 50
+Potato leaf early blight 0.0017 362 -14 415 183
+Potato leaf late blight 0.2379 140 329 273 415
+Potato leaf late blight 0.0934 322 191 408 299
+Potato leaf late blight 0.0034 0 318 292 419
+Potato leaf late blight 0.0029 342 1 417 145
+Potato leaf late blight 0.0017 399 87 415 245
+Potato leaf late blight 0.0014 397 0 415 144
+Potato leaf late blight 0.0011 394 286 415 400
+Tomato Septoria leaf spot 0.0011 -14 404 55 416
+Tomato leaf late blight 0.9474 133 5 276 214
+Tomato leaf late blight 0.9434 152 99 328 336
+Tomato leaf late blight 0.4629 327 271 416 412
+Tomato leaf late blight 0.4034 315 189 415 295
+Tomato leaf late blight 0.0071 196 97 329 255
+Tomato leaf late blight 0.0059 374 261 416 362
+Tomato leaf late blight 0.0032 359 3 416 144
+Tomato leaf late blight 0.0026 63 50 353 371
+Tomato leaf late blight 0.0021 341 -3 415 76
+Tomato leaf late blight 0.0019 327 176 417 380
+Tomato leaf late blight 0.0019 394 261 415 392
+Tomato leaf late blight 0.0018 398 151 416 279
+Tomato leaf late blight 0.0016 369 313 414 404
+Tomato leaf late blight 0.0013 265 0 353 49
+Tomato leaf late blight 0.0010 109 167 316 371
+Tomato leaf late blight 0.0010 397 -2 416 112

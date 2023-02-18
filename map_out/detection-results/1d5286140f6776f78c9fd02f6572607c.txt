@@ -1,0 +1,7 @@
+Cherry leaf 0.0011 71 0 143 20
+Potato leaf late blight 0.0021 15 106 336 374
+Potato leaf late blight 0.0013 262 -2 413 419
+Strawberry leaf 0.0053 380 308 414 407
+Tomato leaf late blight 0.5789 46 8 427 407
+Tomato leaf late blight 0.0012 16 71 292 399
+grape leaf 0.0010 325 -1 416 45

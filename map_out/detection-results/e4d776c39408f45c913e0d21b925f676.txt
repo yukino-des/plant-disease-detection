@@ -1,0 +1,15 @@
+Potato leaf early blight 0.0027 181 353 282 406
+Potato leaf early blight 0.0024 114 333 304 417
+Potato leaf late blight 0.8728 56 86 217 345
+Potato leaf late blight 0.4152 164 13 272 158
+Potato leaf late blight 0.1196 215 188 377 357
+Potato leaf late blight 0.0253 223 75 365 207
+Potato leaf late blight 0.0236 209 60 386 346
+Potato leaf late blight 0.0141 203 261 365 360
+Potato leaf late blight 0.0031 47 141 200 274
+Potato leaf late blight 0.0022 128 349 270 407
+Potato leaf late blight 0.0018 133 333 328 418
+Potato leaf late blight 0.0014 54 250 213 352
+Potato leaf late blight 0.0010 82 96 215 205
+Soyabean leaf 0.0036 175 4 274 192
+Tomato leaf 0.0012 -1 0 10 7

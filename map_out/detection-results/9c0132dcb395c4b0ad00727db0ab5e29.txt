@@ -1,0 +1,4 @@
+Apple Scab Leaf 0.6270 -3 5 202 405
+Apple Scab Leaf 0.5518 193 4 413 407
+Apple rust leaf 0.5527 -1 0 199 360
+Blueberry leaf 0.0014 117 53 190 379

@@ -1,0 +1,10 @@
+Bell_pepper leaf 0.0166 -2 0 111 50
+Bell_pepper leaf 0.0033 3 -1 135 90
+Bell_pepper leaf 0.0031 -1 0 114 157
+Corn leaf blight 0.9905 88 96 401 242
+Corn leaf blight 0.0140 7 65 419 343
+Corn leaf blight 0.0015 122 1 293 97
+Tomato Early blight leaf 0.0234 2 186 418 416
+Tomato Early blight leaf 0.0036 135 246 413 412
+Tomato leaf late blight 0.0035 20 215 398 405
+Tomato mold leaf 0.0252 -1 241 46 319

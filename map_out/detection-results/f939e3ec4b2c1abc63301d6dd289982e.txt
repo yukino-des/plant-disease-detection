@@ -1,0 +1,8 @@
+Potato leaf early blight 0.7650 37 7 326 403
+Potato leaf early blight 0.0046 12 0 282 227
+Potato leaf early blight 0.0027 8 0 146 89
+Potato leaf early blight 0.0022 341 109 411 351
+Potato leaf early blight 0.0020 -7 1 151 47
+Potato leaf late blight 0.0015 343 123 412 404
+Squash Powdery mildew leaf 0.0013 360 189 416 407
+Squash Powdery mildew leaf 0.0011 372 332 418 416

@@ -1,0 +1,8 @@
+Potato leaf late blight 0.0377 298 273 414 417
+Raspberry leaf 0.0024 119 368 279 416
+Tomato Septoria leaf spot 0.0014 322 0 453 8
+Tomato leaf 0.0016 106 371 262 417
+Tomato leaf late blight 0.9386 32 18 377 393
+Tomato leaf late blight 0.0478 265 271 422 425
+Tomato leaf late blight 0.0349 -4 299 229 419
+Tomato leaf late blight 0.0066 331 282 415 410

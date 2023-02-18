@@ -1,0 +1,16 @@
+Cherry leaf 0.0142 333 0 416 46
+Cherry leaf 0.0133 341 -5 415 177
+Cherry leaf 0.0045 403 -3 415 43
+Cherry leaf 0.0021 371 0 415 52
+Cherry leaf 0.0021 309 0 380 43
+Cherry leaf 0.0015 393 0 416 80
+Cherry leaf 0.0013 408 0 416 23
+Cherry leaf 0.0011 306 0 413 25
+Cherry leaf 0.0010 407 -1 416 8
+Cherry leaf 0.0010 299 0 364 24
+Corn leaf blight 0.9378 -12 -1 424 356
+Corn leaf blight 0.0083 340 15 417 257
+Corn leaf blight 0.0019 314 5 414 416
+Corn leaf blight 0.0016 365 27 414 340
+Peach leaf 0.0047 343 -4 414 203
+Strawberry leaf 0.0010 82 0 252 22

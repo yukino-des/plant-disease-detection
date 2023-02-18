@@ -1,0 +1,5 @@
+Potato leaf early blight 0.6791 11 -2 405 412
+Potato leaf early blight 0.0015 398 -8 417 151
+Tomato Early blight leaf 0.2654 31 4 375 301
+Tomato Early blight leaf 0.0030 56 111 412 411
+Tomato Septoria leaf spot 0.0023 396 -8 417 122

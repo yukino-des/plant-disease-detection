@@ -1,0 +1,2 @@
+Potato leaf early blight 0.7857 2 30 411 297
+Raspberry leaf 0.0022 341 146 415 416

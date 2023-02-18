@@ -1,0 +1,13 @@
+Strawberry leaf 229 203 314 321
+Strawberry leaf 313 223 394 345
+Strawberry leaf 199 308 312 391
+Strawberry leaf 74 295 186 379
+Strawberry leaf 85 187 165 320
+Strawberry leaf 29 195 93 317
+Strawberry leaf 30 79 97 184
+Strawberry leaf 81 71 178 143
+Strawberry leaf 72 22 163 97
+Strawberry leaf 302 67 377 161
+Strawberry leaf 269 92 328 189
+Strawberry leaf 212 23 303 88
+Strawberry leaf 195 74 284 134

@@ -1,0 +1,11 @@
+Squash Powdery mildew leaf 0.0014 190 2 335 49
+Squash Powdery mildew leaf 0.0012 319 241 410 409
+Tomato Early blight leaf 0.3921 0 105 204 395
+Tomato Early blight leaf 0.0145 201 17 421 353
+Tomato Early blight leaf 0.0076 0 -2 138 148
+Tomato Septoria leaf spot 0.0032 51 4 128 112
+Tomato Septoria leaf spot 0.0027 1 0 118 153
+Tomato Septoria leaf spot 0.0025 160 0 391 76
+Tomato Septoria leaf spot 0.0011 65 11 108 104
+Tomato leaf late blight 0.2613 203 32 414 393
+Tomato leaf late blight 0.2607 0 133 208 404

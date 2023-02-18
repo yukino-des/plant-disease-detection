@@ -1,0 +1,16 @@
+Potato leaf early blight 0.0094 94 31 154 176
+Potato leaf early blight 0.0013 52 62 127 336
+Tomato Early blight leaf 0.0511 134 155 234 371
+Tomato Early blight leaf 0.0057 198 7 338 292
+Tomato Early blight leaf 0.0032 4 23 105 393
+Tomato Septoria leaf spot 0.7230 211 69 342 401
+Tomato Septoria leaf spot 0.6691 130 172 242 410
+Tomato Septoria leaf spot 0.0107 137 144 232 326
+Tomato Septoria leaf spot 0.0037 340 0 415 73
+Tomato Septoria leaf spot 0.0015 214 157 340 321
+Tomato Septoria leaf spot 0.0010 161 0 213 25
+Tomato Septoria leaf spot 0.0010 361 0 429 8
+Tomato leaf bacterial spot 0.0029 136 188 236 401
+Tomato leaf late blight 0.0015 1 166 46 366
+Tomato leaf yellow virus 0.0033 410 391 415 417
+Tomato leaf yellow virus 0.0018 409 405 414 417

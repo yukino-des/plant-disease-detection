@@ -1,0 +1,20 @@
+Bell_pepper leaf spot 0.3440 127 208 301 406
+Bell_pepper leaf spot 0.0079 38 190 173 411
+Bell_pepper leaf spot 0.0015 41 198 136 355
+Bell_pepper leaf spot 0.0010 154 227 245 392
+Blueberry leaf 0.0545 95 -1 234 159
+Blueberry leaf 0.0271 214 185 408 352
+Blueberry leaf 0.0198 186 86 419 251
+Blueberry leaf 0.0090 153 3 333 169
+Blueberry leaf 0.0072 150 209 383 409
+Blueberry leaf 0.0018 169 191 389 286
+Blueberry leaf 0.0018 199 180 409 245
+Blueberry leaf 0.0018 397 276 417 409
+Blueberry leaf 0.0018 173 84 317 196
+Blueberry leaf 0.0016 177 157 289 206
+Blueberry leaf 0.0016 208 -2 334 106
+Blueberry leaf 0.0016 38 201 106 350
+Blueberry leaf 0.0014 300 104 415 232
+Blueberry leaf 0.0011 395 118 417 246
+Blueberry leaf 0.0010 114 -2 296 104
+Corn leaf blight 0.0018 54 197 153 361

@@ -1,0 +1,6 @@
+Corn leaf blight 0.9432 -14 67 430 366
+Strawberry leaf 0.0022 346 405 429 415
+Strawberry leaf 0.0020 410 390 416 416
+Strawberry leaf 0.0020 409 406 416 417
+Strawberry leaf 0.0018 408 365 416 426
+Strawberry leaf 0.0015 412 379 416 412

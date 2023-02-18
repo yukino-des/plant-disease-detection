@@ -1,0 +1,5 @@
+Corn leaf blight 0.0018 343 -6 416 173
+Corn rust leaf 0.9971 -9 5 419 403
+Corn rust leaf 0.0217 -7 5 291 282
+Corn rust leaf 0.0010 160 27 376 396
+Tomato Septoria leaf spot 0.0505 -11 307 248 418

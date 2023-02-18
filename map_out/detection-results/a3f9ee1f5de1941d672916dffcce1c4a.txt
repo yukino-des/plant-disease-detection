@@ -1,0 +1,14 @@
+Tomato leaf 0.9138 180 186 306 316
+Tomato leaf 0.8986 233 121 383 214
+Tomato leaf 0.8658 75 226 218 367
+Tomato leaf 0.0144 77 197 118 256
+Tomato leaf 0.0094 1 231 55 365
+Tomato leaf 0.0066 175 194 251 274
+Tomato leaf 0.0032 196 167 230 206
+Tomato leaf 0.0028 175 170 351 367
+Tomato leaf 0.0026 220 58 390 238
+Tomato leaf 0.0023 186 103 250 164
+Tomato leaf 0.0018 218 220 306 325
+Tomato leaf 0.0011 13 240 58 323
+Tomato leaf 0.0010 132 118 176 180
+Tomato leaf yellow virus 0.0014 408 290 415 372

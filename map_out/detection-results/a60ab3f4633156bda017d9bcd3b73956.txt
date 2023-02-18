@@ -1,0 +1,74 @@
+Bell_pepper leaf 0.2616 66 277 294 345
+Bell_pepper leaf 0.0711 255 42 413 174
+Bell_pepper leaf 0.0674 241 85 378 212
+Bell_pepper leaf 0.0496 1 11 144 144
+Bell_pepper leaf 0.0250 239 25 386 131
+Bell_pepper leaf 0.0188 142 371 289 415
+Bell_pepper leaf 0.0154 -2 87 113 146
+Bell_pepper leaf 0.0124 337 39 417 167
+Bell_pepper leaf 0.0109 152 326 319 418
+Bell_pepper leaf 0.0107 144 251 411 413
+Bell_pepper leaf 0.0086 73 0 230 45
+Bell_pepper leaf 0.0061 206 0 281 23
+Bell_pepper leaf 0.0041 257 211 414 414
+Bell_pepper leaf 0.0037 250 38 371 96
+Bell_pepper leaf 0.0037 1 -6 79 150
+Bell_pepper leaf 0.0034 243 61 413 279
+Bell_pepper leaf 0.0032 33 39 145 103
+Bell_pepper leaf 0.0028 304 163 415 254
+Bell_pepper leaf 0.0027 173 -2 291 42
+Bell_pepper leaf 0.0025 337 217 416 407
+Bell_pepper leaf 0.0019 396 55 416 181
+Bell_pepper leaf 0.0018 256 387 400 415
+Bell_pepper leaf 0.0018 113 387 259 415
+Bell_pepper leaf 0.0017 371 51 415 155
+Bell_pepper leaf 0.0015 398 112 416 218
+Bell_pepper leaf 0.0013 186 0 285 10
+Bell_pepper leaf 0.0012 -1 -1 55 52
+Bell_pepper leaf 0.0011 191 317 414 420
+Bell_pepper leaf 0.0011 57 0 215 25
+Bell_pepper leaf spot 0.2352 -12 187 295 285
+Bell_pepper leaf spot 0.1026 84 -2 262 90
+Bell_pepper leaf spot 0.0191 80 283 282 362
+Bell_pepper leaf spot 0.0187 253 17 413 151
+Bell_pepper leaf spot 0.0084 124 335 300 416
+Bell_pepper leaf spot 0.0068 110 95 245 191
+Bell_pepper leaf spot 0.0059 18 7 201 137
+Bell_pepper leaf spot 0.0058 -3 199 171 285
+Bell_pepper leaf spot 0.0058 103 171 312 265
+Bell_pepper leaf spot 0.0049 257 1 413 92
+Bell_pepper leaf spot 0.0043 1 0 149 104
+Bell_pepper leaf spot 0.0041 333 -1 414 41
+Bell_pepper leaf spot 0.0038 5 95 278 263
+Bell_pepper leaf spot 0.0036 222 89 341 208
+Bell_pepper leaf spot 0.0028 113 268 352 344
+Bell_pepper leaf spot 0.0024 298 0 420 25
+Bell_pepper leaf spot 0.0023 191 -1 301 40
+Bell_pepper leaf spot 0.0021 0 82 143 189
+Bell_pepper leaf spot 0.0021 0 145 151 266
+Bell_pepper leaf spot 0.0019 67 0 280 155
+Bell_pepper leaf spot 0.0018 250 30 373 88
+Bell_pepper leaf spot 0.0013 9 64 204 154
+Bell_pepper leaf spot 0.0012 369 1 415 76
+Bell_pepper leaf spot 0.0011 138 278 332 388
+Bell_pepper leaf spot 0.0010 367 0 421 24
+Bell_pepper leaf spot 0.0010 142 -1 337 92
+Bell_pepper leaf spot 0.0010 60 222 291 311
+Corn leaf blight 0.0099 301 0 420 39
+Corn leaf blight 0.0076 38 405 97 415
+Corn leaf blight 0.0043 0 307 39 377
+Corn leaf blight 0.0021 28 394 91 414
+Corn leaf blight 0.0015 -11 405 81 415
+Corn leaf blight 0.0013 0 334 41 415
+Corn leaf blight 0.0011 0 342 40 370
+Corn leaf blight 0.0010 70 406 146 416
+Corn leaf blight 0.0010 -1 286 24 368
+Peach leaf 0.0037 51 410 83 416
+Peach leaf 0.0013 278 0 381 42
+Peach leaf 0.0012 312 224 414 371
+Peach leaf 0.0010 66 411 100 416
+Tomato leaf 0.0250 329 174 419 222
+Tomato leaf 0.0032 408 393 416 416
+Tomato leaf 0.0026 407 406 416 415
+Tomato leaf 0.0024 393 408 417 415
+Tomato leaf 0.0013 404 386 416 421

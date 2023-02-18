@@ -1,0 +1,21 @@
+Blueberry leaf 0.0326 300 241 386 321
+Blueberry leaf 0.0054 328 78 365 197
+Blueberry leaf 0.0043 330 134 388 266
+Blueberry leaf 0.0037 285 74 340 266
+Blueberry leaf 0.0032 210 284 256 360
+Blueberry leaf 0.0016 161 95 272 146
+Blueberry leaf 0.0015 320 51 367 284
+Blueberry leaf 0.0012 145 93 223 137
+Blueberry leaf 0.0011 209 85 290 150
+Blueberry leaf 0.0011 271 210 313 288
+Potato leaf late blight 0.0037 271 245 396 340
+Raspberry leaf 0.0040 89 54 208 98
+Soyabean leaf 0.9819 88 270 199 378
+Soyabean leaf 0.9743 31 100 175 270
+Soyabean leaf 0.9568 176 164 277 292
+Soyabean leaf 0.0233 270 233 392 328
+Soyabean leaf 0.0175 260 184 299 278
+Soyabean leaf 0.0067 210 277 256 355
+Soyabean leaf 0.0020 247 205 283 290
+Soyabean leaf 0.0015 171 66 291 166
+Soyabean leaf 0.0013 -1 409 25 416

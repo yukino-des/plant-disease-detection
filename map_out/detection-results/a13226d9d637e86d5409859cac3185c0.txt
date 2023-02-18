@@ -1,0 +1,7 @@
+Squash Powdery mildew leaf 0.2516 53 12 417 341
+Strawberry leaf 0.0026 185 54 412 424
+Strawberry leaf 0.0014 182 222 418 397
+Tomato Septoria leaf spot 0.0884 1 -13 302 305
+Tomato leaf bacterial spot 0.3219 4 23 350 317
+Tomato leaf bacterial spot 0.0020 123 15 394 404
+Tomato leaf mosaic virus 0.0024 62 68 420 399

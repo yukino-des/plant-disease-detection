@@ -1,0 +1,4 @@
+Apple rust leaf 0.9672 16 -23 394 366
+Raspberry leaf 0.0029 340 205 415 453
+Soyabean leaf 0.0010 406 183 416 253
+Tomato leaf 0.0014 405 178 415 245

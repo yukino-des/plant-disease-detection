@@ -1,0 +1,83 @@
+Bell_pepper leaf 0.0021 158 0 248 8
+Bell_pepper leaf spot 0.0209 56 325 175 417
+Bell_pepper leaf spot 0.0059 -1 50 70 246
+Bell_pepper leaf spot 0.0015 128 -1 241 50
+Bell_pepper leaf spot 0.0014 176 0 247 67
+Bell_pepper leaf spot 0.0013 196 0 304 53
+Bell_pepper leaf spot 0.0013 74 89 162 212
+Bell_pepper leaf spot 0.0013 235 55 329 124
+Corn leaf blight 0.0011 11 326 157 418
+Tomato Early blight leaf 0.3042 179 318 311 417
+Tomato Early blight leaf 0.2414 61 252 202 350
+Tomato Early blight leaf 0.1651 259 157 400 338
+Tomato Early blight leaf 0.1467 66 92 292 281
+Tomato Early blight leaf 0.0243 0 242 52 415
+Tomato Early blight leaf 0.0048 188 324 418 419
+Tomato Early blight leaf 0.0043 -1 4 59 204
+Tomato Early blight leaf 0.0037 58 89 175 202
+Tomato Early blight leaf 0.0035 69 330 167 395
+Tomato Early blight leaf 0.0031 361 243 416 384
+Tomato Early blight leaf 0.0025 0 181 52 350
+Tomato Early blight leaf 0.0024 298 256 415 417
+Tomato Early blight leaf 0.0023 237 55 366 168
+Tomato Early blight leaf 0.0022 35 248 202 420
+Tomato Early blight leaf 0.0021 1 312 45 409
+Tomato Early blight leaf 0.0020 169 365 262 414
+Tomato Early blight leaf 0.0015 101 95 314 201
+Tomato Early blight leaf 0.0013 358 260 416 325
+Tomato Early blight leaf 0.0012 214 0 390 60
+Tomato Early blight leaf 0.0012 0 105 51 294
+Tomato Early blight leaf 0.0011 197 195 362 338
+Tomato Early blight leaf 0.0010 55 367 154 416
+Tomato leaf bacterial spot 0.0028 363 252 415 403
+Tomato leaf bacterial spot 0.0023 25 -5 204 223
+Tomato leaf bacterial spot 0.0017 392 270 415 387
+Tomato leaf bacterial spot 0.0014 1 0 100 225
+Tomato leaf late blight 0.2560 252 156 405 339
+Tomato leaf late blight 0.2364 87 101 325 299
+Tomato leaf late blight 0.0089 61 69 411 346
+Tomato leaf late blight 0.0052 265 249 407 350
+Tomato leaf late blight 0.0017 202 89 352 190
+Tomato leaf late blight 0.0014 38 215 207 400
+Tomato leaf mosaic virus 0.0566 342 -1 415 75
+Tomato leaf mosaic virus 0.0085 372 52 417 84
+Tomato leaf mosaic virus 0.0069 208 332 312 414
+Tomato leaf mosaic virus 0.0053 366 11 415 97
+Tomato leaf mosaic virus 0.0025 307 5 352 99
+Tomato leaf mosaic virus 0.0024 304 121 386 178
+Tomato leaf mosaic virus 0.0023 392 55 416 94
+Tomato leaf mosaic virus 0.0018 337 0 420 141
+Tomato leaf mosaic virus 0.0016 372 378 417 417
+Tomato leaf mosaic virus 0.0016 355 -1 401 58
+Tomato leaf mosaic virus 0.0015 243 124 346 172
+Tomato leaf mosaic virus 0.0010 340 259 416 329
+Tomato leaf yellow virus 0.0340 231 0 328 56
+Tomato leaf yellow virus 0.0080 358 44 416 97
+Tomato leaf yellow virus 0.0034 264 -2 352 46
+Tomato leaf yellow virus 0.0021 320 -2 408 53
+Tomato leaf yellow virus 0.0020 322 -1 360 85
+Tomato leaf yellow virus 0.0014 296 0 359 108
+Tomato leaf yellow virus 0.0014 406 3 415 67
+Tomato leaf yellow virus 0.0010 407 36 416 99
+Tomato mold leaf 0.2907 52 0 226 110
+Tomato mold leaf 0.0536 342 -1 415 55
+Tomato mold leaf 0.0294 312 359 412 417
+Tomato mold leaf 0.0280 310 -3 414 100
+Tomato mold leaf 0.0226 218 0 336 78
+Tomato mold leaf 0.0167 0 8 72 201
+Tomato mold leaf 0.0101 376 302 416 385
+Tomato mold leaf 0.0098 226 0 310 55
+Tomato mold leaf 0.0066 161 0 240 54
+Tomato mold leaf 0.0053 369 0 420 23
+Tomato mold leaf 0.0029 371 246 417 320
+Tomato mold leaf 0.0026 204 313 297 417
+Tomato mold leaf 0.0020 38 391 98 416
+Tomato mold leaf 0.0020 216 11 342 147
+Tomato mold leaf 0.0016 340 0 434 9
+Tomato mold leaf 0.0016 339 263 417 426
+Tomato mold leaf 0.0016 267 0 331 23
+Tomato mold leaf 0.0014 236 89 377 188
+Tomato mold leaf 0.0014 33 404 101 416
+Tomato mold leaf 0.0012 104 -1 307 87
+Tomato mold leaf 0.0012 407 -8 416 64
+Tomato mold leaf 0.0010 273 258 414 416

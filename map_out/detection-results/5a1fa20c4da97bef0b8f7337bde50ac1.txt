@@ -1,0 +1,5 @@
+Corn leaf blight 0.9796 -11 44 429 382
+Corn leaf blight 0.0015 0 128 50 363
+Peach leaf 0.0291 -4 -1 148 45
+Peach leaf 0.0276 0 0 287 49
+Peach leaf 0.0017 186 0 373 23

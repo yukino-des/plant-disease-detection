@@ -1,0 +1,34 @@
+Raspberry leaf 0.0029 0 172 43 358
+Squash Powdery mildew leaf 0.9643 0 3 220 410
+Squash Powdery mildew leaf 0.7165 203 27 417 400
+Squash Powdery mildew leaf 0.5990 223 1 339 68
+Squash Powdery mildew leaf 0.5194 216 154 351 391
+Squash Powdery mildew leaf 0.0230 308 55 414 367
+Squash Powdery mildew leaf 0.0118 328 -3 416 49
+Squash Powdery mildew leaf 0.0084 211 24 414 211
+Squash Powdery mildew leaf 0.0081 204 -2 298 56
+Squash Powdery mildew leaf 0.0056 195 0 233 52
+Squash Powdery mildew leaf 0.0047 218 32 340 182
+Squash Powdery mildew leaf 0.0043 392 -3 415 115
+Squash Powdery mildew leaf 0.0042 157 -1 239 51
+Squash Powdery mildew leaf 0.0033 378 0 415 74
+Squash Powdery mildew leaf 0.0024 164 0 228 9
+Squash Powdery mildew leaf 0.0020 242 -1 411 76
+Squash Powdery mildew leaf 0.0018 -4 254 229 409
+Squash Powdery mildew leaf 0.0016 164 -2 204 77
+Squash Powdery mildew leaf 0.0016 342 0 434 9
+Squash Powdery mildew leaf 0.0016 212 0 263 24
+Squash Powdery mildew leaf 0.0016 195 0 245 23
+Squash Powdery mildew leaf 0.0016 366 -6 414 152
+Squash Powdery mildew leaf 0.0011 86 0 208 48
+Squash Powdery mildew leaf 0.0011 191 0 248 9
+Strawberry leaf 0.0122 1 232 77 425
+Strawberry leaf 0.0020 221 366 343 415
+Strawberry leaf 0.0013 408 406 415 417
+Strawberry leaf 0.0011 410 392 416 416
+grape leaf 0.0050 1 208 75 417
+grape leaf 0.0042 339 162 414 394
+grape leaf 0.0029 252 342 340 414
+grape leaf 0.0021 0 180 44 385
+grape leaf 0.0015 392 0 414 40
+grape leaf 0.0011 392 0 415 7

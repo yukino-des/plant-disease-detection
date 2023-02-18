@@ -1,0 +1,8 @@
+Strawberry leaf 0.9975 37 8 264 205
+Strawberry leaf 0.9969 234 81 391 352
+Strawberry leaf 0.9917 117 123 257 404
+Strawberry leaf 0.0018 177 13 253 131
+Strawberry leaf 0.0012 290 0 402 7
+Strawberry leaf 0.0012 148 115 244 320
+Strawberry leaf 0.0011 258 78 359 262
+grape leaf 0.0044 -1 181 50 411

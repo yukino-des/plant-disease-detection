@@ -1,0 +1,68 @@
+Potato leaf early blight 0.0517 230 180 394 309
+Potato leaf early blight 0.0292 180 29 299 178
+Potato leaf early blight 0.0096 249 54 347 168
+Potato leaf early blight 0.0052 90 46 157 126
+Potato leaf early blight 0.0036 245 339 367 417
+Potato leaf early blight 0.0026 238 172 329 235
+Potato leaf early blight 0.0023 14 0 137 92
+Potato leaf early blight 0.0018 147 72 214 133
+Potato leaf early blight 0.0012 3 55 76 126
+Potato leaf early blight 0.0012 82 33 204 137
+Potato leaf early blight 0.0010 1 41 78 232
+Potato leaf late blight 0.0013 397 246 416 372
+Potato leaf late blight 0.0012 358 247 404 338
+Tomato Early blight leaf 0.0326 16 323 137 413
+Tomato Early blight leaf 0.0235 160 232 219 414
+Tomato Early blight leaf 0.0055 310 -1 411 87
+Tomato Early blight leaf 0.0042 181 3 254 49
+Tomato Early blight leaf 0.0033 16 171 103 323
+Tomato Early blight leaf 0.0025 296 0 400 51
+Tomato Septoria leaf spot 0.0560 160 223 219 404
+Tomato Septoria leaf spot 0.0435 13 166 133 321
+Tomato Septoria leaf spot 0.0247 221 175 397 370
+Tomato Septoria leaf spot 0.0193 134 190 171 270
+Tomato Septoria leaf spot 0.0139 258 209 396 313
+Tomato Septoria leaf spot 0.0135 0 226 36 291
+Tomato Septoria leaf spot 0.0056 33 152 107 285
+Tomato Septoria leaf spot 0.0042 -5 0 58 21
+Tomato Septoria leaf spot 0.0026 231 241 322 385
+Tomato Septoria leaf spot 0.0026 74 181 137 243
+Tomato Septoria leaf spot 0.0015 1 67 77 238
+Tomato Septoria leaf spot 0.0015 -17 0 72 10
+Tomato Septoria leaf spot 0.0010 38 289 107 336
+Tomato Septoria leaf spot 0.0010 7 177 146 423
+Tomato leaf 0.0061 261 358 356 416
+Tomato leaf bacterial spot 0.0757 162 224 224 402
+Tomato leaf bacterial spot 0.0276 29 175 118 317
+Tomato leaf late blight 0.0144 -1 216 37 286
+Tomato leaf late blight 0.0047 366 245 413 343
+Tomato leaf late blight 0.0026 396 241 416 349
+Tomato leaf late blight 0.0024 249 38 339 168
+Tomato leaf late blight 0.0017 337 1 412 105
+Tomato leaf late blight 0.0016 277 29 345 102
+Tomato leaf mosaic virus 0.0017 407 0 416 23
+Tomato leaf mosaic virus 0.0016 348 -1 401 71
+Tomato leaf mosaic virus 0.0015 141 371 232 414
+Tomato leaf mosaic virus 0.0014 30 337 137 408
+Tomato mold leaf 0.1159 334 0 410 70
+Tomato mold leaf 0.0272 279 26 341 85
+Tomato mold leaf 0.0259 339 57 388 93
+Tomato mold leaf 0.0131 250 78 335 162
+Tomato mold leaf 0.0089 264 345 357 416
+Tomato mold leaf 0.0077 397 136 416 235
+Tomato mold leaf 0.0046 393 -2 416 39
+Tomato mold leaf 0.0035 196 13 243 45
+Tomato mold leaf 0.0031 345 181 363 228
+Tomato mold leaf 0.0030 196 0 258 21
+Tomato mold leaf 0.0029 -2 0 45 23
+Tomato mold leaf 0.0023 12 0 101 49
+Tomato mold leaf 0.0021 405 -6 416 45
+Tomato mold leaf 0.0021 392 45 415 92
+Tomato mold leaf 0.0021 77 0 137 23
+Tomato mold leaf 0.0020 405 140 416 218
+Tomato mold leaf 0.0019 43 296 90 335
+Tomato mold leaf 0.0019 29 -1 114 76
+Tomato mold leaf 0.0017 406 45 415 105
+Tomato mold leaf 0.0012 371 0 420 25
+Tomato mold leaf 0.0011 393 13 416 101
+Tomato mold leaf 0.0010 409 290 415 370

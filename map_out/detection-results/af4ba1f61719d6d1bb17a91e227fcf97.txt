@@ -1,0 +1,19 @@
+Apple Scab Leaf 0.8180 68 134 392 357
+Apple Scab Leaf 0.2391 -1 343 58 414
+Apple Scab Leaf 0.1903 13 319 157 416
+Apple Scab Leaf 0.0341 215 326 385 415
+Apple Scab Leaf 0.0025 6 23 363 399
+Apple Scab Leaf 0.0019 362 294 414 416
+Apple Scab Leaf 0.0014 396 230 416 393
+Apple leaf 0.1112 35 316 167 417
+Apple leaf 0.0092 15 26 286 179
+Apple rust leaf 0.0031 284 248 406 381
+Apple rust leaf 0.0010 395 248 416 407
+Blueberry leaf 0.0111 280 270 405 394
+Blueberry leaf 0.0043 256 38 372 189
+Blueberry leaf 0.0034 8 21 290 145
+Cherry leaf 0.0059 259 40 368 196
+Cherry leaf 0.0029 249 320 412 413
+Cherry leaf 0.0010 206 250 396 411
+Corn leaf blight 0.0011 0 133 81 356
+Peach leaf 0.0012 2 118 80 343

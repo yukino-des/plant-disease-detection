@@ -1,0 +1,21 @@
+Cherry leaf 0.0538 335 257 416 406
+Cherry leaf 0.0121 300 307 417 415
+Cherry leaf 0.0023 331 0 416 117
+Cherry leaf 0.0022 393 284 416 406
+Cherry leaf 0.0017 282 366 408 416
+Cherry leaf 0.0015 362 289 416 420
+Cherry leaf 0.0012 367 405 424 415
+Cherry leaf 0.0012 186 0 310 48
+Cherry leaf 0.0010 226 317 394 416
+Peach leaf 0.0011 74 0 171 8
+Strawberry leaf 0.0129 167 0 259 53
+Strawberry leaf 0.0038 306 65 382 138
+Strawberry leaf 0.0014 408 407 416 416
+Strawberry leaf 0.0014 390 410 417 416
+grape leaf 0.0010 154 0 332 80
+grape leaf black rot 0.9790 62 17 359 403
+grape leaf black rot 0.0055 303 59 382 244
+grape leaf black rot 0.0016 271 102 320 170
+grape leaf black rot 0.0015 276 14 400 409
+grape leaf black rot 0.0011 268 8 411 228
+grape leaf black rot 0.0010 70 103 164 261

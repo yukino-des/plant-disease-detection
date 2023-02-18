@@ -1,0 +1,14 @@
+Potato leaf early blight 0.7097 237 65 324 266
+Potato leaf early blight 0.7096 252 182 409 411
+Potato leaf early blight 0.6679 28 34 236 307
+Potato leaf early blight 0.5635 158 34 245 181
+Potato leaf early blight 0.2956 -1 259 231 417
+Potato leaf early blight 0.0116 114 258 235 367
+Potato leaf early blight 0.0052 231 35 360 363
+Potato leaf early blight 0.0043 110 323 242 416
+Potato leaf early blight 0.0031 126 77 170 161
+Potato leaf early blight 0.0027 302 178 393 352
+Potato leaf early blight 0.0017 160 134 230 266
+Potato leaf early blight 0.0016 119 65 176 204
+Potato leaf early blight 0.0012 145 45 228 253
+Potato leaf early blight 0.0011 127 364 240 415

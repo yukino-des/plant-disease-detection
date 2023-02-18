@@ -1,0 +1,11 @@
+Squash Powdery mildew leaf 0.0032 3 -2 145 159
+Strawberry leaf 0.0019 175 0 315 50
+Strawberry leaf 0.0017 395 -6 416 120
+Strawberry leaf 0.0017 126 0 424 98
+Strawberry leaf 0.0015 133 0 263 49
+Strawberry leaf 0.0010 363 -2 416 123
+Tomato Early blight leaf 0.0948 4 1 411 304
+Tomato Early blight leaf 0.0201 99 71 417 389
+Tomato Septoria leaf spot 0.0140 9 15 300 400
+Tomato leaf bacterial spot 0.3583 45 30 419 383
+Tomato mold leaf 0.3890 1 18 417 395

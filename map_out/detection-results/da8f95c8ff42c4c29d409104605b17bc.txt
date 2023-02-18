@@ -1,0 +1,15 @@
+Apple Scab Leaf 0.0376 307 0 412 294
+Apple rust leaf 0.0063 317 14 405 286
+Cherry leaf 0.0052 283 -9 410 300
+Corn leaf blight 0.7249 8 5 276 413
+Corn leaf blight 0.2054 0 -2 146 420
+Corn leaf blight 0.0114 0 80 15 316
+Corn leaf blight 0.0096 306 -12 412 349
+Corn leaf blight 0.0060 117 72 284 411
+Corn leaf blight 0.0049 2 37 21 362
+Corn leaf blight 0.0027 2 115 105 425
+Corn leaf blight 0.0025 2 1 210 164
+Corn leaf blight 0.0025 2 50 80 346
+Corn leaf blight 0.0023 1 18 44 349
+Corn leaf blight 0.0018 -1 309 21 406
+Tomato leaf yellow virus 0.0011 409 406 415 417

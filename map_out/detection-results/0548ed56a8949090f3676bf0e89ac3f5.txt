@@ -1,0 +1,12 @@
+Squash Powdery mildew leaf 0.9949 5 5 401 407
+Squash Powdery mildew leaf 0.0088 0 0 105 92
+Squash Powdery mildew leaf 0.0071 -2 -1 82 52
+Squash Powdery mildew leaf 0.0053 0 188 48 405
+Squash Powdery mildew leaf 0.0043 1 124 48 311
+Squash Powdery mildew leaf 0.0030 246 310 417 416
+Squash Powdery mildew leaf 0.0028 132 93 405 379
+Squash Powdery mildew leaf 0.0011 -3 0 46 79
+Strawberry leaf 0.0036 39 373 198 415
+Strawberry leaf 0.0033 308 367 416 416
+Tomato leaf yellow virus 0.0010 339 293 415 366
+grape leaf 0.0041 59 376 239 415

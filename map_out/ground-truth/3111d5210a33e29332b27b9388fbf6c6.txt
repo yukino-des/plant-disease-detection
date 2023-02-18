@@ -1,0 +1,8 @@
+Apple leaf 182 6 274 168
+Apple leaf 289 11 415 143
+Apple leaf 7 97 164 202
+Apple leaf 110 209 268 305
+Apple leaf 18 205 136 308
+Apple leaf 337 246 415 381
+Apple leaf 160 278 340 388
+Apple leaf 14 308 157 397

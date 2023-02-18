@@ -1,0 +1,9 @@
+Potato leaf early blight 0.3703 4 -7 408 358
+Squash Powdery mildew leaf 0.0083 8 -16 295 308
+Tomato Early blight leaf 0.1900 64 1 405 350
+Tomato Septoria leaf spot 0.0016 6 -2 405 242
+Tomato Septoria leaf spot 0.0014 408 344 415 429
+Tomato Septoria leaf spot 0.0011 193 1 410 106
+Tomato leaf late blight 0.1929 55 35 414 370
+Tomato leaf yellow virus 0.0101 411 391 415 416
+Tomato leaf yellow virus 0.0018 409 405 414 417

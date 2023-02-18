@@ -1,0 +1,4 @@
+Apple leaf 0.8975 63 -7 419 356
+Apple leaf 0.0066 20 8 287 407
+Apple rust leaf 0.0030 3 3 414 241
+Blueberry leaf 0.0017 16 -19 291 370

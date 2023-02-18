@@ -1,0 +1,28 @@
+Bell_pepper leaf 0.1931 0 20 55 156
+Bell_pepper leaf 0.0296 13 108 103 167
+Bell_pepper leaf 0.0050 0 -1 21 38
+Bell_pepper leaf 0.0047 0 11 25 134
+Bell_pepper leaf 0.0044 76 1 191 75
+Bell_pepper leaf 0.0025 0 -3 10 42
+Bell_pepper leaf 0.0016 0 0 7 9
+Bell_pepper leaf 0.0015 0 0 42 24
+Bell_pepper leaf 0.0014 0 0 22 7
+Bell_pepper leaf 0.0012 0 -1 6 26
+Blueberry leaf 0.0046 3 0 75 41
+Blueberry leaf 0.0011 -1 2 28 79
+Tomato Early blight leaf 0.0016 301 0 414 142
+Tomato leaf 0.0102 21 106 111 168
+Tomato leaf late blight 0.9218 91 26 274 380
+Tomato leaf late blight 0.2342 69 0 204 80
+Tomato leaf late blight 0.0175 0 182 111 305
+Tomato leaf late blight 0.0067 315 308 415 417
+Tomato leaf late blight 0.0020 270 0 413 103
+Tomato leaf late blight 0.0014 54 -1 249 235
+Tomato leaf mosaic virus 0.0084 324 338 418 417
+Tomato leaf mosaic virus 0.0040 337 0 416 113
+Tomato leaf mosaic virus 0.0037 375 2 416 106
+Tomato leaf yellow virus 0.0033 410 390 415 416
+Tomato leaf yellow virus 0.0013 408 361 416 429
+Tomato leaf yellow virus 0.0011 409 405 415 416
+Tomato mold leaf 0.0031 305 -1 412 111
+Tomato mold leaf 0.0023 361 -1 416 115

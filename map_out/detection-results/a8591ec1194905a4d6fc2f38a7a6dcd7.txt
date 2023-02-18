@@ -1,0 +1,35 @@
+Apple Scab Leaf 0.1155 -1 20 53 183
+Apple Scab Leaf 0.0047 0 79 22 223
+Apple Scab Leaf 0.0041 97 10 164 134
+Apple Scab Leaf 0.0027 -1 27 23 178
+Apple Scab Leaf 0.0021 0 106 8 188
+Apple Scab Leaf 0.0021 0 144 15 348
+Apple Scab Leaf 0.0015 -1 11 24 103
+Apple rust leaf 0.9464 241 29 407 349
+Apple rust leaf 0.9391 27 59 168 361
+Apple rust leaf 0.0258 0 38 49 232
+Apple rust leaf 0.0129 375 -2 417 76
+Apple rust leaf 0.0046 0 1 73 179
+Apple rust leaf 0.0042 28 91 154 255
+Apple rust leaf 0.0038 74 129 156 332
+Apple rust leaf 0.0033 335 -2 415 46
+Apple rust leaf 0.0032 86 9 157 133
+Apple rust leaf 0.0024 77 0 137 21
+Apple rust leaf 0.0021 0 87 18 274
+Apple rust leaf 0.0021 391 -1 416 113
+Apple rust leaf 0.0020 -1 64 23 206
+Apple rust leaf 0.0018 60 0 140 9
+Apple rust leaf 0.0016 -2 -15 29 217
+Apple rust leaf 0.0015 365 -5 415 121
+Apple rust leaf 0.0014 -3 16 119 348
+Apple rust leaf 0.0014 388 0 416 56
+Apple rust leaf 0.0013 44 0 109 21
+Apple rust leaf 0.0012 -6 0 61 23
+Apple rust leaf 0.0011 256 132 399 284
+Apple rust leaf 0.0010 400 42 416 231
+Blueberry leaf 0.0042 151 0 224 22
+Blueberry leaf 0.0029 137 98 203 302
+Blueberry leaf 0.0026 128 0 230 9
+Blueberry leaf 0.0025 164 39 212 132
+Blueberry leaf 0.0020 134 -1 230 39
+Blueberry leaf 0.0011 122 0 205 20

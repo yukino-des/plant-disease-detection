@@ -1,0 +1,10 @@
+Bell_pepper leaf spot 0.7366 6 30 354 382
+Cherry leaf 0.0020 274 236 356 384
+Corn leaf blight 0.0017 401 90 417 306
+Corn leaf blight 0.0011 3 95 407 419
+Corn leaf blight 0.0011 0 65 50 332
+Strawberry leaf 0.0036 337 0 437 8
+Strawberry leaf 0.0026 408 -17 415 72
+Strawberry leaf 0.0018 409 0 417 8
+Strawberry leaf 0.0010 -2 0 20 85
+Tomato Septoria leaf spot 0.0092 -1 -17 402 325

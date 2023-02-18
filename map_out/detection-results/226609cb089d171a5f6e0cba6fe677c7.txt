@@ -1,0 +1,7 @@
+Apple rust leaf 0.9264 1 59 414 354
+Apple rust leaf 0.4759 5 119 352 288
+Apple rust leaf 0.0018 3 133 292 410
+Apple rust leaf 0.0016 2 191 165 417
+Apple rust leaf 0.0010 65 184 342 298
+Corn rust leaf 0.0127 193 0 414 170
+Corn rust leaf 0.0012 2 4 230 158

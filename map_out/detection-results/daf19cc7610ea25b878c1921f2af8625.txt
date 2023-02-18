@@ -1,0 +1,12 @@
+Corn leaf blight 0.9904 -25 5 438 222
+Corn leaf blight 0.8857 -12 207 428 405
+Corn leaf blight 0.4995 -8 22 428 394
+Corn leaf blight 0.0338 10 142 209 249
+Corn leaf blight 0.0078 21 110 390 299
+Corn leaf blight 0.0047 54 270 356 413
+Corn leaf blight 0.0040 54 157 356 256
+Corn leaf blight 0.0023 48 225 363 323
+Corn leaf blight 0.0020 55 17 362 145
+Corn leaf blight 0.0014 -2 242 235 414
+Corn leaf blight 0.0010 7 -1 411 103
+Corn leaf blight 0.0010 0 17 52 254

@@ -1,0 +1,3 @@
+Corn leaf blight 0.0017 -14 0 157 21
+Tomato leaf late blight 0.9052 9 21 350 392
+Tomato leaf late blight 0.0030 104 1 411 303

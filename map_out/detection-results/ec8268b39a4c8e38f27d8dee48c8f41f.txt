@@ -1,0 +1,13 @@
+Blueberry leaf 0.9253 6 4 414 392
+Blueberry leaf 0.0050 306 314 416 416
+Blueberry leaf 0.0037 3 191 145 304
+Blueberry leaf 0.0027 400 118 416 248
+Blueberry leaf 0.0020 186 307 422 419
+Blueberry leaf 0.0018 68 0 343 243
+Blueberry leaf 0.0014 1 -2 49 121
+Blueberry leaf 0.0011 0 1 24 111
+Blueberry leaf 0.0010 14 3 155 104
+Peach leaf 0.0028 0 0 39 109
+Peach leaf 0.0020 0 3 20 167
+Peach leaf 0.0014 0 -15 46 184
+Potato leaf late blight 0.0145 407 137 415 222

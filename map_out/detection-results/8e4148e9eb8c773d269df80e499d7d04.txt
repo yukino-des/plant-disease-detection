@@ -1,0 +1,2 @@
+grape leaf 0.0012 -1 261 230 405
+grape leaf black rot 0.9685 10 4 405 403

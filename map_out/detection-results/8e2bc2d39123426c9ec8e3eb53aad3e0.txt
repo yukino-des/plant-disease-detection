@@ -1,0 +1,6 @@
+Bell_pepper leaf spot 0.0271 33 224 141 404
+Tomato Early blight leaf 0.5344 54 19 373 249
+Tomato Early blight leaf 0.2234 133 253 371 407
+Tomato Early blight leaf 0.1552 24 236 146 423
+Tomato Early blight leaf 0.0633 34 166 190 269
+Tomato leaf late blight 0.1211 131 233 371 401

@@ -1,0 +1,15 @@
+Blueberry leaf 0.9838 143 13 257 255
+Blueberry leaf 0.9737 29 102 145 271
+Blueberry leaf 0.9622 161 176 401 283
+Blueberry leaf 0.0069 339 405 419 415
+Blueberry leaf 0.0061 -16 404 70 415
+Blueberry leaf 0.0058 138 192 284 276
+Blueberry leaf 0.0036 392 410 418 416
+Blueberry leaf 0.0025 9 405 109 415
+Blueberry leaf 0.0018 -10 393 66 415
+Blueberry leaf 0.0017 377 411 414 416
+Blueberry leaf 0.0015 408 406 416 416
+Blueberry leaf 0.0014 257 168 398 266
+Blueberry leaf 0.0012 354 392 421 415
+Blueberry leaf 0.0010 411 390 416 419
+Soyabean leaf 0.0010 389 0 418 5

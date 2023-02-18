@@ -1,0 +1,8 @@
+Strawberry leaf 0.9990 159 19 319 244
+Strawberry leaf 0.9988 5 124 202 309
+Strawberry leaf 0.9948 193 198 389 366
+Strawberry leaf 0.0026 12 0 151 99
+Strawberry leaf 0.0026 394 6 416 165
+Strawberry leaf 0.0018 109 130 195 304
+Strawberry leaf 0.0013 184 57 277 245
+Tomato leaf 0.0010 0 0 10 7

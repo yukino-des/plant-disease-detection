@@ -1,0 +1,8 @@
+Raspberry leaf 0.9885 113 143 355 390
+Raspberry leaf 0.9758 112 17 322 156
+Raspberry leaf 0.9584 23 124 139 352
+Raspberry leaf 0.0035 141 166 333 319
+Raspberry leaf 0.0014 388 0 420 4
+Strawberry leaf 0.0011 411 389 415 416
+Strawberry leaf 0.0010 409 406 415 417
+grape leaf black rot 0.0010 393 387 414 416

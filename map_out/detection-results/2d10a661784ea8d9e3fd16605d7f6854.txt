@@ -1,0 +1,6 @@
+Strawberry leaf 0.9990 134 27 337 256
+Strawberry leaf 0.9983 17 85 187 280
+Strawberry leaf 0.9958 174 181 408 355
+Strawberry leaf 0.0020 141 78 195 256
+Strawberry leaf 0.0019 153 119 339 382
+Strawberry leaf 0.0010 148 39 222 232

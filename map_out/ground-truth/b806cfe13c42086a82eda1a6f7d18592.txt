@@ -1,0 +1,3 @@
+Strawberry leaf 175 16 313 241
+Strawberry leaf 203 205 379 376
+Strawberry leaf 10 123 195 314

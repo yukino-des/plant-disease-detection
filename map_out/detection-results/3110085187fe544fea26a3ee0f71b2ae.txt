@@ -1,0 +1,30 @@
+Corn leaf blight 0.9867 -11 7 425 405
+Corn leaf blight 0.2604 -1 -2 101 99
+Corn leaf blight 0.0646 347 366 424 391
+Corn leaf blight 0.0286 18 10 331 278
+Corn leaf blight 0.0278 -9 125 299 409
+Corn leaf blight 0.0250 2 42 77 94
+Corn leaf blight 0.0163 0 0 88 53
+Corn leaf blight 0.0125 345 372 413 398
+Corn leaf blight 0.0107 29 67 114 270
+Corn leaf blight 0.0101 350 404 410 415
+Corn leaf blight 0.0096 1 38 100 389
+Corn leaf blight 0.0091 -1 19 62 88
+Corn leaf blight 0.0089 294 265 358 421
+Corn leaf blight 0.0066 10 -5 142 303
+Corn leaf blight 0.0043 363 409 394 415
+Corn leaf blight 0.0042 337 391 391 415
+Corn leaf blight 0.0028 358 392 417 415
+Corn leaf blight 0.0028 -5 -1 48 25
+Corn leaf blight 0.0022 377 410 412 415
+Corn leaf blight 0.0017 308 372 417 416
+Corn leaf blight 0.0017 408 351 416 421
+Corn leaf blight 0.0017 76 -8 392 169
+Corn leaf blight 0.0016 5 74 77 293
+Corn leaf blight 0.0013 4 8 146 145
+Corn leaf blight 0.0011 303 332 349 414
+Corn leaf blight 0.0011 411 364 416 394
+Corn leaf blight 0.0011 307 -22 382 236
+Corn leaf blight 0.0011 350 382 408 409
+Tomato leaf yellow virus 0.0019 357 367 415 412
+Tomato leaf yellow virus 0.0010 0 252 6 347

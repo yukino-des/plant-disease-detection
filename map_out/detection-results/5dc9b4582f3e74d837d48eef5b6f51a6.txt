@@ -1,0 +1,3 @@
+Bell_pepper leaf spot 0.9416 -4 0 415 355
+Bell_pepper leaf spot 0.0012 32 8 381 219
+Tomato Septoria leaf spot 0.0499 -11 -24 424 266

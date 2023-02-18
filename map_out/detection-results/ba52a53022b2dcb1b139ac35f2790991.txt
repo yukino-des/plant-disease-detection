@@ -1,0 +1,15 @@
+Bell_pepper leaf spot 0.0055 376 -1 417 85
+Corn Gray leaf spot 0.8800 -17 147 431 409
+Corn Gray leaf spot 0.0012 59 183 360 288
+Corn leaf blight 0.1567 0 29 168 143
+Corn leaf blight 0.0084 -3 1 163 100
+Corn leaf blight 0.0043 97 0 321 96
+Corn leaf blight 0.0027 1 0 81 48
+Corn leaf blight 0.0021 377 -4 416 114
+Corn leaf blight 0.0021 0 0 222 50
+Corn leaf blight 0.0017 401 108 416 254
+Corn leaf blight 0.0017 0 -7 16 121
+Corn leaf blight 0.0016 135 0 237 46
+Corn leaf blight 0.0013 394 0 416 142
+Corn leaf blight 0.0010 58 5 357 157
+Corn leaf blight 0.0010 -5 -6 422 232
