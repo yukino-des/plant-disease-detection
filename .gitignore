@@ -1,8 +1,10 @@
 .idea/
 *.docx
 tmp/
-map_out/
-img/
-img_out/
-video/
-video_out/
+maps_out/
+imgs/
+imgs_out/
+videos/
+videos_out/
+model_data/_voc_classes.txt
+VOCdevkit/_VOC/

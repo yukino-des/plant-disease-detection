@@ -16,16 +16,16 @@ if __name__ == "__main__":
     score_threhold = 0.5
     map_vis = False
     VOCdevkit_path = 'VOCdevkit'
-    map_out_path = 'map_out'
+    maps_out_path = 'maps_out'
     image_ids = open(os.path.join(VOCdevkit_path, "VOC/ImageSets/Main/test.txt")).read().strip().split()
-    if not os.path.exists(map_out_path):
-        os.makedirs(map_out_path)
-    if not os.path.exists(os.path.join(map_out_path, 'ground-truth')):
-        os.makedirs(os.path.join(map_out_path, 'ground-truth'))
-    if not os.path.exists(os.path.join(map_out_path, 'detection-results')):
-        os.makedirs(os.path.join(map_out_path, 'detection-results'))
-    if not os.path.exists(os.path.join(map_out_path, 'images-optional')):
-        os.makedirs(os.path.join(map_out_path, 'images-optional'))
+    if not os.path.exists(maps_out_path):
+        os.makedirs(maps_out_path)
+    if not os.path.exists(os.path.join(maps_out_path, 'ground-truth')):
+        os.makedirs(os.path.join(maps_out_path, 'ground-truth'))
+    if not os.path.exists(os.path.join(maps_out_path, 'detection-results')):
+        os.makedirs(os.path.join(maps_out_path, 'detection-results'))
+    if not os.path.exists(os.path.join(maps_out_path, 'images-optional')):
+        os.makedirs(os.path.join(maps_out_path, 'images-optional'))
     class_names, _ = get_classes(classes_path)
     print("Load model.")
     yolo = YOLO(confidence=confidence, nms_iou=nms_iou)
@@ -35,12 +35,12 @@ if __name__ == "__main__":
         image_path = os.path.join(VOCdevkit_path, "VOC/JPEGImages/" + image_id + ".jpg")
         image = Image.open(image_path)
         if map_vis:
-            image.save(os.path.join(map_out_path, "images-optional/" + image_id + ".jpg"))
-        yolo.get_map_txt(image_id, image, class_names, map_out_path)
+            image.save(os.path.join(maps_out_path, "images-optional/" + image_id + ".jpg"))
+        yolo.get_map_txt(image_id, image, class_names, maps_out_path)
     print("Get predict result done.")
     print("Get ground truth result.")
     for image_id in tqdm(image_ids):
-        with open(os.path.join(map_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
+        with open(os.path.join(maps_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
             root = ET.parse(os.path.join(VOCdevkit_path, "VOC/Annotations/" + image_id + ".xml")).getroot()
             for obj in root.findall('object'):
                 difficult_flag = False
@@ -62,5 +62,5 @@ if __name__ == "__main__":
                     new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
     print("Get ground truth result done.")
     print("Get map.")
-    get_map(MINOVERLAP, True, score_threhold=score_threhold, path=map_out_path)
+    get_map(MINOVERLAP, True, score_threhold=score_threhold, path=maps_out_path)
     print("Get map done.")

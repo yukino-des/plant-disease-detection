@@ -243,8 +243,8 @@ class YOLO(object):
             onnx.save(model_onnx, model_path)
         print('Save to {}'.format(model_path))
 
-    def get_map_txt(self, image_id, image, class_names, map_out_path):
-        f = open(os.path.join(map_out_path, "detection-results/" + image_id + ".txt"), "w")
+    def get_map_txt(self, image_id, image, class_names, maps_out_path):
+        f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
