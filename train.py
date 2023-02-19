@@ -17,14 +17,15 @@ from utils.utils import download_weights, get_anchors, get_classes, show_config
 from utils.utils_fit import fit_one_epoch
 
 if __name__ == "__main__":
-    # TODO
+    # todo update `Cuda = True`
     Cuda = False
     distributed = False
     fp16 = False
     classes_path = 'model_data/voc_classes.txt'
     anchors_path = 'model_data/yolo_anchors.txt'
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-    model_path = 'model_data/yolov4_mobilenet_v2_voc.pth'
+    # todo update `model_path = 'logs/best_epoch_weights.pth'` if training is interrupted
+    model_path = 'model_data/mobilenetv2_yolov4_voc.pth'
     input_shape = [416, 416]
     backbone = "mobilenetv2"
     pretrained = False
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     special_aug_ratio = 0.7
     label_smoothing = 0
     # `optimizer_type = "adam"`
+    # todo update `Init_Epoch` if training is interrupted
     Init_Epoch = 0
     Freeze_Epoch = 50
     Freeze_batch_size = 16
@@ -70,8 +72,8 @@ if __name__ == "__main__":
     eval_flag = True
     eval_period = 10
     num_workers = 4
-    train_annotation_path = '2007_train.txt'
-    val_annotation_path = '2007_val.txt'
+    train_annotation_path = 'train.txt'
+    val_annotation_path = 'val.txt'
     ngpus_per_node = torch.cuda.device_count()
     if distributed:
         dist.init_process_group(backend="nccl")
@@ -262,7 +264,7 @@ if __name__ == "__main__":
                                          class_names,
                                          num_classes,
                                          val_lines,
-                                         # FIXME
+                                         # fixme
                                          log_dir,
                                          Cuda,
                                          eval_flag=eval_flag,

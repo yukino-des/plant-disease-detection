@@ -306,7 +306,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./map_out'):
             score_threhold_idx = 0
             for idx, detection in enumerate(dr_data):
                 file_id = detection["file_id"]
-                # FIXME
+                # fixme
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threhold:
                     score_threhold_idx = idx

@@ -78,7 +78,7 @@ class YoloDataset(Dataset):
             image = image.resize((nw, nh), Image.BICUBIC)
             new_image = Image.new('RGB', (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
-            # FIXME
+            # fixme
             image_data = np.array(new_image, np.float32)
             if len(box) > 0:
                 np.random.shuffle(box)
@@ -107,7 +107,7 @@ class YoloDataset(Dataset):
         image = new_image
         flip = self.rand() < .5
         if flip: image = image.transpose(Image.FLIP_LEFT_RIGHT)
-        # FIXME
+        # fixme
         image_data = np.array(image, np.uint8)
         r = np.random.uniform(-1, 1, 3) * [hue, sat, val] + 1
         hue, sat, val = cv2.split(cv2.cvtColor(image_data, cv2.COLOR_RGB2HSV))
@@ -212,7 +212,7 @@ class YoloDataset(Dataset):
                 dx = int(w * min_offset_x)
                 dy = int(h * min_offset_y) - nh
             new_image = Image.new('RGB', (w, h), (128, 128, 128))
-            # FIXME
+            # fixme
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)
             index = index + 1

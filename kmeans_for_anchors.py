@@ -70,7 +70,7 @@ if __name__ == '__main__':
     np.random.seed(0)
     input_shape = [416, 416]
     anchors_num = 9
-    path = 'VOCdevkit/VOC2007/Annotations'
+    path = 'VOCdevkit/VOC/Annotations'
     print('Load xmls.')
     data = load_data(path)
     print('Load xmls done.')

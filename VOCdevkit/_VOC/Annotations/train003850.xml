@@ -1,0 +1,26 @@
+<annotation>
+	<folder>database</folder>
+	<filename>003850.jpg</filename>
+	<path>G:\database\g1.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>3136</width>
+		<height>3136</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>Disease-B</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>462</xmin>
+			<ymin>925</ymin>
+			<xmax>2654</xmax>
+			<ymax>2365</ymax>
+		</bndbox>
+	</object>
+</annotation>

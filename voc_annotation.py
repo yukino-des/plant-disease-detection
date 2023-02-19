@@ -10,14 +10,14 @@ classes_path = 'model_data/voc_classes.txt'
 trainval_percent = 0.9
 train_percent = 0.9
 VOCdevkit_path = 'VOCdevkit'
-VOCdevkit_sets = [('2007', 'train'), ('2007', 'val')]
+VOCdevkit_sets = ['train', 'val']
 classes, _ = get_classes(classes_path)
 photo_nums = np.zeros(len(VOCdevkit_sets))
 nums = np.zeros(len(classes))
 
 
-def convert_annotation(year, image_id, list_file):
-    in_file = open(os.path.join(VOCdevkit_path, 'VOC%s/Annotations/%s.xml' % (year, image_id)), encoding='utf-8')
+def convert_annotation(image_id, list_file):
+    in_file = open(os.path.join(VOCdevkit_path, 'VOC/Annotations/%s.xml' % image_id), encoding='utf-8')
     tree = ET.parse(in_file)
     root = tree.getroot()
     for obj in root.iter('object'):
@@ -49,8 +49,8 @@ if __name__ == "__main__":
     if " " in os.path.abspath(VOCdevkit_path):
         raise ValueError("Image path cannot contain spaces.")
     print("Generate txt in ImageSets.")
-    xmlfilepath = os.path.join(VOCdevkit_path, 'VOC2007/Annotations')
-    saveBasePath = os.path.join(VOCdevkit_path, 'VOC2007/ImageSets/Main')
+    xmlfilepath = os.path.join(VOCdevkit_path, 'VOC/Annotations')
+    saveBasePath = os.path.join(VOCdevkit_path, 'VOC/ImageSets/Main')
     temp_xml = os.listdir(xmlfilepath)
     total_xml = []
     for xml in temp_xml:
@@ -81,20 +81,20 @@ if __name__ == "__main__":
     fval.close()
     ftest.close()
     print("Generate txt in ImageSets done.")
-    print("Generate 2007_train.txt and 2007_val.txt.")
+    print("Generate train.txt and val.txt.")
     type_index = 0
-    for year, image_set in VOCdevkit_sets:
-        image_ids = open(os.path.join(VOCdevkit_path, 'VOC%s/ImageSets/Main/%s.txt' % (year, image_set)),
+    for image_set in VOCdevkit_sets:
+        image_ids = open(os.path.join(VOCdevkit_path, 'VOC/ImageSets/Main/%s.txt' % image_set),
                          encoding='utf-8').read().strip().split()
-        list_file = open('%s_%s.txt' % (year, image_set), 'w', encoding='utf-8')
+        list_file = open('%s.txt' % image_set, 'w', encoding='utf-8')
         for image_id in image_ids:
-            list_file.write('%s/VOC%s/JPEGImages/%s.jpg' % (os.path.abspath(VOCdevkit_path), year, image_id))
-            convert_annotation(year, image_id, list_file)
+            list_file.write('%s/VOC/JPEGImages/%s.jpg' % (os.path.abspath(VOCdevkit_path), image_id))
+            convert_annotation(image_id, list_file)
             list_file.write('\n')
         photo_nums[type_index] = len(image_ids)
         type_index += 1
         list_file.close()
-    print("Generate 2007_train.txt and 2007_val.txt done.")
+    print("Generate train.txt and val.txt done.")
     str_nums = [str(int(x)) for x in nums]
     tableData = [classes, str_nums]
     colWidths = [0] * len(tableData)

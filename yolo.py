@@ -27,8 +27,8 @@ class YOLO(object):
         "confidence": 0.5,
         "nms_iou": 0.3,
         "letterbox_image": False,
-        # TODO
-        "cuda": False,
+        # todo update `"cuda": True`
+        "cuda": False
     }
 
     @classmethod

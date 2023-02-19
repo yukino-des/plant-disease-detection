@@ -17,7 +17,7 @@ if __name__ == "__main__":
     map_vis = False
     VOCdevkit_path = 'VOCdevkit'
     map_out_path = 'map_out'
-    image_ids = open(os.path.join(VOCdevkit_path, "VOC2007/ImageSets/Main/test.txt")).read().strip().split()
+    image_ids = open(os.path.join(VOCdevkit_path, "VOC/ImageSets/Main/test.txt")).read().strip().split()
     if not os.path.exists(map_out_path):
         os.makedirs(map_out_path)
     if not os.path.exists(os.path.join(map_out_path, 'ground-truth')):
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     print("Load model done.")
     print("Get predict result.")
     for image_id in tqdm(image_ids):
-        image_path = os.path.join(VOCdevkit_path, "VOC2007/JPEGImages/" + image_id + ".jpg")
+        image_path = os.path.join(VOCdevkit_path, "VOC/JPEGImages/" + image_id + ".jpg")
         image = Image.open(image_path)
         if map_vis:
             image.save(os.path.join(map_out_path, "images-optional/" + image_id + ".jpg"))
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     print("Get ground truth result.")
     for image_id in tqdm(image_ids):
         with open(os.path.join(map_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
-            root = ET.parse(os.path.join(VOCdevkit_path, "VOC2007/Annotations/" + image_id + ".xml")).getroot()
+            root = ET.parse(os.path.join(VOCdevkit_path, "VOC/Annotations/" + image_id + ".xml")).getroot()
             for obj in root.findall('object'):
                 difficult_flag = False
                 if obj.find('difficult') is not None:
