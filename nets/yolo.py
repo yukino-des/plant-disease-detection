@@ -57,7 +57,7 @@ class Upsample(nn.Module):
         super(Upsample, self).__init__()
         self.upsample = nn.Sequential(
             conv2d(in_channels, out_channels, 1),
-            nn.Upsample(scale_factor=2, mode='nearest')
+            nn.Upsample(scale_factor=2, mode="nearest")
         )
 
     def forward(self, x, ):
@@ -101,7 +101,7 @@ class YoloBody(nn.Module):
             in_filters = [32, 96, 320]
         else:
             raise ValueError(
-                'Unsupported backbone - `{}`, Use mobilenetv2'.format(backbone))
+                "Unsupported backbone - `{}`, Use mobilenetv2".format(backbone))
         self.conv1 = make_three_conv([512, 1024], in_filters[2])
         self.SPP = SpatialPyramidPooling()
         self.conv2 = make_three_conv([512, 1024], 2048)

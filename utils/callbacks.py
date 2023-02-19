@@ -14,7 +14,7 @@ from .utils import cvtColor, preprocess_input, resize_image
 from .utils_bbox import DecodeBox
 from .utils_map import get_map
 
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 
 
 class LossHistory:
@@ -35,21 +35,21 @@ class LossHistory:
             os.makedirs(self.log_dir)
         self.losses.append(loss)
         self.val_loss.append(val_loss)
-        with open(os.path.join(self.log_dir, "epoch_loss.txt"), 'a') as f:
+        with open(os.path.join(self.log_dir, "epoch_loss.txt"), "a") as f:
             f.write(str(loss))
             f.write("\n")
-        with open(os.path.join(self.log_dir, "epoch_val_loss.txt"), 'a') as f:
+        with open(os.path.join(self.log_dir, "epoch_val_loss.txt"), "a") as f:
             f.write(str(val_loss))
             f.write("\n")
-        self.writer.add_scalar('loss', loss, epoch)
-        self.writer.add_scalar('val_loss', val_loss, epoch)
+        self.writer.add_scalar("loss", loss, epoch)
+        self.writer.add_scalar("val_loss", val_loss, epoch)
         self.loss_plot()
 
     def loss_plot(self):
         iters = range(len(self.losses))
         plt.figure()
-        plt.plot(iters, self.losses, 'red', linewidth=2, label='train loss')
-        plt.plot(iters, self.val_loss, 'coral', linewidth=2, label='val loss')
+        plt.plot(iters, self.losses, "red", linewidth=2, label="train loss")
+        plt.plot(iters, self.val_loss, "coral", linewidth=2, label="val loss")
         try:
             if len(self.losses) < 25:
                 num = 5
@@ -57,20 +57,20 @@ class LossHistory:
                 num = 15
             plt.plot(iters,
                      signal.savgol_filter(self.losses, num, 3),
-                     'green',
-                     linestyle='--',
+                     "green",
+                     linestyle="--",
                      linewidth=2,
-                     label='smooth train loss')
+                     label="smooth train loss")
             plt.plot(iters,
                      signal.savgol_filter(self.val_loss, num, 3),
-                     '#8B4513',
-                     linestyle='--', linewidth=2,
-                     label='smooth val loss')
+                     "#8B4513",
+                     linestyle="--", linewidth=2,
+                     label="smooth val loss")
         except:
             pass
         plt.grid(True)
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
         plt.legend(loc="upper right")
         plt.savefig(os.path.join(self.log_dir, "epoch_loss.png"))
         plt.cla()
@@ -121,16 +121,16 @@ class EvalCallback:
         self.maps = [0]
         self.epoches = [0]
         if self.eval_flag:
-            with open(os.path.join(self.log_dir, "epoch_map.txt"), 'a') as f:
+            with open(os.path.join(self.log_dir, "epoch_map.txt"), "a") as f:
                 f.write(str(0))
                 f.write("\n")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w", encoding='utf-8')
+        f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -142,7 +142,7 @@ class EvalCallback:
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return
-            top_label = np.array(results[0][:, 6], dtype='int32')
+            top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
         top_100 = np.argsort(top_conf)[::-1][:self.max_boxes]
@@ -173,9 +173,9 @@ class EvalCallback:
             print("Get map.")
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
-                image_id = os.path.basename(line[0]).split('.')[0]
+                image_id = os.path.basename(line[0]).split(".")[0]
                 image = Image.open(line[0])
-                gt_boxes = np.array([np.array(list(map(int, box.split(',')))) for box in line[1:]])
+                gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
                 self.get_map_txt(image_id, image, self.class_names, self.maps_out_path)
                 with open(os.path.join(self.maps_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
                     for box in gt_boxes:
@@ -186,15 +186,15 @@ class EvalCallback:
             temp_map = get_map(self.MINOVERLAP, False, path=self.maps_out_path)
             self.maps.append(temp_map)
             self.epoches.append(epoch)
-            with open(os.path.join(self.log_dir, "epoch_map.txt"), 'a') as f:
+            with open(os.path.join(self.log_dir, "epoch_map.txt"), "a") as f:
                 f.write(str(temp_map))
                 f.write("\n")
             plt.figure()
-            plt.plot(self.epoches, self.maps, 'red', linewidth=2, label='train map')
+            plt.plot(self.epoches, self.maps, "red", linewidth=2, label="train map")
             plt.grid(True)
-            plt.xlabel('Epoch')
-            plt.ylabel('Map %s' % str(self.MINOVERLAP))
-            plt.title('A Map Curve')
+            plt.xlabel("Epoch")
+            plt.ylabel("Map %s" % str(self.MINOVERLAP))
+            plt.title("A Map Curve")
             plt.legend(loc="upper right")
             plt.savefig(os.path.join(self.log_dir, "epoch_map.png"))
             plt.cla()

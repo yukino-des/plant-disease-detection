@@ -25,6 +25,19 @@ lsof -i:8081
 kill -9 {PID}
 ```
 
+4. if `os.name == "Windows"`
+```text
+HTTP_PROXY http://127.0.0.1:7890
+HTTPS_PROXY http://127.0.0.1:7890
+```
+
+5. git
+```shell
+git stash
+git pull
+git rm -r --cached .
+```
+
 ### class blance
 
 <img src="VOCdevkit/class_balance.png" alt="class balance">

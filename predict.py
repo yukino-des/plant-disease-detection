@@ -39,11 +39,11 @@ def predict():
     onnx_save_path = "model_data/models.onnx"
     if mode == "predict":
         while True:
-            img = input('Input image filename:')
+            img = input("Input image filename:")
             try:
                 image = Image.open(img)
             except:
-                print('Open error!')
+                print("Open error!")
                 continue
             else:
                 r_image, _ = yolo.detect_image(image, crop=crop, count=count)
@@ -52,7 +52,7 @@ def predict():
         capture = cv2.VideoCapture(video_path)
         if video_save_path != "":
             video_save_path = "videos_out/01.avi"
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         out = cv2.VideoWriter(video_save_path, fourcc, video_fps, size)
         ref, frame = capture.read()
@@ -86,12 +86,12 @@ def predict():
     elif mode == "fps":
         img = Image.open(fps_image_path)
         tact_time = yolo.get_FPS(img, test_interval)
-        print(str(tact_time) + ' seconds, ' + str(1 / tact_time) + ' FPS, @batch_size 1')
+        print(str(tact_time) + " seconds, " + str(1 / tact_time) + " FPS, @batch_size 1")
     elif mode == "dir_predict":
         img_names = os.listdir(dir_origin_path)
         for img_name in tqdm(img_names):
             if img_name.lower().endswith(
-                    ('.bmp', '.dib', '.png', '.jpg', '.jpeg', '.pbm', '.pgm', '.ppm', '.tif', '.tiff')):
+                    (".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff")):
                 image_path = os.path.join(dir_origin_path, img_name)
                 image = Image.open(image_path)
                 r_image, _ = yolo.detect_image(image)
@@ -100,11 +100,11 @@ def predict():
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
     elif mode == "heatmap":
         while True:
-            img = input('Input image filename:')
+            img = input("Input image filename:")
             try:
                 image = Image.open(img)
             except:
-                print('Open error!')
+                print("Open error!")
                 continue
             else:
                 yolo.detect_heatmap(image, heatmap_save_path)
@@ -114,5 +114,5 @@ def predict():
         raise AssertionError("Use mode: 'predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict'.")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     predict()

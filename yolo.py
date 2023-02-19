@@ -18,12 +18,12 @@ from utils.utils_bbox import DecodeBox
 
 class YOLO(object):
     _defaults = {
-        "model_path": 'logs/best_epoch_weights.pth',
-        "classes_path": 'model_data/voc_classes.txt',
-        "anchors_path": 'model_data/yolo_anchors.txt',
+        "model_path": "logs/best_epoch_weights.pth",
+        "classes_path": "model_data/voc_classes.txt",
+        "anchors_path": "model_data/yolo_anchors.txt",
         "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],
         "input_shape": [416, 416],
-        "backbone": 'mobilenetv2',
+        "backbone": "mobilenetv2",
         "confidence": 0.5,
         "nms_iou": 0.3,
         "letterbox_image": False,
@@ -36,15 +36,15 @@ class YOLO(object):
         if n in cls._defaults:
             return cls._defaults[n]
         else:
-            return "Unrecognized attribute name '" + n + "'"
+            return "Unrecognized attribute name "" + n + """
 
     def __init__(self, **kwargs):
-        self.classes_path = ''
-        self.anchors_path = ''
+        self.classes_path = ""
+        self.anchors_path = ""
         self.input_shape = []
         self.anchors_mask = []
-        self.backbone = ''
-        self.model_path = ''
+        self.backbone = ""
+        self.model_path = ""
         self.cuda = False
         self.letterbox_image = False
         self.confidence = 0
@@ -67,7 +67,7 @@ class YOLO(object):
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes, self.backbone)
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
         self.net = self.net.eval()
         if not onnx:
@@ -79,7 +79,7 @@ class YOLO(object):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -95,11 +95,11 @@ class YOLO(object):
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return image, {}
-            top_label = np.array(results[0][:, 6], dtype='int32')
+            top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font='model_data/simhei.ttf',
-                                  size=np.floor(3e-2 * image.size[1] + 0.5).astype('int32'))
+        font = ImageFont.truetype(font="model_data/simhei.ttf",
+                                  size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
         if count:
             print("top_label:", top_label)
@@ -113,10 +113,10 @@ class YOLO(object):
         if crop:
             for i, c in list(enumerate(top_label)):
                 top, left, bottom, right = top_boxes[i]
-                top = max(0, np.floor(top).astype('int32'))
-                left = max(0, np.floor(left).astype('int32'))
-                bottom = min(image.size[1], np.floor(bottom).astype('int32'))
-                right = min(image.size[0], np.floor(right).astype('int32'))
+                top = max(0, np.floor(top).astype("int32"))
+                left = max(0, np.floor(left).astype("int32"))
+                bottom = min(image.size[1], np.floor(bottom).astype("int32"))
+                right = min(image.size[0], np.floor(right).astype("int32"))
                 dir_save_path = "imgs_out"
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
@@ -130,17 +130,17 @@ class YOLO(object):
             box = top_boxes[i]
             score = top_conf[i]
             top, left, bottom, right = box
-            top = max(0, np.floor(top).astype('int32'))
-            left = max(0, np.floor(left).astype('int32'))
-            bottom = min(image.size[1], np.floor(bottom).astype('int32'))
-            right = min(image.size[0], np.floor(right).astype('int32'))
-            label = '{} {:.2f}'.format(predicted_class, score)
+            top = max(0, np.floor(top).astype("int32"))
+            left = max(0, np.floor(left).astype("int32"))
+            bottom = min(image.size[1], np.floor(bottom).astype("int32"))
+            right = min(image.size[0], np.floor(right).astype("int32"))
+            label = "{} {:.2f}".format(predicted_class, score)
             count += 1
-            key = '{}-{:02}'.format(predicted_class, count)
-            image_info[key] = ['{}×{}'.format(right - left, bottom - top), np.round(float(score), 3)]
+            key = "{}-{:02}".format(predicted_class, count)
+            image_info[key] = ["{}×{}".format(right - left, bottom - top), np.round(float(score), 3)]
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
-            label = label.encode('utf-8')
+            label = label.encode("utf-8")
             if top - label_size[1] >= 0:
                 text_origin = np.array([left, top - label_size[1]])
             else:
@@ -148,7 +148,7 @@ class YOLO(object):
             for d in range(thickness):
                 draw.rectangle((left + d, top + d, right - d, bottom - d), outline=self.colors[c])
             draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
-            draw.text(tuple(text_origin), str(label, 'UTF-8'), fill=(0, 0, 0), font=font)
+            draw.text(tuple(text_origin), str(label, "UTF-8"), fill=(0, 0, 0), font=font)
             del draw
         return image, image_info
 
@@ -156,7 +156,7 @@ class YOLO(object):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -189,14 +189,14 @@ class YOLO(object):
     def detect_heatmap(self, image, heatmap_save_path):
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
                 images = images.cuda()
             outputs = self.net(images)
         plt.imshow(image, alpha=1)
-        plt.axis('off')
+        plt.axis("off")
         mask = np.zeros((image.size[1], image.size[0]))
         sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
         for sub_output in outputs:
@@ -205,22 +205,22 @@ class YOLO(object):
             sub_output = np.transpose(np.reshape(sub_output, [b, 3, -1, h, w]), [0, 3, 4, 1, 2])[0]
             score = np.max(sigmoid(sub_output[..., 4]), -1)
             score = cv2.resize(score, (image.size[0], image.size[1]))
-            normed_score = (score * 255).astype('uint8')
+            normed_score = (score * 255).astype("uint8")
             mask = np.maximum(mask, normed_score)
-        plt.imshow(mask, alpha=0.5, interpolation='nearest', cmap="jet")
-        plt.axis('off')
+        plt.imshow(mask, alpha=0.5, interpolation="nearest", cmap="jet")
+        plt.axis("off")
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
-        plt.savefig(heatmap_save_path, dpi=200, bbox_inches='tight', pad_inches=-0.1)
+        plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
         print("Save to " + heatmap_save_path)
         plt.show()
 
     def convert_to_onnx(self, simplify, model_path):
         self.generate(onnx=True)
-        im = torch.zeros(1, 3, *self.input_shape).to('cpu')
+        im = torch.zeros(1, 3, *self.input_shape).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        print(f'Onnx {onnx.__version__}.')
+        print(f"Onnx {onnx.__version__}.")
         torch.onnx.export(self.net,
                           im,
                           f=model_path,
@@ -234,21 +234,21 @@ class YOLO(object):
         model_onnx = onnx.load(model_path)
         onnx.checker.check_model(model_onnx)
         if simplify:
-            print(f'Onnx-simplifier {onnxsim.__version__}.')
+            print(f"Onnx-simplifier {onnxsim.__version__}.")
             model_onnx, check = onnxsim.simplify(
                 model_onnx,
                 dynamic_input_shape=False,
                 input_shapes=None)
-            assert check, 'assert check failed'
+            assert check, "assert check failed"
             onnx.save(model_onnx, model_path)
-        print('Save to {}'.format(model_path))
+        print("Save to {}".format(model_path))
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
         f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype='float32')), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -264,7 +264,7 @@ class YOLO(object):
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return
-            top_label = np.array(results[0][:, 6], dtype='int32')
+            top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
         for i, c in list(enumerate(top_label)):

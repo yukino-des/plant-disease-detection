@@ -9,23 +9,23 @@ from utils.utils_map import get_map
 from yolo import YOLO
 
 if __name__ == "__main__":
-    classes_path = 'model_data/voc_classes.txt'
+    classes_path = "model_data/voc_classes.txt"
     MINOVERLAP = 0.5
     confidence = 0.001
     nms_iou = 0.5
     score_threhold = 0.5
     map_vis = False
-    VOCdevkit_path = 'VOCdevkit'
-    maps_out_path = 'maps_out'
+    VOCdevkit_path = "VOCdevkit"
+    maps_out_path = "maps_out"
     image_ids = open(os.path.join(VOCdevkit_path, "VOC/ImageSets/Main/test.txt")).read().strip().split()
     if not os.path.exists(maps_out_path):
         os.makedirs(maps_out_path)
-    if not os.path.exists(os.path.join(maps_out_path, 'ground-truth')):
-        os.makedirs(os.path.join(maps_out_path, 'ground-truth'))
-    if not os.path.exists(os.path.join(maps_out_path, 'detection-results')):
-        os.makedirs(os.path.join(maps_out_path, 'detection-results'))
-    if not os.path.exists(os.path.join(maps_out_path, 'images-optional')):
-        os.makedirs(os.path.join(maps_out_path, 'images-optional'))
+    if not os.path.exists(os.path.join(maps_out_path, "ground-truth")):
+        os.makedirs(os.path.join(maps_out_path, "ground-truth"))
+    if not os.path.exists(os.path.join(maps_out_path, "detection-results")):
+        os.makedirs(os.path.join(maps_out_path, "detection-results"))
+    if not os.path.exists(os.path.join(maps_out_path, "images-optional")):
+        os.makedirs(os.path.join(maps_out_path, "images-optional"))
     class_names, _ = get_classes(classes_path)
     print("Load model.")
     yolo = YOLO(confidence=confidence, nms_iou=nms_iou)
@@ -42,20 +42,20 @@ if __name__ == "__main__":
     for image_id in tqdm(image_ids):
         with open(os.path.join(maps_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
             root = ET.parse(os.path.join(VOCdevkit_path, "VOC/Annotations/" + image_id + ".xml")).getroot()
-            for obj in root.findall('object'):
+            for obj in root.findall("object"):
                 difficult_flag = False
-                if obj.find('difficult') is not None:
-                    difficult = obj.find('difficult').text
+                if obj.find("difficult") is not None:
+                    difficult = obj.find("difficult").text
                     if int(difficult) == 1:
                         difficult_flag = True
-                obj_name = obj.find('name').text
+                obj_name = obj.find("name").text
                 if obj_name not in class_names:
                     continue
-                bndbox = obj.find('bndbox')
-                left = bndbox.find('xmin').text
-                top = bndbox.find('ymin').text
-                right = bndbox.find('xmax').text
-                bottom = bndbox.find('ymax').text
+                bndbox = obj.find("bndbox")
+                left = bndbox.find("xmin").text
+                top = bndbox.find("ymin").text
+                right = bndbox.find("xmax").text
+                bottom = bndbox.find("ymax").text
                 if difficult_flag:
                     new_f.write("%s %s %s %s %s difficult\n" % (obj_name, left, top, right, bottom))
                 else:

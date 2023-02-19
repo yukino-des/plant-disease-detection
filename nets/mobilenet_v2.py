@@ -2,7 +2,7 @@ from torch import nn
 from torch.hub import load_state_dict_from_url
 
 model_urls = {
-    'mobilenet_v2': 'https://download.pytorch.org/models/mobilenet_v2-b0353104.pth',
+    "mobilenet_v2": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
 }
 
 
@@ -84,7 +84,7 @@ class MobileNetV2(nn.Module):
         )
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
-                nn.init.kaiming_normal_(m.weight, mode='fan_out')
+                nn.init.kaiming_normal_(m.weight, mode="fan_out")
                 if m.bias is not None:
                     nn.init.zeros_(m.bias)
             elif isinstance(m, nn.BatchNorm2d):
@@ -104,7 +104,7 @@ class MobileNetV2(nn.Module):
 def mobilenet_v2(pretrained=False, progress=True):
     model = MobileNetV2()
     if pretrained:
-        state_dict = load_state_dict_from_url(model_urls['mobilenet_v2'],
+        state_dict = load_state_dict_from_url(model_urls["mobilenet_v2"],
                                               model_dir="model_data",
                                               progress=progress)
         model.load_state_dict(state_dict)

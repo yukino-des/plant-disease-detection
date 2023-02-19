@@ -9,7 +9,7 @@ import sys
 import cv2
 import matplotlib
 
-matplotlib.use('Agg')
+matplotlib.use("Agg")
 from matplotlib import pyplot as plt
 import numpy as np
 
@@ -109,10 +109,10 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
         for key in sorted_keys:
             fp_sorted.append(dictionary[key] - true_p_bar[key])
             tp_sorted.append(true_p_bar[key])
-        plt.barh(range(n_classes), fp_sorted, align='center', color='crimson', label='False Positive')
-        plt.barh(range(n_classes), tp_sorted, align='center', color='forestgreen', label='True Positive',
+        plt.barh(range(n_classes), fp_sorted, align="center", color="crimson", label="False Positive")
+        plt.barh(range(n_classes), tp_sorted, align="center", color="forestgreen", label="True Positive",
                  left=fp_sorted)
-        plt.legend(loc='lower right')
+        plt.legend(loc="lower right")
         fig = plt.gcf()
         axes = plt.gca()
         r = fig.canvas.get_renderer()
@@ -121,8 +121,8 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
             tp_val = tp_sorted[i]
             fp_str_val = " " + str(fp_val)
             tp_str_val = fp_str_val + " " + str(tp_val)
-            t = plt.text(val, i, tp_str_val, color='forestgreen', va='center', fontweight='bold')
-            plt.text(val, i, fp_str_val, color='crimson', va='center', fontweight='bold')
+            t = plt.text(val, i, tp_str_val, color="forestgreen", va="center", fontweight="bold")
+            plt.text(val, i, fp_str_val, color="crimson", va="center", fontweight="bold")
             if i == (len(sorted_values) - 1):
                 adjust_axes(r, t, fig, axes)
     else:
@@ -134,7 +134,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
             str_val = " " + str(val)
             if val < 1.0:
                 str_val = " {0:.2f}".format(val)
-            t = plt.text(val, i, str_val, color=plot_color, va='center', fontweight='bold')
+            t = plt.text(val, i, str_val, color=plot_color, va="center", fontweight="bold")
             if i == (len(sorted_values) - 1):
                 adjust_axes(r, t, fig, axes)
     fig.canvas.manager.set_window_title(window_title)
@@ -150,7 +150,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     if figure_height > init_height:
         fig.set_figheight(figure_height)
     plt.title(plot_title, fontsize=14)
-    plt.xlabel(x_label, fontsize='large')
+    plt.xlabel(x_label, fontsize="large")
     fig.tight_layout()
     fig.savefig(output_path)
     if to_show:
@@ -158,12 +158,12 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     plt.close()
 
 
-def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
-    GT_PATH = os.path.join(path, 'ground-truth')
-    DR_PATH = os.path.join(path, 'detection-results')
-    IMG_PATH = os.path.join(path, 'images-optional')
-    TEMP_FILES_PATH = os.path.join(path, '.temp_files')
-    RESULTS_FILES_PATH = os.path.join(path, 'results')
+def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path="./maps_out"):
+    GT_PATH = os.path.join(path, "ground-truth")
+    DR_PATH = os.path.join(path, "detection-results")
+    IMG_PATH = os.path.join(path, "images-optional")
+    TEMP_FILES_PATH = os.path.join(path, ".temp_files")
+    RESULTS_FILES_PATH = os.path.join(path, "results")
     show_animation = True
     if os.path.exists(IMG_PATH):
         for dirpath, dirnames, files in os.walk(IMG_PATH):
@@ -179,7 +179,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
         os.makedirs(RESULTS_FILES_PATH)
     if draw_plot:
         try:
-            matplotlib.use('TkAgg')
+            matplotlib.use("TkAgg")
         except:
             pass
         os.makedirs(os.path.join(RESULTS_FILES_PATH, "AP"))
@@ -188,7 +188,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
         os.makedirs(os.path.join(RESULTS_FILES_PATH, "Precision"))
     if show_animation:
         os.makedirs(os.path.join(RESULTS_FILES_PATH, "images", "detections"))
-    ground_truth_files_list = glob.glob(GT_PATH + '/*.txt')
+    ground_truth_files_list = glob.glob(GT_PATH + "/*.txt")
     if len(ground_truth_files_list) == 0:
         error("Error: No ground-truth files found!")
     ground_truth_files_list.sort()
@@ -251,12 +251,12 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
                     else:
                         counter_images_per_class[class_name] = 1
                     already_seen_classes.append(class_name)
-        with open(TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json", 'w') as outfile:
+        with open(TEMP_FILES_PATH + "/" + file_id + "_ground_truth.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     gt_classes = list(gt_counter_per_class.keys())
     gt_classes = sorted(gt_classes)
     n_classes = len(gt_classes)
-    dr_files_list = glob.glob(DR_PATH + '/*.txt')
+    dr_files_list = glob.glob(DR_PATH + "/*.txt")
     dr_files_list.sort()
     for class_index, class_name in enumerate(gt_classes):
         bounding_boxes = []
@@ -286,13 +286,13 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
                 if tmp_class_name == class_name:
                     bbox = left + " " + top + " " + right + " " + bottom
                     bounding_boxes.append({"confidence": confidence, "file_id": file_id, "bbox": bbox})
-        bounding_boxes.sort(key=lambda x: float(x['confidence']), reverse=True)
-        with open(TEMP_FILES_PATH + "/" + class_name + "_dr.json", 'w') as outfile:
+        bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
+        with open(TEMP_FILES_PATH + "/" + class_name + "_dr.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     sum_AP = 0.0
     ap_dictionary = {}
     lamr_dictionary = {}
-    with open(RESULTS_FILES_PATH + "/results.txt", 'w') as results_file:
+    with open(RESULTS_FILES_PATH + "/results.txt", "w") as results_file:
         results_file.write("AP and precision/recall per class\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
@@ -353,7 +353,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
                             tp[idx] = 1
                             gt_match["used"] = True
                             count_true_positives[class_name] += 1
-                            with open(gt_file, 'w') as f:
+                            with open(gt_file, "w") as f:
                                 f.write(json.dumps(ground_truth_data))
                             if show_animation:
                                 status = "MATCH!"
@@ -440,8 +440,8 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
                 F1_text = "0.00" + " = " + class_name + " F1 "
                 Recall_text = "0.00%" + " = " + class_name + " Recall "
                 Precision_text = "0.00%" + " = " + class_name + " Precision "
-            rounded_prec = ['%.2f' % elem for elem in prec]
-            rounded_rec = ['%.2f' % elem for elem in rec]
+            rounded_prec = ["%.2f" % elem for elem in prec]
+            rounded_rec = ["%.2f" % elem for elem in rec]
             results_file.write(text + "\n Precision: " + str(rounded_prec) + "\n Recall :" + str(rounded_rec) + "\n\n")
             if len(prec) > 0:
                 print(text + "\t||\tscore_threhold=" + str(score_threhold) + " : " + "F1=" + "{0:.2f}".format(
@@ -457,42 +457,42 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
             lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
             lamr_dictionary[class_name] = lamr
             if draw_plot:
-                plt.plot(rec, prec, '-o')
+                plt.plot(rec, prec, "-o")
                 area_under_curve_x = mrec[:-1] + [mrec[-2]] + [mrec[-1]]
                 area_under_curve_y = mprec[:-1] + [0.0] + [mprec[-1]]
-                plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor='r')
+                plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor="r")
                 fig = plt.gcf()
-                fig.canvas.manager.set_window_title('AP ' + class_name)
-                plt.title('class: ' + text)
-                plt.xlabel('Recall')
-                plt.ylabel('Precision')
+                fig.canvas.manager.set_window_title("AP " + class_name)
+                plt.title("class: " + text)
+                plt.xlabel("Recall")
+                plt.ylabel("Precision")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
                 fig.savefig(RESULTS_FILES_PATH + "/AP/" + class_name + ".png")
                 plt.cla()
-                plt.plot(score, F1, "-", color='orangered')
-                plt.title('class: ' + F1_text + "\nscore_threhold=" + str(score_threhold))
-                plt.xlabel('Score_Threhold')
-                plt.ylabel('F1')
+                plt.plot(score, F1, "-", color="orangered")
+                plt.title("class: " + F1_text + "\nscore_threhold=" + str(score_threhold))
+                plt.xlabel("Score_Threhold")
+                plt.ylabel("F1")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
                 fig.savefig(RESULTS_FILES_PATH + "/F1/" + class_name + ".png")
                 plt.cla()
-                plt.plot(score, rec, "-H", color='gold')
-                plt.title('class: ' + Recall_text + "\nscore_threhold=" + str(score_threhold))
-                plt.xlabel('Score_Threhold')
-                plt.ylabel('Recall')
+                plt.plot(score, rec, "-H", color="gold")
+                plt.title("class: " + Recall_text + "\nscore_threhold=" + str(score_threhold))
+                plt.xlabel("Score_Threhold")
+                plt.ylabel("Recall")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
                 fig.savefig(RESULTS_FILES_PATH + "/Recall/" + class_name + ".png")
                 plt.cla()
-                plt.plot(score, prec, "-s", color='palevioletred')
-                plt.title('class: ' + Precision_text + "\nscore_threhold=" + str(score_threhold))
-                plt.xlabel('Score_Threhold')
-                plt.ylabel('Precision')
+                plt.plot(score, prec, "-s", color="palevioletred")
+                plt.title("class: " + Precision_text + "\nscore_threhold=" + str(score_threhold))
+                plt.xlabel("Score_Threhold")
+                plt.ylabel("Precision")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
@@ -519,14 +519,14 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
             else:
                 det_counter_per_class[class_name] = 1
     dr_classes = list(det_counter_per_class.keys())
-    with open(RESULTS_FILES_PATH + "/results.txt", 'a') as results_file:
+    with open(RESULTS_FILES_PATH + "/results.txt", "a") as results_file:
         results_file.write("\nNumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
             results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
-    with open(RESULTS_FILES_PATH + "/results.txt", 'a') as results_file:
+    with open(RESULTS_FILES_PATH + "/results.txt", "a") as results_file:
         results_file.write("\nNumber of detected objects per class\n")
         for class_name in sorted(dr_classes):
             n_det = det_counter_per_class[class_name]
@@ -541,7 +541,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
         x_label = "Number of objects per class"
         output_path = RESULTS_FILES_PATH + "/ground-truth-info.png"
         to_show = False
-        plot_color = 'forestgreen'
+        plot_color = "forestgreen"
         draw_plot_func(
             gt_counter_per_class,
             n_classes,
@@ -551,7 +551,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
             output_path,
             to_show,
             plot_color,
-            '',
+            "",
         )
     if draw_plot:
         window_title = "lamr"
@@ -559,7 +559,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
         x_label = "log-average miss rate"
         output_path = RESULTS_FILES_PATH + "/lamr.png"
         to_show = False
-        plot_color = 'royalblue'
+        plot_color = "royalblue"
         draw_plot_func(
             lamr_dictionary,
             n_classes,
@@ -577,7 +577,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path='./maps_out'):
         x_label = "Average Precision"
         output_path = RESULTS_FILES_PATH + "/mAP.png"
         to_show = False
-        plot_color = 'royalblue'
+        plot_color = "royalblue"
         draw_plot_func(
             ap_dictionary,
             n_classes,

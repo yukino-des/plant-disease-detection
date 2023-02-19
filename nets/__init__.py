@@ -1,1 +1,1 @@
-_ = {'Author': 'github.com/yukino'}
+_ = {"Author": "github.com/yukino"}

@@ -68,7 +68,7 @@ class YoloDataset(Dataset):
         image = cvtColor(image)
         iw, ih = image.size
         h, w = input_shape
-        box = np.array([np.array(list(map(int, box.split(',')))) for box in line[1:]])
+        box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
         if not random:
             scale = min(w / iw, h / ih)
             nw = int(iw * scale)
@@ -76,7 +76,7 @@ class YoloDataset(Dataset):
             dx = (w - nw) // 2
             dy = (h - nh) // 2
             image = image.resize((nw, nh), Image.BICUBIC)
-            new_image = Image.new('RGB', (w, h), (128, 128, 128))
+            new_image = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             # fixme
             image_data = np.array(new_image, np.float32)
@@ -102,7 +102,7 @@ class YoloDataset(Dataset):
         image = image.resize((nw, nh), Image.BICUBIC)
         dx = int(self.rand(0, w - nw))
         dy = int(self.rand(0, h - nh))
-        new_image = Image.new('RGB', (w, h), (128, 128, 128))
+        new_image = Image.new("RGB", (w, h), (128, 128, 128))
         new_image.paste(image, (dx, dy))
         image = new_image
         flip = self.rand() < .5
@@ -185,7 +185,7 @@ class YoloDataset(Dataset):
             image = Image.open(line_content[0])
             image = cvtColor(image)
             iw, ih = image.size
-            box = np.array([np.array(list(map(int, box.split(',')))) for box in line_content[1:]])
+            box = np.array([np.array(list(map(int, box.split(",")))) for box in line_content[1:]])
             flip = self.rand() < .5
             if flip and len(box) > 0:
                 image = image.transpose(Image.FLIP_LEFT_RIGHT)
@@ -211,7 +211,7 @@ class YoloDataset(Dataset):
             elif index == 3:
                 dx = int(w * min_offset_x)
                 dy = int(h * min_offset_y) - nh
-            new_image = Image.new('RGB', (w, h), (128, 128, 128))
+            new_image = Image.new("RGB", (w, h), (128, 128, 128))
             # fixme
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)

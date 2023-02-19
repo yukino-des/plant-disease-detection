@@ -27,8 +27,8 @@ def fit_one_epoch(model_train,
     loss = 0
     val_loss = 0
     if local_rank == 0:
-        print('Start Train')
-        pbar = tqdm(total=epoch_step, desc=f'Epoch {epoch + 1}/{Epoch}', postfix=dict, mininterval=0.3)
+        print("Start Train")
+        pbar = tqdm(total=epoch_step, desc=f"Epoch {epoch + 1}/{Epoch}", postfix=dict, mininterval=0.3)
     model_train.train()
     for iteration, batch in enumerate(gen):
         if iteration >= epoch_step:
@@ -65,14 +65,14 @@ def fit_one_epoch(model_train,
         loss += loss_value.item()
         if local_rank == 0:
             # fixme
-            pbar.set_postfix(**{'loss': loss / (iteration + 1),
-                                'lr': get_lr(optimizer)})
+            pbar.set_postfix(**{"loss": loss / (iteration + 1),
+                                "lr": get_lr(optimizer)})
             pbar.update(1)
     if local_rank == 0:
         pbar.close()
-        print('Finish Train')
-        print('Start Validation')
-        pbar = tqdm(total=epoch_step_val, desc=f'Epoch {epoch + 1}/{Epoch}', postfix=dict, mininterval=0.3)
+        print("Finish Train")
+        print("Start Validation")
+        pbar = tqdm(total=epoch_step_val, desc=f"Epoch {epoch + 1}/{Epoch}", postfix=dict, mininterval=0.3)
     model_train.eval()
     for iteration, batch in enumerate(gen_val):
         if iteration >= epoch_step_val:
@@ -92,19 +92,19 @@ def fit_one_epoch(model_train,
         # fixme
         val_loss += loss_value.item()
         if local_rank == 0:
-            pbar.set_postfix(**{'val_loss': val_loss / (iteration + 1)})
+            pbar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
             pbar.update(1)
     if local_rank == 0:
         pbar.close()
-        print('Finish Validation')
+        print("Finish Validation")
         loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
         eval_callback.on_epoch_end(epoch + 1, model_train)
-        print('Epoch:' + str(epoch + 1) + '/' + str(Epoch))
-        print('Total Loss: %.3f || Val Loss: %.3f' % (loss / epoch_step, val_loss / epoch_step_val))
+        print("Epoch:" + str(epoch + 1) + "/" + str(Epoch))
+        print("Total Loss: %.3f || Val Loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
         if (epoch + 1) % save_period == 0 or epoch + 1 == Epoch:
             torch.save(model.state_dict(), os.path.join(save_dir, "ep%03d-loss%.3f-val_loss%.3f.pth" % (
                 epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
         if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-            print('best_epoch_weights.pth saved.')
+            print("best_epoch_weights.pth saved.")
             torch.save(model.state_dict(), os.path.join(save_dir, "best_epoch_weights.pth"))
         torch.save(model.state_dict(), os.path.join(save_dir, "last_epoch_weights.pth"))

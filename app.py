@@ -21,10 +21,10 @@ app.add_middleware(
 )
 
 
-@app.post('/upload', response_model=dict)
+@app.post("/upload", response_model=dict)
 def upload(file: Union[UploadFile, None] = None):
     if file is None:
-        return {'status': 0}
+        return {"status": 0}
     file_name, extend_name = file.filename.split(".")
     src_path = os.path.join("tmp/src", file.filename)
     dest_path = os.path.join("tmp/dest", f"{file_name}.png")
@@ -42,12 +42,12 @@ def upload(file: Union[UploadFile, None] = None):
                 "image_info": image_info}
 
 
-@app.get('/show/{fpath:path}', response_class=FileResponse)
+@app.get("/show/{fpath:path}", response_class=FileResponse)
 def show(fpath):
-    return FileResponse(path=fpath, headers={'Content-Type': 'image/png'})
+    return FileResponse(path=fpath, headers={"Content-Type": "image/png"})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     os.chdir(sys.path[0])
     dirs = ["tmp/src", "tmp/dest"]
     for _dir in dirs:
