@@ -1,5 +1,8 @@
-.idea/
 *.docx
+*.txt
+*/*.txt
+
+.idea/
 imgs/
 *_out/
 tmp/
