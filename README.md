@@ -1,6 +1,6 @@
 # backend
 
-### Backend project for plant disease detection: Pytorch + FastAPI
+### Backend project for plant disease detection (Pytorch + FastAPI)
 
 1. install requirements (GPU version)
 
@@ -23,19 +23,6 @@ python app.py
 ```shell
 lsof -i:8081
 kill -9 {PID}
-```
-
-4. if `os.name == "Windows"`
-```text
-HTTP_PROXY http://127.0.0.1:7890
-HTTPS_PROXY http://127.0.0.1:7890
-```
-
-5. git
-```shell
-git stash
-git pull
-git rm -r --cached .
 ```
 
 ### class blance
