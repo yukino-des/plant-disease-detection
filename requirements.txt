@@ -8,5 +8,6 @@ opencv-python==4.7.0.68
 torchvision==0.14.1
 onnx==1.13.0
 onnxsim==0.4.17
+setuptools==58.0.4
 thop==0.1.1.post2209072238
 torchsummary==1.5.1
