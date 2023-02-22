@@ -12,29 +12,28 @@ from yolo import YOLO
 def predict():
     yolo = YOLO()
     mode = "predict"
-
-    # predict
+    # todo `mode = "predict"`
     crop = True
     count = True
 
-    # video
-    # video_path = "video/sample0.mp4"
-    video_path = 0  # Use camera, press ESC to exit.
-    video_save_path = "video_out/sample0.avi"
+    # todo `mode = "video"`
+    # video_path = "sample0.mp4"
+    video_path = 0  # use camera
+    video_save_path = "sample0.avi"
     video_fps = 25.0
 
-    # fps
+    # todo `mode = "fps"`
     test_interval = 100
     fps_image_path = "VOCdevkit/VOC/JPEGImages/0a7112a13fe95daebbd21301b000888a.jpg"
 
-    # dir_predict
+    # todo `mode = "dir_predict"`
     dir_origin_path = "imgs"
     dir_save_path = "imgs_out"
 
-    # heatmap
+    # todo `mode = "heatmap"`
     heatmap_save_path = "imgs_out/heatmap.png"
 
-    # export_onnx
+    # todo `mode = "export_onnx"`
     simplify = True
     onnx_save_path = "model_data/models.onnx"
     if mode == "predict":
