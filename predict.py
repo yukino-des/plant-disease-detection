@@ -24,7 +24,7 @@ def predict():
 
     # todo `mode = "fps"`
     test_interval = 100
-    fps_image_path = "VOCdevkit/VOC/JPEGImages/0a7112a13fe95daebbd21301b000888a.jpg"
+    fps_image_path = "VOC/JPEGImages/0a7112a13fe95daebbd21301b000888a.jpg"
 
     # todo `mode = "dir_predict"`
     dir_origin_path = "imgs"

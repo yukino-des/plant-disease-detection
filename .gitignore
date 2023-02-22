@@ -7,4 +7,4 @@ imgs_out/
 videos/
 videos_out/
 model_data/_voc_classes.txt
-VOCdevkit/_VOC/
+_voc/

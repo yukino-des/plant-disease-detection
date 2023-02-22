@@ -49,11 +49,9 @@ def show(fpath):
 
 if __name__ == "__main__":
     os.chdir(sys.path[0])
-    dirs = ["tmp/src", "tmp/dest"]
-    for _dir in dirs:
-        if not os.path.exists(_dir):
-            os.makedirs(_dir)
-        for file in os.listdir(_dir):
-            os.remove(os.path.join(_dir, file))
+    directories = ["tmp/src", "tmp/dest", "imgs_out"]
+    for directory in directories:
+        shutil.rmtree(directory, ignore_errors=True)
+        os.makedirs(directory)
     yolo = YOLO()
     uvicorn.run(app, host="0.0.0.0", port=8081)
