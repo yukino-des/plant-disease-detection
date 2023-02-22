@@ -4,3 +4,5 @@ imgs/
 *_out/
 tmp/
 app.py
+build/
+dist/

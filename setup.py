@@ -10,18 +10,15 @@ classifiers = [
 setup_kwargs = {
     "name": "plant-disease-detection-3181137349",
     "version": "0.0.1",
-    "author": "YukinoShita Yukino",
+    "author": "yukino-des",
     "author_email": "3181137349go@gmail.com",
-    "description": "Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.",
+    "description": "Plant disease detection",
     "long_description": long_description,
+    "long_description_content_type": "text/plain",
     "url": "https://github.com/yukin-des/plant-disease-detection.git",
     "packages": find_packages(),
     "include_package_data": True,
-    "entry_points": {
-        "console_scripts": [
-            "backbone = nets:get_backbone"
-        ]
-    },
+    "entry_points": {"console_scripts": ["backbone = nets:get_backbone"]},
     "install_requires": ["torch==1.13.1",
                          "numpy==1.24.2",
                          "Pillow==9.4.0",

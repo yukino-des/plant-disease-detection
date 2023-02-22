@@ -1,22 +1,21 @@
 Metadata-Version: 2.1
 Name: plant-disease-detection-3181137349
 Version: 0.0.1
-Summary: Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.
+Summary: Plant disease detection
 Home-page: https://github.com/yukin-des/plant-disease-detection.git
-Author: YukinoShita Yukino
+Author: yukino-des
 Author-email: 3181137349go@gmail.com
 License: UNKNOWN
 Platform: UNKNOWN
 Classifier: Programming Language :: Python :: 3
 Classifier: License :: OSI Approved :: MIT License
 Classifier: Operating System :: Unix
+Description-Content-Type: text/plain
 License-File: LICENSE
 
 # backend
 
 ### Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.
-
-install requirements (CPU/GPU version)
 
 ```shell
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116

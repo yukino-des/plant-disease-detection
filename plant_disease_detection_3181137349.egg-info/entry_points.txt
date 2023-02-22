@@ -1,4 +1,3 @@
 [console_scripts]
-backbone = nets:backbone
-summary = nets:summary
+backbone = nets:get_backbone
 

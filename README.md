@@ -2,8 +2,6 @@
 
 ### Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.
 
-install requirements (CPU/GPU version)
-
 ```shell
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 pip install python-multipart
