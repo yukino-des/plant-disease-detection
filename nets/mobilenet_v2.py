@@ -109,7 +109,3 @@ def mobilenet_v2(pretrained=False, progress=True):
                                               progress=progress)
         model.load_state_dict(state_dict)
     return model
-
-
-def backbone():
-    print(mobilenet_v2())

@@ -19,8 +19,7 @@ setup_kwargs = {
     "include_package_data": True,
     "entry_points": {
         "console_scripts": [
-            "backbone = nets:backbone",
-            "summary = nets:summary"
+            "backbone = nets:get_backbone"
         ]
     },
     "install_requires": ["torch==1.13.1",

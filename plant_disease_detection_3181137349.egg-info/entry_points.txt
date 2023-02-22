@@ -1,0 +1,4 @@
+[console_scripts]
+backbone = nets:backbone
+summary = nets:summary
+
