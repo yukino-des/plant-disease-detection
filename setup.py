@@ -8,7 +8,7 @@ classifiers = [
     "Operating System :: Unix"
 ]
 setup_kwargs = {
-    "name": "plant-disease-detection-3181137349",
+    "name": "plant-disease-detection",
     "version": "0.0.1",
     "author": "yukino-des",
     "author_email": "3181137349go@gmail.com",
