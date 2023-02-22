@@ -111,5 +111,5 @@ def mobilenet_v2(pretrained=False, progress=True):
     return model
 
 
-if __name__ == "__main__":
+def backbone():
     print(mobilenet_v2())

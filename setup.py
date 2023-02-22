@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as readme:
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: OSX"
+    "Operating System :: Unix"
 ]
 setup_kwargs = {
     "name": "plant-disease-detection-3181137349",
@@ -17,7 +17,12 @@ setup_kwargs = {
     "url": "https://github.com/yukin-des/plant-disease-detection.git",
     "packages": find_packages(),
     "include_package_data": True,
-    "entry_points": {"console_scripts": ["popto8bit = popto8bit:main"]},
+    "entry_points": {
+        "console_scripts": [
+            "backbone = nets:backbone",
+            "summary = nets:summary"
+        ]
+    },
     "install_requires": ["torch==1.13.1",
                          "numpy==1.24.2",
                          "Pillow==9.4.0",
