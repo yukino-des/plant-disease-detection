@@ -1,10 +1,6 @@
 .idea/
 *.docx
-tmp/
-maps_out/
 imgs/
-imgs_out/
-videos/
-videos_out/
-model_data/_voc_classes.txt
-_voc/
+*_out/
+tmp/
+app.py
