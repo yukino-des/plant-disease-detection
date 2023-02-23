@@ -6,7 +6,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 
-matplotlib.use("Agg")  # matplotlib.use("TkAgg")
+matplotlib.use("TkAgg")  # matplotlib.use("TkAgg")
 
 
 def cas_iou(box, cluster):

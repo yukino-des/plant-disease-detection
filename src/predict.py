@@ -11,44 +11,42 @@ from src.yolo import YOLO
 
 def main():
     yolo = YOLO()
-    mode = "predict"
-    # mode = "predict
+    mode = input("Input mode in ['predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict']:")
+    # mode = "predict"
     crop = True
     count = True
 
     # mode = "video"
-    # video_path = "sample0.mp4"
-    video_path = 0  # use camera
-    video_save_path = "sample0.avi"
+    video_save_path = "tmp/video_out/0.avi"
     video_fps = 25.0
 
     # mode = "fps"
     test_interval = 100
-    fps_image_path = "../VOC/JPEGImages/0a7112a13fe95daebbd21301b000888a.jpg"
 
     # mode = "dir_predict"
     dir_origin_path = "../tmp/imgs"
     dir_save_path = "../tmp/imgs_out"
 
     # mode = "heatmap"
-    heatmap_save_path = "../tmp/imgs_out/heatmap.png"
+    heatmap_save_path = "../tmp/heatmap.png"
 
     # mode = "export_onnx"
     simplify = True
     onnx_save_path = "../data/models.onnx"
+
     if mode == "predict":
-        while True:
-            img = input("Input image filename:")
-            try:
-                image = Image.open(img)
-            except:
-                print("Open error!")
-                continue
-            else:
-                r_image, _ = yolo.detect_image(image, crop=crop, count=count)
-                r_image.show()
+        img = input("Input image path:")
+        try:
+            image = Image.open(img)
+        except:
+            print("Open error!")
+        else:
+            r_image, _ = yolo.detect_image(image, crop=crop, count=count)
+            r_image.show()
+
     elif mode == "video":
-        capture = cv2.VideoCapture(video_path)
+        video_path = input("Input video path, input 0 to call camera:")
+        capture = cv2.VideoCapture(0 if video_path == "0" else video_path)
         if video_save_path != "":
             video_save_path = "../tmp/videos_out/01.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
@@ -82,10 +80,13 @@ def main():
         print("Save to " + video_save_path)
         out.release()
         cv2.destroyAllWindows()
+
     elif mode == "fps":
+        fps_image_path = input("Input image path:")
         img = Image.open(fps_image_path)
         tact_time = yolo.get_FPS(img, test_interval)
         print(str(tact_time) + " seconds, " + str(1 / tact_time) + " FPS, @batch_size 1")
+
     elif mode == "dir_predict":
         img_names = os.listdir(dir_origin_path)
         for img_name in tqdm(img_names):
@@ -97,16 +98,16 @@ def main():
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
+
     elif mode == "heatmap":
-        while True:
-            img = input("Input image filename:")
-            try:
-                image = Image.open(img)
-            except:
-                print("Open error!")
-                continue
-            else:
-                yolo.detect_heatmap(image, heatmap_save_path)
+        img = input("Input image path:")
+        try:
+            image = Image.open(img)
+        except:
+            print("Open error!")
+        else:
+            yolo.detect_heatmap(image, heatmap_save_path)
+
     elif mode == "export_onnx":
         yolo.convert_to_onnx(simplify, onnx_save_path)
     else:

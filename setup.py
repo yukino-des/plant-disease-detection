@@ -35,4 +35,4 @@ setup_kwargs = {
                          "python-multipart==0.0.5"],
     "classifiers": classifiers
 }
-setup(**setup_kwargs)
+setup(**setup_kwargs)  # ../VOC/JPEGImages/0a5bc3ac046a487f4ae911f98452d61e.jpg

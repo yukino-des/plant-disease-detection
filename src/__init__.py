@@ -22,3 +22,7 @@ def run(mode: str):
         train.main()
     else:
         raise AssertionError("Use mode: 'annotation', 'kmeans',  'map', 'predict', 'summary', 'train'.")
+
+
+if __name__ == "__main__":
+    run(input())

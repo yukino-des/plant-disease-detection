@@ -117,7 +117,7 @@ class YOLO(object):
                 left = max(0, np.floor(left).astype("int32"))
                 bottom = min(image.size[1], np.floor(bottom).astype("int32"))
                 right = min(image.size[0], np.floor(right).astype("int32"))
-                dir_save_path = "../imgs_out"
+                dir_save_path = "../tmp/imgs_out"
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 crop_image = image.crop([left, top, right, bottom])
@@ -186,6 +186,12 @@ class YOLO(object):
         tact_time = (t2 - t1) / test_interval
         return tact_time
 
+    def logistic(self, x):
+        if np.all(x >= 0):
+            return 1.0 / (1 + np.exp(-x))
+        else:
+            return np.exp(x) / (1 + np.exp(x))
+
     def detect_heatmap(self, image, heatmap_save_path):
         image = cvtColor(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
@@ -198,12 +204,11 @@ class YOLO(object):
         plt.imshow(image, alpha=1)
         plt.axis("off")
         mask = np.zeros((image.size[1], image.size[0]))
-        sigmoid = lambda x: 1.0 / (1.0 + np.exp(-x))
         for sub_output in outputs:
             sub_output = sub_output.cpu().numpy()
             b, c, h, w = np.shape(sub_output)
             sub_output = np.transpose(np.reshape(sub_output, [b, 3, -1, h, w]), [0, 3, 4, 1, 2])[0]
-            score = np.max(sigmoid(sub_output[..., 4]), -1)
+            score = np.max(self.logistic(sub_output[..., 4]), -1)
             score = cv2.resize(score, (image.size[0], image.size[1]))
             normed_score = (score * 255).astype("uint8")
             mask = np.maximum(mask, normed_score)
@@ -213,7 +218,6 @@ class YOLO(object):
         plt.margins(0, 0)
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
         print("Save to " + heatmap_save_path)
-        plt.show()
 
     def convert_to_onnx(self, simplify, model_path):
         self.generate(onnx=True)
