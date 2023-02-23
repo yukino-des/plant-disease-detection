@@ -4,7 +4,7 @@ from PIL import Image
 from tqdm import tqdm
 from utils.utils import get_classes
 from utils.utils_map import get_map
-from yolo import YOLO
+from yolo_v4 import YOLO
 
 
 def main():

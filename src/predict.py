@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-from src.yolo import YOLO
+from src.yolo_v4 import YOLO
 
 
 def main():
