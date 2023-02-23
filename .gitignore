@@ -1,12 +1,5 @@
 *.docx
-*.txt
-*/*.txt
-app.py
+src/app.py
 
 .idea/
-imgs/
-*_out/
 tmp/
-build/
-dist/
-plant_disease_detection_3181137349.egg-info/
