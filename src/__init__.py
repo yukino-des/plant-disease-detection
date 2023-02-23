@@ -1,10 +1,11 @@
-from src import map
-from src import predict
-from src import summary
-from src import train
-from src import annotation
-from src import app
-from src import kmeans
+import map
+import predict
+import summary
+import train
+import annotation
+import app
+import kmeans
+from utils import mobilenet_v2
 
 
 def run(mode: str):
@@ -20,9 +21,11 @@ def run(mode: str):
         summary.main()
     elif mode == "train":
         train.main()
+    elif mode == "backbone":
+        print(mobilenet_v2.mobilenet_v2())
     else:
-        raise AssertionError("Use mode: 'annotation', 'kmeans',  'map', 'predict', 'summary', 'train'.")
+        raise AssertionError("Use mode: 'annotation', 'kmeans',  'map', 'predict', 'summary', 'train', 'backbone'.")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run(input())
