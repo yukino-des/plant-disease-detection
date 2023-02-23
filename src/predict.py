@@ -17,7 +17,7 @@ def main():
     count = True
 
     # mode = "video"
-    video_save_path = "tmp/video_out/0.avi"
+    video_save_path = "tmp/416.avi"
     video_fps = 25.0
 
     # mode = "fps"
