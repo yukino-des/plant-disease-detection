@@ -12,7 +12,7 @@ setup_kwargs = {
     "version": "0.0.1",
     "author": "yukino-des",
     "author_email": "3181137349go@gmail.com",
-    "description": "Plant disease detection",
+    "description": "Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.",
     "long_description": long_description,
     "long_description_content_type": "text/plain",
     "url": "https://github.com/yukin-des/plant-disease-detection.git",

@@ -10,8 +10,6 @@ from src import kmeans
 def run(mode: str):
     if mode == "annotation":
         annotation.main()
-    elif mode == "app":
-        app.main()
     elif mode == "kmeans":
         kmeans.main()
     elif mode == "map":
@@ -23,4 +21,4 @@ def run(mode: str):
     elif mode == "train":
         train.main()
     else:
-        raise AssertionError("Use mode: 'annotation', 'app', 'kmeans',  'map', 'predict', 'summary', 'train'.")
+        raise AssertionError("Use mode: 'annotation', 'kmeans',  'map', 'predict', 'summary', 'train'.")
