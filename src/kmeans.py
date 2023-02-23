@@ -66,11 +66,11 @@ def load_data(path):
     return np.array(data)
 
 
-if __name__ == "__main__":
+def main():
     np.random.seed(0)
     input_shape = [416, 416]
     anchors_num = 9
-    path = "VOC/Annotations"
+    path = "../VOC/Annotations"
     print("Load xmls.")
     data = load_data(path)
     print("Load xmls done.")
@@ -82,12 +82,12 @@ if __name__ == "__main__":
     for j in range(anchors_num):
         plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
         plt.scatter(cluster[j][0], cluster[j][1], marker="x", c="black")
-    plt.savefig("kmeans_for_anchors.jpg")
+    plt.savefig("../tmp/kmeans_for_anchors.jpg")
     print("kmeans_for_anchors.jpg saved.")
     cluster = cluster[np.argsort(cluster[:, 0] * cluster[:, 1])]
     print("avg_ratio: {:.2f}".format(avg_iou(data, cluster)))
     print(cluster)
-    f = open("yolo_anchors.txt", "w")
+    f = open("../tmp/yolo_anchors.txt", "w")
     row = np.shape(cluster)[0]
     for i in range(row):
         if i == 0:

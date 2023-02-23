@@ -6,7 +6,7 @@ import numpy as np
 
 from utils.utils import get_classes
 
-classes_path = "model_data/voc_classes.txt"
+classes_path = "../data/voc_classes.txt"
 trainval_percent = 0.9
 train_percent = 0.9
 voc_sets = ["train", "val"]
@@ -16,7 +16,7 @@ nums = np.zeros(len(classes))
 
 
 def convert_annotation(image_id, list_file):
-    in_file = open("VOC/Annotations/%s.xml" % image_id, encoding="utf-8")
+    in_file = open("../VOC/Annotations/%s.xml" % image_id, encoding="utf-8")
     tree = ET.parse(in_file)
     root = tree.getroot()
     for obj in root.iter("object"):
@@ -43,11 +43,11 @@ def printTable(List1, List2):
         print()
 
 
-if __name__ == "__main__":
+def main():
     random.seed(0)
     print("Generate txt in ImageSets.")
-    xmlfilepath = "VOC/Annotations"
-    saveBasePath = "VOC/ImageSets/Main"
+    xmlfilepath = "../VOC/Annotations"
+    saveBasePath = "../VOC/ImageSets/Main"
     temp_xml = os.listdir(xmlfilepath)
     total_xml = []
     for xml in temp_xml:
@@ -81,11 +81,11 @@ if __name__ == "__main__":
     print("Generate train.txt and val.txt.")
     type_index = 0
     for image_set in voc_sets:
-        image_ids = open("VOC/ImageSets/Main/%s.txt" % image_set,
+        image_ids = open("../VOC/ImageSets/Main/%s.txt" % image_set,
                          encoding="utf-8").read().strip().split()
         list_file = open("%s.txt" % image_set, "w", encoding="utf-8")
         for image_id in image_ids:
-            list_file.write("VOC/JPEGImages/%s.jpg" % image_id)
+            list_file.write("../VOC/JPEGImages/%s.jpg" % image_id)
             convert_annotation(image_id, list_file)
             list_file.write("\n")
         photo_nums[type_index] = len(image_ids)
@@ -104,4 +104,4 @@ if __name__ == "__main__":
     if photo_nums[0] <= 500:
         print("The dataset is too small.")
     if np.sum(nums) == 0:
-        print("model_data/voc_class.txt ERROR!")
+        print("../data/voc_class.txt ERROR!")

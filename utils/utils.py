@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 from PIL import Image
 from torch.hub import load_state_dict_from_url
@@ -63,7 +62,7 @@ def show_config(**kwargs):
     print("-" * 70)
 
 
-def download_weights(backbone, model_dir="./model_data"):
+def download_weights(backbone, model_dir="./data"):
     download_urls = {
         "mobilenetv2": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
     }

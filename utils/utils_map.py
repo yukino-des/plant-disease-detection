@@ -5,13 +5,12 @@ import operator
 import os
 import shutil
 import sys
-
 import cv2
 import matplotlib
+import numpy as np
+from matplotlib import pyplot as plt
 
 matplotlib.use("Agg")
-from matplotlib import pyplot as plt
-import numpy as np
 
 
 def log_average_miss_rate(precision, fp_cumsum, num_images):
@@ -306,7 +305,6 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path="./maps_out"):
             score_threhold_idx = 0
             for idx, detection in enumerate(dr_data):
                 file_id = detection["file_id"]
-                # fixme
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threhold:
                     score_threhold_idx = idx
@@ -501,7 +499,7 @@ def get_map(MINOVERLAP, draw_plot, score_threhold=0.5, path="./maps_out"):
         if show_animation:
             cv2.destroyAllWindows()
         if n_classes == 0:
-            print("../model_data/voc_classes.txt ERROR!")
+            print("../data/voc_classes.txt ERROR!")
             return 0
         results_file.write("\nmAP of all classes\n")
         mAP = sum_AP / n_classes

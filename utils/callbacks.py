@@ -10,9 +10,9 @@ from scipy import signal
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from .utils import cvtColor, preprocess_input, resize_image
-from .utils_bbox import DecodeBox
-from .utils_map import get_map
+from utils.utils import cvtColor, preprocess_input, resize_image
+from utils.utils_bbox import DecodeBox
+from utils.utils_map import get_map
 
 matplotlib.use("Agg")
 

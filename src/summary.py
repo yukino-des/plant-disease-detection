@@ -2,9 +2,10 @@ import torch
 from thop import clever_format, profile
 from torchsummary import summary
 
-from nets.yolo import YoloBody
+from utils.yolo_v4 import YoloBody
 
-if __name__ == "__main__":
+
+def main():
     input_shape = [416, 416]
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
     num_classes = 80

@@ -11,16 +11,16 @@ import torch
 from PIL import ImageDraw, ImageFont
 from torch import nn
 
-from nets.yolo import YoloBody
+from utils.yolo_v4 import YoloBody
 from utils.utils import cvtColor, get_anchors, get_classes, preprocess_input, resize_image, show_config
 from utils.utils_bbox import DecodeBox
 
 
 class YOLO(object):
     _defaults = {
-        "model_path": "logs/best_epoch_weights.pth",
-        "classes_path": "model_data/voc_classes.txt",
-        "anchors_path": "model_data/yolo_anchors.txt",
+        "model_path": "../data/best_epoch_weights.pth",
+        "classes_path": "../data/voc_classes.txt",
+        "anchors_path": "../data/yolo_anchors.txt",
         "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],
         "input_shape": [416, 416],
         "backbone": "mobilenetv2",
@@ -98,7 +98,7 @@ class YOLO(object):
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font="model_data/simhei.ttf",
+        font = ImageFont.truetype(font="../data/simhei.ttf",
                                   size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
         if count:
@@ -117,7 +117,7 @@ class YOLO(object):
                 left = max(0, np.floor(left).astype("int32"))
                 bottom = min(image.size[1], np.floor(bottom).astype("int32"))
                 right = min(image.size[0], np.floor(right).astype("int32"))
-                dir_save_path = "imgs_out"
+                dir_save_path = "../imgs_out"
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 crop_image = image.crop([left, top, right, bottom])

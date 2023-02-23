@@ -6,36 +6,36 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-from yolo import YOLO
+from src.yolo import YOLO
 
 
-def predict():
+def main():
     yolo = YOLO()
     mode = "predict"
-    # todo `mode = "predict"`
+    # mode = "predict
     crop = True
     count = True
 
-    # todo `mode = "video"`
+    # mode = "video"
     # video_path = "sample0.mp4"
     video_path = 0  # use camera
     video_save_path = "sample0.avi"
     video_fps = 25.0
 
-    # todo `mode = "fps"`
+    # mode = "fps"
     test_interval = 100
-    fps_image_path = "VOC/JPEGImages/0a7112a13fe95daebbd21301b000888a.jpg"
+    fps_image_path = "../VOC/JPEGImages/0a7112a13fe95daebbd21301b000888a.jpg"
 
-    # todo `mode = "dir_predict"`
-    dir_origin_path = "imgs"
-    dir_save_path = "imgs_out"
+    # mode = "dir_predict"
+    dir_origin_path = "../tmp/imgs"
+    dir_save_path = "../tmp/imgs_out"
 
-    # todo `mode = "heatmap"`
-    heatmap_save_path = "imgs_out/heatmap.png"
+    # mode = "heatmap"
+    heatmap_save_path = "../tmp/imgs_out/heatmap.png"
 
-    # todo `mode = "export_onnx"`
+    # mode = "export_onnx"
     simplify = True
-    onnx_save_path = "model_data/models.onnx"
+    onnx_save_path = "../data/models.onnx"
     if mode == "predict":
         while True:
             img = input("Input image filename:")
@@ -50,7 +50,7 @@ def predict():
     elif mode == "video":
         capture = cv2.VideoCapture(video_path)
         if video_save_path != "":
-            video_save_path = "videos_out/01.avi"
+            video_save_path = "../tmp/videos_out/01.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         out = cv2.VideoWriter(video_save_path, fourcc, video_fps, size)
@@ -111,7 +111,3 @@ def predict():
         yolo.convert_to_onnx(simplify, onnx_save_path)
     else:
         raise AssertionError("Use mode: 'predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict'.")
-
-
-if __name__ == "__main__":
-    predict()

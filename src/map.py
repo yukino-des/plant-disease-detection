@@ -1,22 +1,21 @@
 import os
 from xml.etree import ElementTree as ET
-
 from PIL import Image
 from tqdm import tqdm
-
 from utils.utils import get_classes
 from utils.utils_map import get_map
 from yolo import YOLO
 
-if __name__ == "__main__":
-    classes_path = "model_data/voc_classes.txt"
+
+def main():
+    classes_path = "../data/voc_classes.txt"
     MINOVERLAP = 0.5
     confidence = 0.001
     nms_iou = 0.5
     score_threhold = 0.5
     map_vis = False
-    maps_out_path = "maps_out"
-    image_ids = open("VOC/ImageSets/Main/test.txt").read().strip().split()
+    maps_out_path = "../tmp/maps_out"
+    image_ids = open("../VOC/ImageSets/Main/test.txt").read().strip().split()
     if not os.path.exists(maps_out_path):
         os.makedirs(maps_out_path)
     if not os.path.exists(os.path.join(maps_out_path, "ground-truth")):
@@ -31,7 +30,7 @@ if __name__ == "__main__":
     print("Load model done.")
     print("Get predict result.")
     for image_id in tqdm(image_ids):
-        image_path = "VOC/JPEGImages/" + image_id + ".jpg"
+        image_path = "../VOC/JPEGImages/" + image_id + ".jpg"
         image = Image.open(image_path)
         if map_vis:
             image.save(os.path.join(maps_out_path, "images-optional/" + image_id + ".jpg"))
@@ -40,7 +39,7 @@ if __name__ == "__main__":
     print("Get ground truth result.")
     for image_id in tqdm(image_ids):
         with open(os.path.join(maps_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
-            root = ET.parse("VOC/Annotations/" + image_id + ".xml").getroot()
+            root = ET.parse("../VOC/Annotations/" + image_id + ".xml").getroot()
             for obj in root.findall("object"):
                 difficult_flag = False
                 if obj.find("difficult") is not None:

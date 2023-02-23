@@ -9,23 +9,24 @@ from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 
-from nets.yolo import YoloBody
-from nets.yolo_training import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
+from utils.yolo_v4 import YoloBody
+from utils.yolo_training import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
 from utils.callbacks import EvalCallback, LossHistory
 from utils.dataloader import YoloDataset, yolo_dataset_collate
 from utils.utils import download_weights, get_anchors, get_classes, show_config
 from utils.utils_fit import fit_one_epoch
 
-if __name__ == "__main__":
+
+def main():
     # todo update `Cuda = True`
     Cuda = False
     distributed = False
     fp16 = False
-    classes_path = "model_data/voc_classes.txt"
-    anchors_path = "model_data/yolo_anchors.txt"
+    classes_path = "../data/voc_classes.txt"
+    anchors_path = "../data/yolo_anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-    # todo update `model_path = "logs/best_epoch_weights.pth"` if training is interrupted
-    model_path = "model_data/mobilenetv2_yolov4_voc.pth"
+    # todo update `model_path = "../data/best_epoch_weights.pth"` if training is interrupted
+    model_path = "../data/mobilenetv2_yolov4_voc.pth"
     input_shape = [416, 416]
     backbone = "mobilenetv2"
     pretrained = False
@@ -36,8 +37,7 @@ if __name__ == "__main__":
     special_aug_ratio = 0.7
     label_smoothing = 0
     # `optimizer_type = "adam"`
-    # todo update `Init_Epoch` if training is interrupted
-    Init_Epoch = 0
+    Init_Epoch = 0  # update `Init_Epoch` if training is interrupted
     Freeze_Epoch = 50
     Freeze_batch_size = 16  # 8
     UnFreeze_Epoch = 100
@@ -68,7 +68,7 @@ if __name__ == "__main__":
     focal_alpha = 0.25
     focal_gamma = 2
     save_period = 10
-    save_dir = "logs"
+    save_dir = "data"
     eval_flag = True
     eval_period = 10
     num_workers = 2
@@ -264,7 +264,6 @@ if __name__ == "__main__":
                                          class_names,
                                          num_classes,
                                          val_lines,
-                                         # fixme
                                          log_dir,
                                          Cuda,
                                          eval_flag=eval_flag,

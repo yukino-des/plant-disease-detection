@@ -1,12 +1,12 @@
 *.docx
 *.txt
 */*.txt
+app.py
 
 .idea/
 imgs/
 *_out/
 tmp/
-app.py
 build/
 dist/
 plant_disease_detection_3181137349.egg-info/
