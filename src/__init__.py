@@ -1,8 +1,8 @@
-import map
+import maps
 import predict
 import summary
 import train
-import annotation
+import annotations
 import app
 import kmeans
 from utils import mobilenet_v2
@@ -10,11 +10,11 @@ from utils import mobilenet_v2
 
 def run(mode: str):
     if mode == "annotation":
-        annotation.main()
+        annotations.main()
     elif mode == "kmeans":
         kmeans.main()
     elif mode == "map":
-        map.main()
+        maps.main()
     elif mode == "predict":
         predict.main()
     elif mode == "summary":
