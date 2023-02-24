@@ -1,7 +1,7 @@
 import cv2
+import numpy as np
 import os
 import time
-import numpy as np
 from PIL import Image
 from tqdm import tqdm
 from utils.yolov4 import YOLO

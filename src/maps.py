@@ -1,10 +1,10 @@
 import os
-from xml.etree import ElementTree as ET
 from PIL import Image
 from tqdm import tqdm
 from utils.utils import get_classes
 from utils.utils_map import get_map
 from utils.yolov4 import YOLO
+from xml.etree import ElementTree as ET
 
 if __name__ == '__main__':
     classes_path = "../data/voc_classes.txt"

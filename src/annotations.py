@@ -1,8 +1,8 @@
 import numpy as np
 import os
 import random
-from xml.etree import ElementTree as ET
 from utils.utils import get_classes
+from xml.etree import ElementTree as ET
 
 classes_path = "../data/voc_classes.txt"
 trainval_percent = 0.9
