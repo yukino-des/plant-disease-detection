@@ -8,31 +8,33 @@ classifiers = [
     "Operating System :: Unix"
 ]
 setup_kwargs = {
-    "name": "plant-disease-detection-3181137349",
-    "version": "0.0.1",
     "author": "yukino-des",
     "author_email": "3181137349go@gmail.com",
+    "classifiers": classifiers,
     "description": "Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.",
+    "entry_points": {"console_scripts": ["backbone = utils:backbone"]},
+    "include_package_data": True,
     "long_description": long_description,
     "long_description_content_type": "text/plain",
-    "url": "https://github.com/yukin-des/plant-disease-detection.git",
+    "name": "plant-disease-detection-3181137349",
     "packages": find_packages(),
-    "include_package_data": True,
-    "entry_points": {"console_scripts": ["backbone = utils:backbone"]},
-    "install_requires": ["torch==1.13.1",
-                         "numpy==1.24.2",
-                         "Pillow==9.4.0",
-                         "matplotlib==3.7.0",
-                         "scipy==1.10.1",
-                         "tqdm==4.64.1",
-                         "opencv-python==4.7.0.68",
-                         "torchvision==0.14.1",
-                         "onnx==1.13.0",
-                         "onnxsim==0.4.17",
-                         "setuptools==58.0.4",
-                         "thop==0.1.1.post2209072238",
-                         "torchsummary==1.5.1",
-                         "python-multipart==0.0.5"],
-    "classifiers": classifiers
+    "url": "https://github.com/yukin-des/plant-disease-detection.git",
+    "version": "0.0.1",
+    # VOC/JPEGImages/0a5bc3ac046a487f4ae911f98452d61e.jpg
+    "install_requires": ["matplotlib==3.7.0"
+                         "numpy==1.24.2"
+                         "onnx==1.13.0"
+                         "onnxsim==0.4.17"
+                         "opencv-python==4.7.0.68"
+                         "Pillow==9.4.0"
+                         "python-multipart==0.0.5"
+                         "scipy==1.10.1"
+                         "setuptools==58.0.4"
+                         "tensorboard==2.12.0"
+                         "thop==0.1.1.post2209072238"
+                         "torch==1.13.1"
+                         "torchsummary==1.5.1"
+                         "torchvision==0.14.1"
+                         "tqdm==4.64.1"],
 }
-setup(**setup_kwargs)  # ../VOC/JPEGImages/0a5bc3ac046a487f4ae911f98452d61e.jpg
+setup(**setup_kwargs)
