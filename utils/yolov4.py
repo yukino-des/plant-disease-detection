@@ -1,7 +1,7 @@
 import torch
 from collections import OrderedDict
 from torch import nn
-from utils.mobilenet_v2 import mobilenet_v2
+from utils.mobilenetv2 import mobilenet_v2
 
 
 class MobileNetV2(nn.Module):

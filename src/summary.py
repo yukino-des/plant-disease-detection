@@ -2,7 +2,7 @@ import torch
 from thop import clever_format, profile
 from torchsummary import summary
 
-from utils.yolo import YoloBody
+from utils.yolov4 import YoloBody
 
 
 def main():

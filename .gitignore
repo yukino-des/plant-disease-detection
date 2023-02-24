@@ -1,4 +1,5 @@
 *.docx
+*.ipynb
 src/app.py
 
 .idea/

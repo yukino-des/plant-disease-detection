@@ -1,9 +1,7 @@
 import os
 import random
-from xml.etree import ElementTree as ET
-
 import numpy as np
-
+from xml.etree import ElementTree as ET
 from utils.utils import get_classes
 
 classes_path = "../data/voc_classes.txt"

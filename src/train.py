@@ -9,8 +9,8 @@ from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 
-from utils.yolo import YoloBody
-from utils.yolo_training import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
+from utils.yolov4 import YoloBody
+from utils.yolov4_training import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
 from utils.callbacks import EvalCallback, LossHistory
 from utils.dataloader import YoloDataset, yolo_dataset_collate
 from utils.utils import download_weights, get_anchors, get_classes, show_config

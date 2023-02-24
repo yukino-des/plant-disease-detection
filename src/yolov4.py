@@ -11,7 +11,7 @@ import torch
 from PIL import ImageDraw, ImageFont
 from torch import nn
 
-from utils.yolo import YoloBody
+from utils.yolov4 import YoloBody
 from utils.utils import cvtColor, get_anchors, get_classes, preprocess_input, resize_image, show_config
 from utils.utils_bbox import DecodeBox
 
