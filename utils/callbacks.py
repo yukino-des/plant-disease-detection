@@ -1,15 +1,13 @@
-import os
-import shutil
-
 import matplotlib
 import numpy as np
+import os
+import shutil
 import torch
-from PIL import Image
 from matplotlib import pyplot as plt
-from scipy import signal
+from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
-
+from scipy import signal
 from utils.utils import cvtColor, preprocess_input, resize_image
 from utils.utils_bbox import DecodeBox
 from utils.utils_map import get_map

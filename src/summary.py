@@ -5,7 +5,7 @@ from torchsummary import summary
 from utils.yolov4 import YoloBody
 
 
-def main():
+if __name__ == '__main__':
     input_shape = [416, 416]
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
     num_classes = 80

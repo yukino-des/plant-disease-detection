@@ -1,6 +1,6 @@
+import numpy as np
 import os
 import random
-import numpy as np
 from xml.etree import ElementTree as ET
 from utils.utils import get_classes
 
@@ -41,7 +41,7 @@ def printTable(List1, List2):
         print()
 
 
-def main():
+if __name__ == '__main__':
     random.seed(0)
     print("Generate txt in ImageSets.")
     xmlfilepath = "../VOC/Annotations"

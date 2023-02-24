@@ -1,11 +1,9 @@
-from random import sample, shuffle
-
 import cv2
 import numpy as np
 import torch
 from PIL import Image
+from random import sample, shuffle
 from torch.utils.data.dataset import Dataset
-
 from utils.utils import cvtColor, preprocess_input
 
 

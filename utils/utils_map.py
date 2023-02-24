@@ -1,13 +1,13 @@
+import cv2
 import glob
 import json
 import math
+import matplotlib
+import numpy as np
 import operator
 import os
 import shutil
 import sys
-import cv2
-import matplotlib
-import numpy as np
 from matplotlib import pyplot as plt
 
 matplotlib.use("Agg")

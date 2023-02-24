@@ -4,10 +4,9 @@ from PIL import Image
 from tqdm import tqdm
 from utils.utils import get_classes
 from utils.utils_map import get_map
-from yolov4 import YOLO
+from utils.yolov4 import YOLO
 
-
-def main():
+if __name__ == '__main__':
     classes_path = "../data/voc_classes.txt"
     MINOVERLAP = 0.5
     confidence = 0.001

@@ -1,5 +1,5 @@
-import os
 import numpy as np
+import os
 from PIL import Image
 from torch.hub import load_state_dict_from_url
 

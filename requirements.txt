@@ -11,3 +11,5 @@ onnxsim==0.4.17
 setuptools==58.0.4
 thop==0.1.1.post2209072238
 torchsummary==1.5.1
+python-multipart==0.0.5
+tensorboard==2.12.0

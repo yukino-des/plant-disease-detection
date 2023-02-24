@@ -1,15 +1,12 @@
+import cv2
 import os
 import time
-
-import cv2
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
+from utils.yolov4 import YOLO
 
-from src.yolov4 import YOLO
-
-
-def main():
+if __name__ == '__main__':
     yolo = YOLO()
     mode = input("Input mode in ['predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict']:")
     # mode = "predict"
