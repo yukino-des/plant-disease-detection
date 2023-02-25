@@ -4,7 +4,7 @@ import torch
 from PIL import Image
 from random import sample, shuffle
 from torch.utils.data.dataset import Dataset
-from utils.utils import cvt_color, preprocess_input
+from utils.util import cvt_color, preprocess_input
 
 
 class YoloDataset(Dataset):

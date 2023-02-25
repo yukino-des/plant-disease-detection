@@ -11,7 +11,7 @@ from collections import OrderedDict
 from PIL import ImageDraw, ImageFont
 from torch import nn
 from utils.mobilenetv2 import mobilenet_v2
-from utils.utils import cvt_color, get_anchors, get_classes, preprocess_input, resize_image, show_config, logistic
+from utils.util import cvt_color, get_anchors, get_classes, preprocess_input, resize_image, show_config, logistic
 from utils.bbox import DecodeBox
 
 
@@ -379,7 +379,7 @@ class YOLO(object):
         print("Save to {}".format(model_path))
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w")
+        f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)

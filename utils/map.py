@@ -104,45 +104,20 @@ def draw_plot_func(dictionary,
                    plot_title,
                    x_label,
                    output_path,
-                   to_show,
-                   plot_color,
-                   true_p_bar):
+                   plot_color, ):
     sorted_dic_by_value = sorted(dictionary.items(), key=operator.itemgetter(1))
     sorted_keys, sorted_values = zip(*sorted_dic_by_value)
-    if true_p_bar != "":
-        fp_sorted = []
-        tp_sorted = []
-        for key in sorted_keys:
-            fp_sorted.append(dictionary[key] - true_p_bar[key])
-            tp_sorted.append(true_p_bar[key])
-        plt.barh(range(n_classes), fp_sorted, align="center", color="crimson", label="False Positive")
-        plt.barh(range(n_classes), tp_sorted, align="center", color="forestgreen", label="True Positive",
-                 left=fp_sorted)
-        plt.legend(loc="lower right")
-        fig = plt.gcf()
-        axes = plt.gca()
-        r = fig.canvas.get_renderer()
-        for i, val in enumerate(sorted_values):
-            fp_val = fp_sorted[i]
-            tp_val = tp_sorted[i]
-            fp_str_val = " " + str(fp_val)
-            tp_str_val = fp_str_val + " " + str(tp_val)
-            t = plt.text(val, i, tp_str_val, color="forestgreen", va="center", fontweight="bold")
-            plt.text(val, i, fp_str_val, color="crimson", va="center", fontweight="bold")
-            if i == (len(sorted_values) - 1):
-                adjust_axes(r, t, fig, axes)
-    else:
-        plt.barh(range(n_classes), sorted_values, color=plot_color)
-        fig = plt.gcf()
-        axes = plt.gca()
-        r = fig.canvas.get_renderer()
-        for i, val in enumerate(sorted_values):
-            str_val = " " + str(val)
-            if val < 1.0:
-                str_val = " {0:.2f}".format(val)
-            t = plt.text(val, i, str_val, color=plot_color, va="center", fontweight="bold")
-            if i == (len(sorted_values) - 1):
-                adjust_axes(r, t, fig, axes)
+    plt.barh(range(n_classes), sorted_values, color=plot_color)
+    fig = plt.gcf()
+    axes = plt.gca()
+    r = fig.canvas.get_renderer()
+    for i, val in enumerate(sorted_values):
+        str_val = " " + str(val)
+        if val < 1.0:
+            str_val = " {0:.2f}".format(val)
+        t = plt.text(val, i, str_val, color=plot_color, va="center", fontweight="bold")
+        if i == (len(sorted_values) - 1):
+            adjust_axes(r, t, fig, axes)
     fig.canvas.manager.set_window_title(window_title)
     tick_font_size = 12
     plt.yticks(range(n_classes), sorted_keys, fontsize=tick_font_size)
@@ -159,24 +134,14 @@ def draw_plot_func(dictionary,
     plt.xlabel(x_label, fontsize="large")
     fig.tight_layout()
     fig.savefig(output_path)
-    if to_show:
-        plt.show()
     plt.close()
 
 
 def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
     gt_path = os.path.join(path, "ground-truth")
-    dr_path = os.path.join(path, "detection-results")
-    img_path = os.path.join(path, "images-optional")
+    dr_path = os.path.join(path, "detection")
     temp_files_path = os.path.join(path, ".temp_files")
     results_files_path = os.path.join(path, "results")
-    show_animation = True
-    if os.path.exists(img_path):
-        for dirpath, dirnames, files in os.walk(img_path):
-            if not files:
-                show_animation = False
-    else:
-        show_animation = False
     if not os.path.exists(temp_files_path):
         os.makedirs(temp_files_path)
     if os.path.exists(results_files_path):
@@ -192,8 +157,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
         os.makedirs(os.path.join(results_files_path, "F1"))
         os.makedirs(os.path.join(results_files_path, "Recall"))
         os.makedirs(os.path.join(results_files_path, "Precision"))
-    if show_animation:
-        os.makedirs(os.path.join(results_files_path, "images", "detections"))
     ground_truth_files_list = glob.glob(gt_path + "/*.txt")
     if len(ground_truth_files_list) == 0:
         error("Error: No ground-truth files found!")
@@ -315,22 +278,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threshold:
                     score_threshold_idx = idx
-                if show_animation:
-                    ground_truth_img = glob.glob1(img_path, file_id + ".*")
-                    if len(ground_truth_img) == 0:
-                        error("Error. Image not found with id: " + file_id)
-                    elif len(ground_truth_img) > 1:
-                        error("Error. Multiple image with id: " + file_id)
-                    else:
-                        img = cv2.imread(img_path + "/" + ground_truth_img[0])
-                        img_cumulative_path = results_files_path + "/images/" + ground_truth_img[0]
-                        if os.path.isfile(img_cumulative_path):
-                            img_cumulative = cv2.imread(img_cumulative_path)
-                        else:
-                            img_cumulative = img.copy()
-                        bottom_border = 60
-                        black = [0, 0, 0]
-                        img = cv2.copyMakeBorder(img, 0, bottom_border, 0, 0, cv2.BORDER_CONSTANT, value=black)
                 gt_file = temp_files_path + "/" + file_id + "_ground_truth.json"
                 ground_truth_data = json.load(open(gt_file))
                 ovmax = -1
@@ -349,8 +296,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                             if ov > ovmax:
                                 ovmax = ov
                                 gt_match = obj
-                if show_animation:
-                    status = "NO MATCH FOUND!"
                 if ovmax >= min_overlap:
                     if "difficult" not in gt_match:
                         if not bool(gt_match["used"]):
@@ -359,66 +304,10 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                             count_true_positives[class_name] += 1
                             with open(gt_file, "w") as f:
                                 f.write(json.dumps(ground_truth_data))
-                            if show_animation:
-                                status = "MATCH!"
                         else:
                             fp[idx] = 1
-                            if show_animation:
-                                status = "REPEATED MATCH!"
                 else:
                     fp[idx] = 1
-                    if ovmax > 0:
-                        status = "INSUFFICIENT OVERLAP"
-                if show_animation:
-                    height, widht = img.shape[:2]
-                    white = (255, 255, 255)
-                    light_blue = (255, 200, 100)
-                    green = (0, 255, 0)
-                    light_red = (30, 30, 255)
-                    margin = 10
-                    v_pos = int(height - margin - (bottom_border / 2.0))
-                    text = "Image: " + ground_truth_img[0] + " "
-                    img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
-                    text = "Class [" + str(class_index) + "/" + str(n_classes) + "]: " + class_name + " "
-                    img, line_width = draw_text_in_image(img,
-                                                         text,
-                                                         (margin + line_width, v_pos),
-                                                         light_blue,
-                                                         line_width)
-                    if ovmax != -1:
-                        color = light_red
-                        if status == "INSUFFICIENT OVERLAP":
-                            text = "IoU: {0:.2f}% ".format(ovmax * 100) + "< {0:.2f}% ".format(min_overlap * 100)
-                        else:
-                            text = "IoU: {0:.2f}% ".format(ovmax * 100) + ">= {0:.2f}% ".format(min_overlap * 100)
-                            color = green
-                        img, _ = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
-                    v_pos += int(bottom_border / 2.0)
-                    rank_pos = str(idx + 1)
-                    text = "Detection #rank: " + rank_pos + " confidence: {0:.2f}% ".format(
-                        float(detection["confidence"]) * 100)
-                    img, line_width = draw_text_in_image(img, text, (margin, v_pos), white, 0)
-                    color = light_red
-                    if status == "MATCH!":
-                        color = green
-                    text = "Result: " + status + " "
-                    img, line_width = draw_text_in_image(img, text, (margin + line_width, v_pos), color, line_width)
-                    font = cv2.FONT_HERSHEY_SIMPLEX
-                    if ovmax > 0:
-                        bbgt = [int(round(float(x))) for x in gt_match["bbox"].split()]
-                        cv2.rectangle(img, (bbgt[0], bbgt[1]), (bbgt[2], bbgt[3]), light_blue, 2)
-                        cv2.rectangle(img_cumulative, (bbgt[0], bbgt[1]), (bbgt[2], bbgt[3]), light_blue, 2)
-                        cv2.putText(img_cumulative, class_name, (bbgt[0], bbgt[1] - 5), font, 0.6, light_blue, 1,
-                                    cv2.LINE_AA)
-                    bb = [int(i) for i in bb]
-                    cv2.rectangle(img, (bb[0], bb[1]), (bb[2], bb[3]), color, 2)
-                    cv2.rectangle(img_cumulative, (bb[0], bb[1]), (bb[2], bb[3]), color, 2)
-                    cv2.putText(img_cumulative, class_name, (bb[0], bb[1] - 5), font, 0.6, color, 1, cv2.LINE_AA)
-                    cv2.imshow("Animation", img)
-                    cv2.waitKey(20)
-                    output_img_path = f"{results_files_path}/images/detections/{class_name}_detection{str(idx)}.jpg"
-                    cv2.imwrite(output_img_path, img)
-                    cv2.imwrite(img_cumulative_path, img_cumulative)
             cumsum = 0
             for idx, val in enumerate(fp):
                 fp[idx] += cumsum
@@ -437,27 +326,26 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
             f1 = np.array(rec) * np.array(prec) * 2 / np.where((np.array(prec) + np.array(rec)) == 0, 1,
                                                                (np.array(prec) + np.array(rec)))
             sum_ap += ap
-            text = "{0:.2f}%".format(ap * 100) + " = " + class_name + " AP "
-            # class_name + " AP = {0:.2f}%".format(ap * 100)
+            text = class_name + "; AP={0:.2f}%".format(ap * 100)
             if len(prec) > 0:
-                f1_text = "{0:.2f}".format(f1[score_threshold_idx]) + " = " + class_name + " F1 "
-                recall_text = "{0:.2f}%".format(rec[score_threshold_idx] * 100) + " = " + class_name + " Recall "
-                precision_text = "{0:.2f}%".format(prec[score_threshold_idx] * 100) + " = " + class_name + " Precision "
+                f1_text = class_name + "; F1=" + "{0:.2f}".format(f1[score_threshold_idx])
+                recall_text = class_name + "; Recall=" + "{0:.2f}%".format(rec[score_threshold_idx] * 100)
+                precision_text = class_name + "; Precision=" + "{0:.2f}%".format(prec[score_threshold_idx] * 100)
             else:
-                f1_text = "0.00" + " = " + class_name + " F1 "
-                recall_text = "0.00%" + " = " + class_name + " Recall "
-                precision_text = "0.00%" + " = " + class_name + " Precision "
+                f1_text = class_name + "; F1=0.00"
+                recall_text = class_name + "; Recall=0.00%"
+                precision_text = class_name + "; Precision=0.00%"
             rounded_prec = ["%.2f" % elem for elem in prec]
             rounded_rec = ["%.2f" % elem for elem in rec]
-            results_file.write(text + "\n Precision: " + str(rounded_prec) + "\n Recall :" + str(rounded_rec) + "\n\n")
+            results_file.write(text + "\nPrecision:" + str(rounded_prec) + "\nRecall:" + str(rounded_rec) + "\n\n")
             if len(prec) > 0:
-                print(text + "\t||\tscore_threshold=" + str(score_threshold) + " : " + "F1=" + "{0:.2f}".format(
-                    f1[score_threshold_idx]) + " ; Recall=" + "{0:.2f}%".format(
-                    rec[score_threshold_idx] * 100) + " ; Precision=" + "{0:.2f}%".format(
+                print(text + "; score_threshold=" + str(score_threshold) + "; F1=" + "{0:.2f}".format(
+                    f1[score_threshold_idx]) + "; Recall=" + "{0:.2f}%".format(
+                    rec[score_threshold_idx] * 100) + "; Precision=" + "{0:.2f}%".format(
                     prec[score_threshold_idx] * 100))
             else:
-                print(text + "\t||\tscore_threshold=" + str(
-                    score_threshold) + " : " + "F1=0.00% ; Recall=0.00% ; Precision=0.00%")
+                print(text + "; score_threshold=" + str(
+                    score_threshold) + "; " + "F1=0.00; Recall=0.00%; Precision=0.00%")
             ap_dictionary[class_name] = ap
             n_images = counter_images_per_class[class_name]
             lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
@@ -504,8 +392,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 axes.set_ylim([0.0, 1.05])
                 fig.savefig(results_files_path + "/Precision/" + class_name + ".png")
                 plt.cla()
-        if show_animation:
-            cv2.destroyAllWindows()
         if n_classes == 0:
             print("../data/voc_classes.txt ERROR!")
             return 0
@@ -537,8 +423,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
         for class_name in sorted(dr_classes):
             n_det = det_counter_per_class[class_name]
             text = class_name + ": " + str(n_det)
-            text += " (tp:" + str(count_true_positives[class_name]) + ""
-            text += ", fp:" + str(n_det - count_true_positives[class_name]) + ")\n"
+            text += " (tp: " + str(count_true_positives[class_name])
+            text += ", fp: " + str(n_det - count_true_positives[class_name]) + ")\n"
             results_file.write(text)
     if draw_plot:
         window_title = "ground-truth-info"
@@ -546,7 +432,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
         plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
         x_label = "Number of objects per class"
         output_path = results_files_path + "/ground-truth-info.png"
-        to_show = False
         plot_color = "forestgreen"
         draw_plot_func(gt_counter_per_class,
                        n_classes,
@@ -554,22 +439,17 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                        plot_title,
                        x_label,
                        output_path,
-                       to_show,
-                       plot_color, "")
+                       plot_color)
         window_title = "lamr"
         plot_title = "log-average miss rate"
         x_label = "log-average miss rate"
         output_path = results_files_path + "/lamr.png"
-        to_show = False
         plot_color = "royalblue"
-        draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, to_show, plot_color,
-                       "")
+        draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP"
-        plot_title = "mAP = {0:.2f}%".format(_map_ * 100)
+        plot_title = "mAP={0:.2f}%".format(_map_ * 100)
         x_label = "Average Precision"
         output_path = results_files_path + "/mAP.png"
-        to_show = False
         plot_color = "royalblue"
-        draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, to_show, plot_color,
-                       "")
+        draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     return _map_

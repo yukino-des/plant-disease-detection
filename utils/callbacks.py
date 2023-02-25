@@ -8,7 +8,7 @@ from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from scipy import signal
-from utils.utils import cvt_color, preprocess_input, resize_image
+from utils.util import cvt_color, preprocess_input, resize_image
 from utils.bbox import DecodeBox
 from utils.map import get_map
 
@@ -124,7 +124,7 @@ class EvalCallback:
                 f.write("\n")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w", encoding="utf-8")
+        f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
@@ -166,8 +166,8 @@ class EvalCallback:
                 os.makedirs(self.maps_out_path)
             if not os.path.exists(os.path.join(self.maps_out_path, "ground-truth")):
                 os.makedirs(os.path.join(self.maps_out_path, "ground-truth"))
-            if not os.path.exists(os.path.join(self.maps_out_path, "detection-results")):
-                os.makedirs(os.path.join(self.maps_out_path, "detection-results"))
+            if not os.path.exists(os.path.join(self.maps_out_path, "detection")):
+                os.makedirs(os.path.join(self.maps_out_path, "detection"))
             print("Get map.")
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()

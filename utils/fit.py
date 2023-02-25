@@ -1,7 +1,7 @@
 import os
 import torch
 from tqdm import tqdm
-from utils.utils import get_lr
+from utils.util import get_lr
 
 
 def fit_one_epoch(model_train,
