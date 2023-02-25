@@ -17,7 +17,7 @@ from torch import nn
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
-from utils.util import (available, cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
+from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
                         resize_image, show_config)
 
 if os.name == "nt":
@@ -65,7 +65,6 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
     val_loss = 0
     pbar = None
     if local_rank == 0:
-        print("Start Train")
         pbar = tqdm(total=epoch_step, desc=f"Epoch {epoch + 1}/{_epoch_}", postfix=dict, mininterval=0.3)
     model_train.train()
     for iteration, batch in enumerate(gen):
@@ -91,8 +90,6 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
             pbar.update(1)
     if local_rank == 0:
         pbar.close()
-        print("Finish Train")
-        print("Start Validation")
         pbar = tqdm(total=epoch_step_val, desc=f"Epoch {epoch + 1}/{_epoch_}", postfix=dict, mininterval=0.3)
     model_train.eval()
     for iteration, batch in enumerate(gen_val):
@@ -116,10 +113,9 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
             pbar.update(1)
     if local_rank == 0:
         pbar.close()
-        print("Finish Validation")
         loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
         eval_callback.on_epoch_end(epoch + 1, model_train)
-        print("Epoch:" + str(epoch + 1) + "/" + str(_epoch_))
+        print("Epoch: " + str(epoch + 1) + "/" + str(_epoch_))
         print("Total Loss: %.3f; Val Loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
         if (epoch + 1) % save_period == 0 or epoch + 1 == _epoch_:
             torch.save(model.state_dict(), os.path.join(save_dir, "ep%03d-loss%.3f-val_loss%.3f.pth" % (
@@ -193,7 +189,7 @@ def weights_init(net, init_type="normal", init_gain=0.02):
             torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
             torch.nn.init.constant_(m.bias.data, 0.0)
 
-    print("Init Type: %s" % init_type)
+    print("init_type: %s" % init_type)
     net.apply(init_func)
 
 
@@ -329,14 +325,10 @@ class YOLO(object):
                                   size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
         if count:
-            print("top_label:", top_label)
-            classes_nums = np.zeros([self.num_classes])
             for i in range(self.num_classes):
                 num = np.sum(top_label == i)
                 if num > 0:
-                    print(self.class_names[i], ":", num)
-                classes_nums[i] = num
-            print("classes_nums:", classes_nums)
+                    print(self.class_names[i] + ":", num)
         if crop:
             for i, c in list(enumerate(top_label)):
                 top, left, bottom, right = top_boxes[i]
@@ -349,7 +341,7 @@ class YOLO(object):
                     os.makedirs(dir_save_path)
                 crop_image = image.crop([left, top, right, bottom])
                 crop_image.save(os.path.join(dir_save_path, "crop_" + str(i) + ".png"), quality=95, subsampling=0)
-                print("save crop_" + str(i) + ".png to " + dir_save_path)
+                print(dir_save_path + "/crop_" + str(i) + ".png saved.")
         image_info = {}
         count = 0
         for i, c in list(enumerate(top_label)):
@@ -438,14 +430,13 @@ class YOLO(object):
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
-        print(heatmap_save_path + "saved.")
+        print(heatmap_save_path + " saved.")
 
     def convert_to_onnx(self, simplify, model_path):
         self.generate(onnx=True)
         im = torch.zeros(1, 3, *self.input_shape).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        print(f"Onnx {onnx.__version__}.")
         torch.onnx.export(self.net,
                           im,
                           f=model_path,
@@ -459,14 +450,13 @@ class YOLO(object):
         model_onnx = onnx.load(model_path)
         onnx.checker.check_model(model_onnx)
         if simplify:
-            print(f"Onnx-simplifier {onnxsim.__version__}.")
             model_onnx, check = onnxsim.simplify(
                 model_onnx,
                 dynamic_input_shape=False,
                 input_shapes=None)
             assert check, "assert check failed"
             onnx.save(model_onnx, model_path)
-        print("Save to {}".format(model_path))
+        print(model_path + " saved.")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
         f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w")

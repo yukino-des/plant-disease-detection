@@ -5,7 +5,6 @@ import matplotlib
 import numpy as np
 import operator
 import os
-import random
 import shutil
 import sys
 import torch
@@ -136,8 +135,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
             pass
         os.makedirs(os.path.join(results_files_path, "AP"))
         os.makedirs(os.path.join(results_files_path, "F1"))
-        os.makedirs(os.path.join(results_files_path, "Recall"))
-        os.makedirs(os.path.join(results_files_path, "Precision"))
+        os.makedirs(os.path.join(results_files_path, "recall"))
+        os.makedirs(os.path.join(results_files_path, "precision"))
     ground_truth_files_list = glob.glob(gt_path + "/*.txt")
     if len(ground_truth_files_list) == 0:
         error("Error: No ground-truth files found!")
@@ -310,23 +309,23 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
             text = class_name + "; AP={0:.2f}%".format(ap * 100)
             if len(prec) > 0:
                 f1_text = class_name + "; F1=" + "{0:.2f}".format(f1[score_threshold_idx])
-                recall_text = class_name + "; Recall=" + "{0:.2f}%".format(rec[score_threshold_idx] * 100)
-                precision_text = class_name + "; Precision=" + "{0:.2f}%".format(prec[score_threshold_idx] * 100)
+                recall_text = class_name + "; recall=" + "{0:.2f}%".format(rec[score_threshold_idx] * 100)
+                precision_text = class_name + "; precision=" + "{0:.2f}%".format(prec[score_threshold_idx] * 100)
             else:
                 f1_text = class_name + "; F1=0.00"
-                recall_text = class_name + "; Recall=0.00%"
-                precision_text = class_name + "; Precision=0.00%"
+                recall_text = class_name + "; recall=0.00%"
+                precision_text = class_name + "; precision=0.00%"
             rounded_prec = ["%.2f" % elem for elem in prec]
             rounded_rec = ["%.2f" % elem for elem in rec]
-            results_file.write(text + "\nPrecision: " + str(rounded_prec) + "\nRecall: " + str(rounded_rec) + "\n\n")
+            results_file.write(text + "\nprecision: " + str(rounded_prec) + "\nrecall: " + str(rounded_rec) + "\n\n")
             if len(prec) > 0:
                 print(text + "; score_threshold=" + str(score_threshold) + "; F1=" + "{0:.2f}".format(
-                    f1[score_threshold_idx]) + "; Recall=" + "{0:.2f}%".format(
-                    rec[score_threshold_idx] * 100) + "; Precision=" + "{0:.2f}%".format(
+                    f1[score_threshold_idx]) + "; recall=" + "{0:.2f}%".format(
+                    rec[score_threshold_idx] * 100) + "; precision=" + "{0:.2f}%".format(
                     prec[score_threshold_idx] * 100))
             else:
                 print(text + "; score_threshold=" + str(
-                    score_threshold) + "; " + "F1=0.00; Recall=0.00%; Precision=0.00%")
+                    score_threshold) + "; " + "F1=0.00; recall=0.00%; precision=0.00%")
             ap_dictionary[class_name] = ap
             n_images = counter_images_per_class[class_name]
             lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
@@ -339,8 +338,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 fig = plt.gcf()
                 fig.canvas.manager.set_window_title("AP " + class_name)
                 plt.title("class: " + text)
-                plt.xlabel("Recall")
-                plt.ylabel("Precision")
+                plt.xlabel("recall")
+                plt.ylabel("precision")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
@@ -358,20 +357,20 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 plt.plot(score, rec, "-H", color="gold")
                 plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
                 plt.xlabel("Score_Threshold")
-                plt.ylabel("Recall")
+                plt.ylabel("recall")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(results_files_path + "/Recall/" + class_name + ".png")
+                fig.savefig(results_files_path + "/recall/" + class_name + ".png")
                 plt.cla()
                 plt.plot(score, prec, "-s", color="palevioletred")
                 plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
                 plt.xlabel("Score_Threshold")
-                plt.ylabel("Precision")
+                plt.ylabel("precision")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(results_files_path + "/Precision/" + class_name + ".png")
+                fig.savefig(results_files_path + "/precision/" + class_name + ".png")
                 plt.cla()
         if n_classes == 0:
             print("../data/classes.txt error.")
@@ -408,11 +407,11 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
             text += ", fp: " + str(n_det - count_true_positives[class_name]) + ")\n"
             results_file.write(text)
     if draw_plot:
-        window_title = "ground-truth-info"
+        window_title = "ground-truth"
         plot_title = "ground-truth\n"
         plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
         x_label = "Number of objects per class"
-        output_path = results_files_path + "/ground-truth-info.png"
+        output_path = results_files_path + "/ground-truth.png"
         plot_color = "forestgreen"
         draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "lamr"
@@ -423,7 +422,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
         draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP"
         plot_title = "mAP={0:.2f}%".format(_map_ * 100)
-        x_label = "Average Precision"
+        x_label = "Average precision"
         output_path = results_files_path + "/mAP.png"
         plot_color = "royalblue"
         draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
@@ -485,7 +484,7 @@ def resize_image(image, size, letterbox_image):
 
 
 def show_config(**kwargs):
-    print("Configurations:")
+    print("configurations: ")
     print("-" * 70)
     print("|%25s | %40s|" % ("keys", "values"))
     print("-" * 70)
@@ -703,7 +702,6 @@ class EvalCallback:
                 os.makedirs(os.path.join(self.maps_out_path, "ground-truth"))
             if not os.path.exists(os.path.join(self.maps_out_path, "detection")):
                 os.makedirs(os.path.join(self.maps_out_path, "detection"))
-            print("Get map.")
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
                 image_id = os.path.basename(line[0]).split(".")[0]
@@ -715,7 +713,6 @@ class EvalCallback:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]
                         new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
-            print("Calculate Map.")
             temp_map = get_map(self.min_overlap, False, path=self.maps_out_path)
             self.maps.append(temp_map)
             self.epochs.append(epoch)

@@ -23,14 +23,14 @@ if __name__ == "__main__":
     simplify = True
     onnx_save_path = "../data/model.onnx"
     # mode = "dir"
-    dir_origin_path = "../tmp/imgs"
+    dir_path = "../tmp/imgs"
     dir_save_path = "../tmp/imgs_out"
     if mode == "img":
         img = input("Input image path: ")
         try:
             image = Image.open(img)
         except:
-            print("Open error!")
+            print("Open error.")
         else:
             r_image, _ = yolo.detect_image(image, crop=crop, count=count)
             r_image.show()
@@ -85,15 +85,15 @@ if __name__ == "__main__":
     elif mode == "onnx":
         yolo.convert_to_onnx(simplify, onnx_save_path)
     elif mode == "dir":
-        img_names = os.listdir(dir_origin_path)
+        img_names = os.listdir(dir_path)
         for img_name in tqdm(img_names):
             if img_name.lower().endswith(
                     (".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff")):
-                image_path = os.path.join(dir_origin_path, img_name)
+                image_path = os.path.join(dir_path, img_name)
                 image = Image.open(image_path)
                 r_image, _ = yolo.detect_image(image)
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
     else:
-        raise AssertionError("Use mode: img, video, fps, heatmap, onnx, dir.")
+        raise AssertionError("Use mode (img, video, fps, heatmap, onnx, dir).")

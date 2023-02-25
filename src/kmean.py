@@ -81,8 +81,9 @@ if __name__ == "__main__":
     for j in range(anchors_num):
         plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
         plt.scatter(cluster[j][0], cluster[j][1], marker="x", c="black")
-    plt.savefig("../tmp/kmeans_for_anchors.jpg")
-    print("../tmp/kmeans_for_anchors.jpg saved.")
+    os.makedirs("../tmp", exist_ok=True)
+    plt.savefig("../tmp/kmeans.jpg")
+    print("../tmp/kmeans.jpg saved.")
     cluster = cluster[np.argsort(cluster[:, 0] * cluster[:, 1])]
     print("avg_ratio: {:.2f}".format(avg_iou(data, cluster)))
     print(cluster)
