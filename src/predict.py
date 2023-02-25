@@ -4,11 +4,11 @@ import os
 import time
 from PIL import Image
 from tqdm import tqdm
-from utils.yolov4 import YOLO
+from utils.yolo import YOLO
 
 if __name__ == '__main__':
     yolo = YOLO()
-    mode = input("Input mode in ['img', 'video', 'fps', 'heatmap', 'onnx', 'dir']:")
+    mode = input("Input mode in ['img', 'video', 'fps', 'heatmap', 'onnx', 'dir']: ")
     # mode = "img"
     crop = True
     count = True
@@ -21,12 +21,12 @@ if __name__ == '__main__':
     heatmap_save_path = "../tmp/heatmap.png"
     # mode = "onnx"
     simplify = True
-    onnx_save_path = "../data/models.onnx"
+    onnx_save_path = "../data/model.onnx"
     # mode = "dir"
     dir_origin_path = "../tmp/imgs"
     dir_save_path = "../tmp/imgs_out"
     if mode == "img":
-        img = input("Input image path:")
+        img = input("Input image path: ")
         try:
             image = Image.open(img)
         except:
@@ -35,7 +35,7 @@ if __name__ == '__main__':
             r_image, _ = yolo.detect_image(image, crop=crop, count=count)
             r_image.show()
     elif mode == "video":
-        video_path = input("Input video path, input 0 to call camera:")
+        video_path = input("Input video path, input 0 to call camera: ")
         capture = cv2.VideoCapture(0 if video_path == "0" else video_path)
         if video_save_path != "":
             video_save_path = "../tmp/videos_out/01.avi"
@@ -57,7 +57,7 @@ if __name__ == '__main__':
             frame = np.array(image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
-            print("fps= %.2f" % fps)
+            print("fps=%.2f" % fps)
             frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow("video", frame)
             c = cv2.waitKey(1) & 0xff
@@ -65,22 +65,21 @@ if __name__ == '__main__':
             if c == 27:
                 capture.release()
                 break
-        print("Video detection done.")
         capture.release()
-        print("Save to " + video_save_path)
+        print(video_save_path + " saved")
         out.release()
         cv2.destroyAllWindows()
     elif mode == "fps":
-        fps_image_path = input("Input image path:")
+        fps_image_path = input("Input image path: ")
         img = Image.open(fps_image_path)
         tact_time = yolo.get_fps(img, test_interval)
         print(str(tact_time) + " seconds, " + str(1 / tact_time) + " FPS, @batch_size 1")
     elif mode == "heatmap":
-        img = input("Input image path:")
+        img = input("Input image path: ")
         try:
             image = Image.open(img)
         except:
-            print("Open error!")
+            print("Open error.")
         else:
             yolo.detect_heatmap(image, heatmap_save_path)
     elif mode == "onnx":
@@ -97,4 +96,4 @@ if __name__ == '__main__':
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
     else:
-        raise AssertionError("Use mode: 'img', 'video', 'fps', 'heatmap', 'onnx', 'dir'.")
+        raise AssertionError("Use mode: img, video, fps, heatmap, onnx, dir.")

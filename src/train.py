@@ -5,18 +5,15 @@ import torch
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
-from utils.callbacks import EvalCallback, LossHistory
-from utils.dataloader import YoloDataset, yolo_dataset_collate
-from utils.util import download_weights, get_anchors, get_classes, show_config
-from utils.train import fit_one_epoch
-from utils.yolov4 import YoloBody
-from utils.train import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
+from utils.util import download_weights, get_anchors, get_classes, show_config, EvalCallback, LossHistory
+from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
+                        YoloBody, YoloDataset, YOLOLoss)
 
 if __name__ == '__main__':
     # todo update `cuda = True`
     cuda = False
-    classes_path = "../data/voc_classes.txt"
-    anchors_path = "../data/yolo_anchors.txt"
+    classes_path = "../data/classes.txt"
+    anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
     # todo update `model_path = "../data/best.pth"` if training is interrupted
     model_path = "../data/best.pth"
@@ -28,8 +25,7 @@ if __name__ == '__main__':
     mixup = True
     mixup_prob = 0.5
     special_aug_ratio = 0.7
-
-    # `optimizer_type = "adam"`
+    # ---------- `optimizer_type = "adam"` ----------
     Init_Epoch = 0  # update `Init_Epoch` if training is interrupted
     Freeze_Epoch = 50
     Freeze_batch_size = 16  # 8
@@ -42,8 +38,7 @@ if __name__ == '__main__':
     momentum = 0.937
     weight_decay = 0
     lr_decay_type = "cos"  # "step"
-
-    # `optimizer_type = "sgd"`
+    # ---------- `optimizer_type = "sgd"` ----------
     """
     Init_Epoch = 0
     Freeze_Epoch = 50
@@ -58,7 +53,6 @@ if __name__ == '__main__':
     weight_decay = 5e-4
     lr_decay_type = "cos"  # "step"
     """
-
     focal_loss = False
     focal_alpha = 0.25
     focal_gamma = 2
@@ -96,21 +90,13 @@ if __name__ == '__main__':
         if local_rank == 0:
             print("\nSuccess:", str(load_key)[:500], "\nSuccess Num:", len(load_key))
             print("\nFail:", str(no_load_key)[:500], "\nFail Num:", len(no_load_key))
-    yolo_loss = YOLOLoss(anchors,
-                         num_classes,
-                         input_shape,
-                         cuda,
-                         anchors_mask,
-                         focal_loss,
-                         focal_alpha,
-                         focal_gamma)
-    time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y_%m_%d_%H_%M_%S")
-    log_dir = os.path.join(save_dir, "loss_" + str(time_str))
+    yolo_loss = YOLOLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
+    time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y%m%d%H%M%S")
+    log_dir = os.path.join(save_dir, "loss" + str(time_str))
     if local_rank == 0:
         loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     else:
         loss_history = None
-    scaler = None
     model_train = model.train()
     if cuda:
         model_train = torch.nn.DataParallel(model)
@@ -123,26 +109,12 @@ if __name__ == '__main__':
     num_train = len(train_lines)
     num_val = len(val_lines)
     if local_rank == 0:
-        show_config(classes_path=classes_path,
-                    anchors_path=anchors_path,
-                    anchors_mask=anchors_mask,
-                    model_path=model_path,
-                    input_shape=input_shape,
-                    Init_Epoch=Init_Epoch,
-                    Freeze_Epoch=Freeze_Epoch,
-                    unfreeze_epoch=unfreeze_epoch,
-                    Freeze_batch_size=Freeze_batch_size,
-                    Unfreeze_batch_size=Unfreeze_batch_size,
-                    Freeze_Train=Freeze_Train,
-                    Init_lr=Init_lr,
-                    Min_lr=Min_lr,
-                    optimizer_type=optimizer_type,
-                    momentum=momentum,
-                    lr_decay_type=lr_decay_type,
-                    save_period=save_period,
-                    save_dir=save_dir,
-                    num_workers=num_workers,
-                    num_train=num_train,
+        show_config(classes_path=classes_path, anchors_path=anchors_path, anchors_mask=anchors_mask,
+                    model_path=model_path, input_shape=input_shape, Init_Epoch=Init_Epoch, Freeze_Epoch=Freeze_Epoch,
+                    unfreeze_epoch=unfreeze_epoch, Freeze_batch_size=Freeze_batch_size,
+                    Unfreeze_batch_size=Unfreeze_batch_size, Freeze_Train=Freeze_Train, Init_lr=Init_lr, Min_lr=Min_lr,
+                    optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type,
+                    save_period=save_period, save_dir=save_dir, num_workers=num_workers, num_train=num_train,
                     num_val=num_val)
         wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
         total_step = num_train // Unfreeze_batch_size * unfreeze_epoch
@@ -180,57 +152,21 @@ if __name__ == '__main__':
         epoch_step_val = num_val // batch_size
         if epoch_step == 0 or epoch_step_val == 0:
             raise ValueError("The dataset is too small.")
-        train_dataset = YoloDataset(train_lines,
-                                    input_shape,
-                                    num_classes,
-                                    epoch_length=unfreeze_epoch,
-                                    mosaic=mosaic,
-                                    mixup=mixup,
-                                    mosaic_prob=mosaic_prob,
-                                    mixup_prob=mixup_prob,
-                                    train=True,
+        train_dataset = YoloDataset(train_lines, input_shape, num_classes, epoch_length=unfreeze_epoch, mosaic=mosaic,
+                                    mixup=mixup, mosaic_prob=mosaic_prob, mixup_prob=mixup_prob, train=True,
                                     special_aug_ratio=special_aug_ratio)
-        val_dataset = YoloDataset(val_lines,
-                                  input_shape,
-                                  num_classes,
-                                  epoch_length=unfreeze_epoch,
-                                  mosaic=False,
-                                  mixup=False,
-                                  mosaic_prob=0,
-                                  mixup_prob=0,
-                                  train=False,
-                                  special_aug_ratio=0)
+        val_dataset = YoloDataset(val_lines, input_shape, num_classes, epoch_length=unfreeze_epoch, mosaic=False,
+                                  mixup=False, mosaic_prob=0, mixup_prob=0, train=False, special_aug_ratio=0)
         train_sampler = None
         val_sampler = None
         shuffle = True
-        gen = DataLoader(train_dataset,
-                         shuffle=shuffle,
-                         batch_size=batch_size,
-                         num_workers=num_workers,
-                         pin_memory=True,
-                         drop_last=True,
-                         collate_fn=yolo_dataset_collate,
-                         sampler=train_sampler)
-        gen_val = DataLoader(val_dataset,
-                             shuffle=shuffle,
-                             batch_size=batch_size,
-                             num_workers=num_workers,
-                             pin_memory=True,
-                             drop_last=True,
-                             collate_fn=yolo_dataset_collate,
-                             sampler=val_sampler)
+        gen = DataLoader(train_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
+                         pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=train_sampler)
+        gen_val = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
+                             pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=val_sampler)
         if local_rank == 0:
-            eval_callback = EvalCallback(model,
-                                         input_shape,
-                                         anchors,
-                                         anchors_mask,
-                                         class_names,
-                                         num_classes,
-                                         val_lines,
-                                         log_dir,
-                                         cuda,
-                                         eval_flag=eval_flag,
-                                         period=eval_period)
+            eval_callback = EvalCallback(model, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines,
+                                         log_dir, cuda, eval_flag=eval_flag, period=eval_period)
         else:
             eval_callback = None
         for epoch in range(Init_Epoch, unfreeze_epoch):
@@ -248,42 +184,17 @@ if __name__ == '__main__':
                 epoch_step_val = num_val // batch_size
                 if epoch_step == 0 or epoch_step_val == 0:
                     raise ValueError("The dataset is too small.")
-                gen = DataLoader(train_dataset,
-                                 shuffle=shuffle,
-                                 batch_size=batch_size,
-                                 num_workers=num_workers,
-                                 pin_memory=True,
-                                 drop_last=True,
-                                 collate_fn=yolo_dataset_collate,
+                gen = DataLoader(train_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
+                                 pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate,
                                  sampler=train_sampler)
-                gen_val = DataLoader(val_dataset,
-                                     shuffle=shuffle,
-                                     batch_size=batch_size,
-                                     num_workers=num_workers,
-                                     pin_memory=True,
-                                     drop_last=True,
-                                     collate_fn=yolo_dataset_collate,
+                gen_val = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
+                                     pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate,
                                      sampler=val_sampler)
                 UnFreeze_flag = True
             gen.dataset.epoch_now = epoch
             gen_val.dataset.epoch_now = epoch
             set_optimizer_lr(optimizer, lr_scheduler_func, epoch)
-            fit_one_epoch(model_train,
-                          model,
-                          yolo_loss,
-                          loss_history,
-                          eval_callback,
-                          optimizer,
-                          epoch,
-                          epoch_step,
-                          epoch_step_val,
-                          gen,
-                          gen_val,
-                          unfreeze_epoch,
-                          cuda,
-                          scaler,
-                          save_period,
-                          save_dir,
-                          local_rank)
+            fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
+                          epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir, local_rank)
         if local_rank == 0:
             loss_history.writer.close()
