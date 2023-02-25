@@ -1,6 +1,5 @@
 *.docx
 src/*.txt
-src/app.py
 VOC/ImageSets/Main/*.txt
 
 
