@@ -17,7 +17,7 @@ from torch import nn
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
-from utils.util import (cuda_avai, cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
+from utils.util import (available, cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
                         resize_image, show_config)
 
 if os.name == "nt":
@@ -34,7 +34,7 @@ defaults = {
     "confidence": 0.5,
     "nms_iou": 0.3,
     "letterbox_image": False,
-    "cuda": cuda_avai()
+    "cuda": False
 }
 
 
@@ -266,7 +266,6 @@ class Upsample(nn.Module):
 
 
 class YOLO(object):
-
     def __init__(self, **kwargs):
         self.classes_path = ""
         self.anchors_path = ""

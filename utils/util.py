@@ -5,6 +5,7 @@ import matplotlib
 import numpy as np
 import operator
 import os
+import random
 import shutil
 import sys
 import torch
@@ -32,7 +33,7 @@ def adjust_axes(r, t, fig, axes):
     axes.set_xlim([x_lim[0], x_lim[1] * propotion])
 
 
-def cuda_avai():
+def available():
     avai = input("Is cuda available (y/n)? ")
     return avai == "y" or avai == "Y"
 
@@ -457,6 +458,15 @@ def log_average_miss_rate(precision, fp_cumsum, num_images):
 def preprocess_input(image):
     image /= 255.0
     return image
+
+
+def print_table(l1, l2):
+    for i in range(len(l1[0])):
+        print("|", end=" ")
+        for j in range(len(l1)):
+            print(l1[j][i].rjust(int(l2[j])), end=" ")
+            print("|", end=" ")
+        print()
 
 
 def resize_image(image, size, letterbox_image):

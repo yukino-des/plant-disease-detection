@@ -1,6 +1,10 @@
 *.docx
 *.ipynb
+src/*.txt
 src/app.py.bak
+VOC/ImageSets/Main/*.txt
+
 
 .idea/
 tmp/
+VOC/.tmp.driveupload/

@@ -1,16 +1,102 @@
 import datetime
 import numpy as np
 import os
+import random
 import torch
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
-from utils.util import download_weights, get_anchors, get_classes, show_config, EvalCallback, LossHistory
+from utils.util import (available, download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback,
+                        LossHistory)
 from utils.yolo import (defaults, fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
                         YoloBody, YoloDataset, YOLOLoss)
+from xml.etree import ElementTree as ET
 
 if __name__ == "__main__":
-    cuda = defaults["cuda"]
+    random.seed(0)
+    classes_path = "../data/classes.txt"
+    trainval_percent = 0.9
+    train_percent = 0.9
+    voc_sets = ["train", "val"]
+    classes, _ = get_classes(classes_path)
+    photo_nums = np.zeros(len(voc_sets))
+    nums = np.zeros(len(classes))
+    xml_file_path = "../VOC/Annotations"
+    save_base_path = "../VOC/ImageSets/Main"
+    temp_xml = os.listdir(xml_file_path)
+    total_xml = []
+    for xml in temp_xml:
+        if xml.endswith(".xml"):
+            total_xml.append(xml)
+    num = len(total_xml)
+    num_list = range(num)
+    tv = int(num * trainval_percent)
+    tr = int(tv * train_percent)
+    trainval = random.sample(num_list, tv)
+    train = random.sample(trainval, tr)
+    ftrainval = open(os.path.join(save_base_path, "trainval.txt"), "w")
+    ftest = open(os.path.join(save_base_path, "test.txt"), "w")
+    ftrain = open(os.path.join(save_base_path, "train.txt"), "w")
+    fval = open(os.path.join(save_base_path, "val.txt"), "w")
+    for i in num_list:
+        name = total_xml[i][:-4] + "\n"
+        if i in trainval:
+            ftrainval.write(name)
+            if i in train:
+                ftrain.write(name)
+            else:
+                fval.write(name)
+        else:
+            ftest.write(name)
+    ftrainval.close()
+    ftrain.close()
+    fval.close()
+    ftest.close()
+    type_index = 0
+    for image_set in voc_sets:
+        image_ids = open("../VOC/ImageSets/Main/%s.txt" % image_set,
+                         encoding="utf-8").read().strip().split()
+        list_file = open("%s.txt" % image_set, "w", encoding="utf-8")
+        for image_id in image_ids:
+            list_file.write("../VOC/JPEGImages/%s.jpg" % image_id)
+            in_file = open("../VOC/Annotations/%s.xml" % image_id, encoding="utf-8")
+            tree = ET.parse(in_file)
+            root = tree.getroot()
+            for obj in root.iter("object"):
+                difficult = 0
+                if obj.find("difficult") is not None:
+                    difficult = obj.find("difficult").text
+                cls = obj.find("name").text
+                if cls not in classes or int(difficult) == 1:
+                    continue
+                cls_id = classes.index(cls)
+                xmlbox = obj.find("bndbox")
+                b = (int(float(xmlbox.find("xmin").text)), int(float(xmlbox.find("ymin").text)),
+                     int(float(xmlbox.find("xmax").text)), int(float(xmlbox.find("ymax").text)))
+                list_file.write(" " + ",".join([str(a) for a in b]) + "," + str(cls_id))
+                nums[classes.index(cls)] = nums[classes.index(cls)] + 1
+            list_file.write("\n")
+        photo_nums[type_index] = len(image_ids)
+        type_index += 1
+        list_file.close()
+    str_nums = [str(int(x)) for x in nums]
+    tableData = [classes, str_nums]
+    colWidths = [0] * len(tableData)
+    for i in range(len(tableData)):
+        for j in range(len(tableData[i])):
+            if len(tableData[i][j]) > colWidths[i]:
+                colWidths[i] = len(tableData[i][j])
+    print_table(tableData, colWidths)
+    if photo_nums[0] <= 500:
+        print("The dataset is too small.")
+    if np.sum(nums) == 0:
+        print("../data/voc_class.txt error.")
+    ctn = input("Continue (y/n)? ")
+    if ctn == "n" or ctn == "N":
+        exit(0)
+    cuda = available()
+    if cuda:
+        defaults["cuda"] = True
     classes_path = "../data/classes.txt"
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
@@ -29,7 +115,7 @@ if __name__ == "__main__":
     freeze_batch_size = 16  # 8
     unfreeze_epoch = 100
     unfreeze_batch_size = 8
-    freeze_Train = True
+    freeze_train = True
     init_lr = 1e-3
     min_lr = init_lr * 0.01
     optimizer_type = "adam"
@@ -43,7 +129,7 @@ if __name__ == "__main__":
     freeze_batch_size = 16
     unfreeze_epoch = 300
     unfreeze_batch_size = 8
-    freeze_Train = True
+    freeze_train = True
     init_lr = 1e-2
     min_lr = init_lr * 0.01
     optimizer_type = "sgd"
@@ -110,7 +196,7 @@ if __name__ == "__main__":
         show_config(classes_path=classes_path, anchors_path=anchors_path, anchors_mask=anchors_mask,
                     model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
                     unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
-                    unfreeze_batch_size=unfreeze_batch_size, freeze_Train=freeze_Train, init_lr=init_lr, min_lr=min_lr,
+                    unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,
                     optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type,
                     save_period=save_period, save_dir=save_dir, num_workers=num_workers, num_train=num_train,
                     num_val=num_val)
@@ -120,10 +206,10 @@ if __name__ == "__main__":
             if num_train // unfreeze_batch_size == 0:
                 raise ValueError("The dataset is too small.")
     unfreeze_flag = False
-    if freeze_Train:
+    if freeze_train:
         for param in model.backbone.parameters():
             param.requires_grad = False
-    batch_size = freeze_batch_size if freeze_Train else unfreeze_batch_size
+    batch_size = freeze_batch_size if freeze_train else unfreeze_batch_size
     nbs = 64
     lr_limit_max = 1e-3 if optimizer_type in ["adam", "adamw"] else 5e-2
     lr_limit_min = 3e-4 if optimizer_type in ["adam", "adamw"] else 5e-4
@@ -167,7 +253,7 @@ if __name__ == "__main__":
     else:
         eval_callback = None
     for epoch in range(init_epoch, unfreeze_epoch):
-        if epoch >= freeze_epoch and not unfreeze_flag and freeze_Train:
+        if epoch >= freeze_epoch and not unfreeze_flag and freeze_train:
             batch_size = unfreeze_batch_size
             nbs = 64
             lr_limit_max = 1e-3 if optimizer_type in ["adam", "adamw"] else 5e-2
