@@ -40,11 +40,8 @@ def cvt_color(image):
         return image
 
 
-def download_weights(backbone, model_dir="../data"):
-    download_urls = {
-        "mobilenetv2": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-    }
-    url = download_urls[backbone]
+def download_weights(model_dir="../data"):
+    url = "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth"
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     load_state_dict_from_url(url, model_dir)

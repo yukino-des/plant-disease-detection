@@ -43,7 +43,7 @@ def kmeans(box, k):
             cluster[j] = np.median(box[near == j], axis=0)
         last_clu = near
         if iternum % 5 == 0:
-            print("iter: {:d} avg_iou: {:.2f}".format(iternum, avg_iou(box, cluster)))
+            print("iter: {:d}; avg_iou: {:.2f}".format(iternum, avg_iou(box, cluster)))
         iternum += 1
     return cluster, near
 
@@ -90,8 +90,8 @@ if __name__ == "__main__":
     row = np.shape(cluster)[0]
     for i in range(row):
         if i == 0:
-            x_y = "%d,%d" % (cluster[i][0], cluster[i][1])
+            xy = "%d,%d" % (cluster[i][0], cluster[i][1])
         else:
-            x_y = ", %d,%d" % (cluster[i][0], cluster[i][1])
-        f.write(x_y)
+            xy = ", %d,%d" % (cluster[i][0], cluster[i][1])
+        f.write(xy)
     f.close()

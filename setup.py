@@ -12,7 +12,7 @@ setup_kwargs = {
     "author_email": "3181137349go@gmail.com",
     "classifiers": classifiers,
     "description": "Plant disease detection, using MobileNetV2 and YOLOv4, Pytorch implementation.",
-    "entry_points": {"console_scripts": ["backbone = utils:backbone"]},
+    "entry_points": {},
     "include_package_data": True,
     "long_description": long_description,
     "long_description_content_type": "text/plain",

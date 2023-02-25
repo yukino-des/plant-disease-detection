@@ -31,7 +31,6 @@ defaults = {
     "anchors_path": "../data/anchors.txt",
     "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],
     "input_shape": [416, 416],
-    "backbone": "mobilenetv2",
     "confidence": 0.5,
     "nms_iou": 0.3,
     "letterbox_image": False,
@@ -229,9 +228,9 @@ def yolox_warm_cos_lr(lr, min_lr, total_iters, warmup_total_iters, warmup_lr_sta
     return lr
 
 
-class MobileNetV2(nn.Module):
+class Backbone(nn.Module):
     def __init__(self, pretrained=False):
-        super(MobileNetV2, self).__init__()
+        super(Backbone, self).__init__()
         self.model = mobilenet_v2(pretrained=pretrained)
 
     def forward(self, x):
@@ -274,7 +273,6 @@ class YOLO(object):
         self.anchors_path = ""
         self.input_shape = []
         self.anchors_mask = []
-        self.backbone = ""
         self.model_path = ""
         self.cuda = False
         self.letterbox_image = False
@@ -297,7 +295,7 @@ class YOLO(object):
         show_config(**defaults)
 
     def generate(self, onnx=False):
-        self.net = YoloBody(self.anchors_mask, self.num_classes, self.backbone)
+        self.net = YoloBody(self.anchors_mask, self.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
         self.net = self.net.eval()
@@ -510,14 +508,10 @@ class YOLO(object):
 
 
 class YoloBody(nn.Module):
-    def __init__(self, anchors_mask, num_classes, backbone="mobilenetv2", pretrained=False):
+    def __init__(self, anchors_mask, num_classes, pretrained=False):
         super(YoloBody, self).__init__()
-        if backbone == "mobilenetv2":
-            self.backbone = MobileNetV2(pretrained=pretrained)
-            in_filters = [32, 96, 320]
-        else:
-            raise ValueError(
-                "Unsupported backbone - `{}`, Use mobilenetv2".format(backbone))
+        self.backbone = Backbone(pretrained=pretrained)
+        in_filters = [32, 96, 320]
         self.conv1 = make3conv([512, 1024], in_filters[2])
         self.SPP = SpatialPyramidPooling()
         self.conv2 = make3conv([512, 1024], 2048)

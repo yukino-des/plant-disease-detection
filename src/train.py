@@ -18,7 +18,6 @@ if __name__ == "__main__":
     # todo update `model_path = "../data/best.pth"` if training is interrupted
     model_path = "../data/pretrain.pth"
     input_shape = [416, 416]
-    backbone = "mobilenetv2"
     pretrained = False
     mosaic = True
     mosaic_prob = 0.5
@@ -67,10 +66,10 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     local_rank = 0
     if pretrained:
-        download_weights(backbone)
+        download_weights()
     class_names, num_classes = get_classes(classes_path)
     anchors, num_anchors = get_anchors(anchors_path)
-    model = YoloBody(anchors_mask, num_classes, backbone=backbone, pretrained=pretrained)
+    model = YoloBody(anchors_mask, num_classes, pretrained=pretrained)
     if not pretrained:
         weights_init(model)
     if model_path != "":
