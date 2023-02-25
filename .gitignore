@@ -1,6 +1,6 @@
 *.docx
 src/*.txt
-src/app.py.bak
+src/app.py
 VOC/ImageSets/Main/*.txt
 
 
