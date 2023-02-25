@@ -32,6 +32,11 @@ def adjust_axes(r, t, fig, axes):
     axes.set_xlim([x_lim[0], x_lim[1] * propotion])
 
 
+def cuda_avai():
+    avai = input("Is cuda available (y/n)? ")
+    return avai == "y" or avai == "Y"
+
+
 def cvt_color(image):
     if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
         return image

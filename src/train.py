@@ -6,12 +6,11 @@ from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 from utils.util import download_weights, get_anchors, get_classes, show_config, EvalCallback, LossHistory
-from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
+from utils.yolo import (defaults, fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
                         YoloBody, YoloDataset, YOLOLoss)
 
 if __name__ == "__main__":
-    # todo update `cuda = True`
-    cuda = False
+    cuda = defaults["cuda"]
     classes_path = "../data/classes.txt"
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]

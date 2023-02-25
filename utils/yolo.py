@@ -17,7 +17,7 @@ from torch import nn
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
-from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
+from utils.util import (cuda_avai, cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
                         resize_image, show_config)
 
 if os.name == "nt":
@@ -35,7 +35,7 @@ defaults = {
     "nms_iou": 0.3,
     "letterbox_image": False,
     # todo update `"cuda": True`
-    "cuda": False
+    "cuda": cuda_avai()
 }
 
 
