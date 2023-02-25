@@ -4,10 +4,7 @@ import torch
 from thop import clever_format, profile
 from torchsummary import summary
 
-proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(proj_dir)
-if not sys.path.__contains__(proj_dir):
-    sys.path.append(proj_dir)
+sys.path.append(os.path.dirname(sys.path[0]))
 from utils.yolo import YoloBody
 
 if __name__ == "__main__":

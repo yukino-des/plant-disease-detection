@@ -9,9 +9,7 @@ from torch.backends import cudnn
 from torch.utils.data import DataLoader
 from xml.etree import ElementTree as ET
 
-proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if not sys.path.__contains__(proj_dir):
-    sys.path.append(proj_dir)
+sys.path.append(os.path.dirname(sys.path[0]))
 from utils.util import (available, download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback,
                         LossHistory)
 from utils.yolo import (defaults, fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,

@@ -7,9 +7,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from starlette.responses import FileResponse
 
-proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if not sys.path.__contains__(proj_dir):
-    sys.path.append(proj_dir)
+sys.path.append(os.path.dirname(sys.path[0]))
+os.chdir(sys.path[0])
 from utils.yolo import YOLO
 
 app = FastAPI()
@@ -49,7 +48,6 @@ def tmp(fpath):
 
 
 if __name__ == "__main__":
-    os.chdir(sys.path[0])
     shutil.rmtree("../tmp", ignore_errors=True)
     dirs = ["../tmp/imgs", "../tmp/imgs_out", "../tmp/maps_out", "../tmp/original", "../tmp/detected"]
     for _dir_ in dirs:
