@@ -8,9 +8,9 @@ from PIL import Image
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 from scipy import signal
-from utils.utils import cvtColor, preprocess_input, resize_image
-from utils.utils_bbox import DecodeBox
-from utils.utils_map import get_map
+from utils.utils import cvt_color, preprocess_input, resize_image
+from utils.bbox import DecodeBox
+from utils.map import get_map
 
 matplotlib.use("Agg")
 
@@ -91,7 +91,7 @@ class EvalCallback:
                  confidence=0.05,
                  nms_iou=0.5,
                  letterbox_image=True,
-                 MINOVERLAP=0.5,
+                 min_overlap=0.5,
                  eval_flag=True,
                  period=1):
         super(EvalCallback, self).__init__()
@@ -109,7 +109,7 @@ class EvalCallback:
         self.confidence = confidence
         self.nms_iou = nms_iou
         self.letterbox_image = letterbox_image
-        self.MINOVERLAP = MINOVERLAP
+        self.min_overlap = min_overlap
         self.eval_flag = eval_flag
         self.period = period
         self.bbox_util = DecodeBox(self.anchors,
@@ -117,7 +117,7 @@ class EvalCallback:
                                    (self.input_shape[0], self.input_shape[1]),
                                    self.anchors_mask)
         self.maps = [0]
-        self.epoches = [0]
+        self.epochs = [0]
         if self.eval_flag:
             with open(os.path.join(self.log_dir, "epoch_map.txt"), "a") as f:
                 f.write(str(0))
@@ -126,7 +126,7 @@ class EvalCallback:
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
         f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
-        image = cvtColor(image)
+        image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
@@ -181,17 +181,17 @@ class EvalCallback:
                         obj_name = self.class_names[obj]
                         new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
             print("Calculate Map.")
-            temp_map = get_map(self.MINOVERLAP, False, path=self.maps_out_path)
+            temp_map = get_map(self.min_overlap, False, path=self.maps_out_path)
             self.maps.append(temp_map)
-            self.epoches.append(epoch)
+            self.epochs.append(epoch)
             with open(os.path.join(self.log_dir, "epoch_map.txt"), "a") as f:
                 f.write(str(temp_map))
                 f.write("\n")
             plt.figure()
-            plt.plot(self.epoches, self.maps, "red", linewidth=2, label="train map")
+            plt.plot(self.epochs, self.maps, "red", linewidth=2, label="train map")
             plt.grid(True)
             plt.xlabel("Epoch")
-            plt.ylabel("Map %s" % str(self.MINOVERLAP))
+            plt.ylabel("Map %s" % str(self.min_overlap))
             plt.title("A Map Curve")
             plt.legend(loc="upper right")
             plt.savefig(os.path.join(self.log_dir, "epoch_map.png"))

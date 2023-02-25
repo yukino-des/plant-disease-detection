@@ -11,8 +11,8 @@ from collections import OrderedDict
 from PIL import ImageDraw, ImageFont
 from torch import nn
 from utils.mobilenetv2 import mobilenet_v2
-from utils.utils import cvtColor, get_anchors, get_classes, preprocess_input, resize_image, show_config
-from utils.utils_bbox import DecodeBox
+from utils.utils import cvt_color, get_anchors, get_classes, preprocess_input, resize_image, show_config, logistic
+from utils.bbox import DecodeBox
 
 
 class MobileNetV2(nn.Module):
@@ -130,26 +130,26 @@ class YoloBody(nn.Module):
 
     def forward(self, x):
         x2, x1, x0 = self.backbone(x)
-        P5 = self.conv1(x0)
-        P5 = self.SPP(P5)
-        P5 = self.conv2(P5)
-        P5_upsample = self.upsample1(P5)
-        P4 = self.conv_for_P4(x1)
-        P4 = torch.cat([P4, P5_upsample], dim=1)
-        P4 = self.make_five_conv1(P4)
-        P4_upsample = self.upsample2(P4)
-        P3 = self.conv_for_P3(x2)
-        P3 = torch.cat([P3, P4_upsample], dim=1)
-        P3 = self.make_five_conv2(P3)
-        P3_downsample = self.down_sample1(P3)
-        P4 = torch.cat([P3_downsample, P4], dim=1)
-        P4 = self.make_five_conv3(P4)
-        P4_downsample = self.down_sample2(P4)
-        P5 = torch.cat([P4_downsample, P5], dim=1)
-        P5 = self.make_five_conv4(P5)
-        out2 = self.yolo_head3(P3)
-        out1 = self.yolo_head2(P4)
-        out0 = self.yolo_head1(P5)
+        p5 = self.conv1(x0)
+        p5 = self.SPP(p5)
+        p5 = self.conv2(p5)
+        p5_upsample = self.upsample1(p5)
+        p4 = self.conv_for_P4(x1)
+        p4 = torch.cat([p4, p5_upsample], dim=1)
+        p4 = self.make_five_conv1(p4)
+        p4_upsample = self.upsample2(p4)
+        p3 = self.conv_for_P3(x2)
+        p3 = torch.cat([p3, p4_upsample], dim=1)
+        p3 = self.make_five_conv2(p3)
+        p3_downsample = self.down_sample1(p3)
+        p4 = torch.cat([p3_downsample, p4], dim=1)
+        p4 = self.make_five_conv3(p4)
+        p4_downsample = self.down_sample2(p4)
+        p5 = torch.cat([p4_downsample, p5], dim=1)
+        p5 = self.make_five_conv4(p5)
+        out2 = self.yolo_head3(p3)
+        out1 = self.yolo_head2(p4)
+        out0 = self.yolo_head1(p5)
         return out0, out1, out2
 
 
@@ -214,7 +214,7 @@ class YOLO(object):
 
     def detect_image(self, image, crop=False, count=False):
         image_shape = np.array(np.shape(image)[0:2])
-        image = cvtColor(image)
+        image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
@@ -289,9 +289,9 @@ class YOLO(object):
             del draw
         return image, image_info
 
-    def get_FPS(self, image, test_interval):
+    def get_fps(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])
-        image = cvtColor(image)
+        image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
@@ -300,37 +300,31 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
-                                                         self.num_classes,
-                                                         self.input_shape,
-                                                         image_shape,
-                                                         self.letterbox_image,
-                                                         conf_thres=self.confidence,
-                                                         nms_thres=self.nms_iou)
+            self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
+                                               self.num_classes,
+                                               self.input_shape,
+                                               image_shape,
+                                               self.letterbox_image,
+                                               conf_thres=self.confidence,
+                                               nms_thres=self.nms_iou)
         t1 = time.time()
         for _ in range(test_interval):
             with torch.no_grad():
                 outputs = self.net(images)
                 outputs = self.bbox_util.decode_box(outputs)
-                results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
-                                                             self.num_classes,
-                                                             self.input_shape,
-                                                             image_shape,
-                                                             self.letterbox_image,
-                                                             conf_thres=self.confidence,
-                                                             nms_thres=self.nms_iou)
+                self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
+                                                   self.num_classes,
+                                                   self.input_shape,
+                                                   image_shape,
+                                                   self.letterbox_image,
+                                                   conf_thres=self.confidence,
+                                                   nms_thres=self.nms_iou)
         t2 = time.time()
         tact_time = (t2 - t1) / test_interval
         return tact_time
 
-    def logistic(self, x):
-        if np.all(x >= 0):
-            return 1.0 / (1 + np.exp(-x))
-        else:
-            return np.exp(x) / (1 + np.exp(x))
-
     def detect_heatmap(self, image, heatmap_save_path):
-        image = cvtColor(image)
+        image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
@@ -345,7 +339,7 @@ class YOLO(object):
             sub_output = sub_output.cpu().numpy()
             b, c, h, w = np.shape(sub_output)
             sub_output = np.transpose(np.reshape(sub_output, [b, 3, -1, h, w]), [0, 3, 4, 1, 2])[0]
-            score = np.max(self.logistic(sub_output[..., 4]), -1)
+            score = np.max(logistic(sub_output[..., 4]), -1)
             score = cv2.resize(score, (image.size[0], image.size[1]))
             normed_score = (score * 255).astype("uint8")
             mask = np.maximum(mask, normed_score)
@@ -387,7 +381,7 @@ class YOLO(object):
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
         f = open(os.path.join(maps_out_path, "detection-results/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
-        image = cvtColor(image)
+        image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():

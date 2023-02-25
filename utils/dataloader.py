@@ -4,7 +4,7 @@ import torch
 from PIL import Image
 from random import sample, shuffle
 from torch.utils.data.dataset import Dataset
-from utils.utils import cvtColor, preprocess_input
+from utils.utils import cvt_color, preprocess_input
 
 
 class YoloDataset(Dataset):
@@ -41,11 +41,11 @@ class YoloDataset(Dataset):
             lines = sample(self.annotation_lines, 3)
             lines.append(self.annotation_lines[index])
             shuffle(lines)
-            image, box = self.get_random_data_with_Mosaic(lines, self.input_shape)
+            image, box = self.get_random_data_with_mosaic(lines, self.input_shape)
             if self.mixup and self.rand() < self.mixup_prob:
                 lines = sample(self.annotation_lines, 1)
                 image_2, box_2 = self.get_random_data(lines[0], self.input_shape, random=self.train)
-                image, box = self.get_random_data_with_MixUp(image, box, image_2, box_2)
+                image, box = self.get_random_data_with_mixup(image, box, image_2, box_2)
         else:
             image, box = self.get_random_data(self.annotation_lines[index], self.input_shape, random=self.train)
         image = np.transpose(preprocess_input(np.array(image, dtype=np.float32)), (2, 0, 1))
@@ -63,7 +63,7 @@ class YoloDataset(Dataset):
     def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=0.7, val=0.4, random=True):
         line = annotation_line.split()
         image = Image.open(line[0])
-        image = cvtColor(image)
+        image = cvt_color(image)
         iw, ih = image.size
         h, w = input_shape
         box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
@@ -76,7 +76,6 @@ class YoloDataset(Dataset):
             image = image.resize((nw, nh), Image.BICUBIC)
             new_image = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
-            # fixme
             image_data = np.array(new_image, np.float32)
             if len(box) > 0:
                 np.random.shuffle(box)
@@ -104,8 +103,8 @@ class YoloDataset(Dataset):
         new_image.paste(image, (dx, dy))
         image = new_image
         flip = self.rand() < .5
-        if flip: image = image.transpose(Image.FLIP_LEFT_RIGHT)
-        # fixme
+        if flip:
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
         image_data = np.array(image, np.uint8)
         r = np.random.uniform(-1, 1, 3) * [hue, sat, val] + 1
         hue, sat, val = cv2.split(cv2.cvtColor(image_data, cv2.COLOR_RGB2HSV))
@@ -120,7 +119,8 @@ class YoloDataset(Dataset):
             np.random.shuffle(box)
             box[:, [0, 2]] = box[:, [0, 2]] * nw / iw + dx
             box[:, [1, 3]] = box[:, [1, 3]] * nh / ih + dy
-            if flip: box[:, [0, 2]] = w - box[:, [2, 0]]
+            if flip:
+                box[:, [0, 2]] = w - box[:, [2, 0]]
             box[:, 0:2][box[:, 0:2] < 0] = 0
             box[:, 2][box[:, 2] > w] = w
             box[:, 3][box[:, 3] > h] = h
@@ -171,7 +171,7 @@ class YoloDataset(Dataset):
                 merge_bbox.append(tmp_box)
         return merge_bbox
 
-    def get_random_data_with_Mosaic(self, annotation_line, input_shape, jitter=0.3, hue=.1, sat=0.7, val=0.4):
+    def get_random_data_with_mosaic(self, annotation_line, input_shape, jitter=0.3, hue=.1, sat=0.7, val=0.4):
         h, w = input_shape
         min_offset_x = self.rand(0.3, 0.7)
         min_offset_y = self.rand(0.3, 0.7)
@@ -181,7 +181,7 @@ class YoloDataset(Dataset):
         for line in annotation_line:
             line_content = line.split()
             image = Image.open(line_content[0])
-            image = cvtColor(image)
+            image = cvt_color(image)
             iw, ih = image.size
             box = np.array([np.array(list(map(int, box.split(",")))) for box in line_content[1:]])
             flip = self.rand() < .5
@@ -249,7 +249,7 @@ class YoloDataset(Dataset):
         new_boxes = self.merge_bboxes(box_datas, cutx, cuty)
         return new_image, new_boxes
 
-    def get_random_data_with_MixUp(self, image_1, box_1, image_2, box_2):
+    def get_random_data_with_mixup(self, image_1, box_1, image_2, box_2):
         new_image = np.array(image_1, np.float32) * 0.5 + np.array(image_2, np.float32) * 0.5
         if len(box_1) == 0:
             new_boxes = box_2

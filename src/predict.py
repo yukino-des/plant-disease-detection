@@ -8,8 +8,8 @@ from utils.yolov4 import YOLO
 
 if __name__ == '__main__':
     yolo = YOLO()
-    mode = input("Input mode in ['predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict']:")
-    # mode = "predict"
+    mode = input("Input mode in ['img', 'video', 'fps', 'heatmap', 'onnx', 'dir']:")
+    # mode = "img"
     crop = True
     count = True
 
@@ -20,18 +20,18 @@ if __name__ == '__main__':
     # mode = "fps"
     test_interval = 100
 
-    # mode = "dir_predict"
-    dir_origin_path = "../tmp/imgs"
-    dir_save_path = "../tmp/imgs_out"
-
     # mode = "heatmap"
     heatmap_save_path = "../tmp/heatmap.png"
 
-    # mode = "export_onnx"
+    # mode = "onnx"
     simplify = True
     onnx_save_path = "../data/models.onnx"
 
-    if mode == "predict":
+    # mode = "dir"
+    dir_origin_path = "../tmp/imgs"
+    dir_save_path = "../tmp/imgs_out"
+
+    if mode == "img":
         img = input("Input image path:")
         try:
             image = Image.open(img)
@@ -81,10 +81,22 @@ if __name__ == '__main__':
     elif mode == "fps":
         fps_image_path = input("Input image path:")
         img = Image.open(fps_image_path)
-        tact_time = yolo.get_FPS(img, test_interval)
+        tact_time = yolo.get_fps(img, test_interval)
         print(str(tact_time) + " seconds, " + str(1 / tact_time) + " FPS, @batch_size 1")
 
-    elif mode == "dir_predict":
+    elif mode == "heatmap":
+        img = input("Input image path:")
+        try:
+            image = Image.open(img)
+        except:
+            print("Open error!")
+        else:
+            yolo.detect_heatmap(image, heatmap_save_path)
+
+    elif mode == "onnx":
+        yolo.convert_to_onnx(simplify, onnx_save_path)
+
+    elif mode == "dir":
         img_names = os.listdir(dir_origin_path)
         for img_name in tqdm(img_names):
             if img_name.lower().endswith(
@@ -96,16 +108,5 @@ if __name__ == '__main__':
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
 
-    elif mode == "heatmap":
-        img = input("Input image path:")
-        try:
-            image = Image.open(img)
-        except:
-            print("Open error!")
-        else:
-            yolo.detect_heatmap(image, heatmap_save_path)
-
-    elif mode == "export_onnx":
-        yolo.convert_to_onnx(simplify, onnx_save_path)
     else:
-        raise AssertionError("Use mode: 'predict', 'video', 'fps', 'heatmap', 'export_onnx', 'dir_predict'.")
+        raise AssertionError("Use mode: 'img', 'video', 'fps', 'heatmap', 'onnx', 'dir'.")

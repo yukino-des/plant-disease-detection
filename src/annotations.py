@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import random
-from utils.utils import get_classes
+from utils.util import get_classes
 from xml.etree import ElementTree as ET
 
 classes_path = "../data/voc_classes.txt"
@@ -32,11 +32,11 @@ def convert_annotation(image_id, list_file):
         nums[classes.index(cls)] = nums[classes.index(cls)] + 1
 
 
-def printTable(List1, List2):
-    for i in range(len(List1[0])):
+def print_table(l1, l2):
+    for i in range(len(l1[0])):
         print("|", end=" ")
-        for j in range(len(List1)):
-            print(List1[j][i].rjust(int(List2[j])), end=" ")
+        for j in range(len(l1)):
+            print(l1[j][i].rjust(int(l2[j])), end=" ")
             print("|", end=" ")
         print()
 
@@ -44,9 +44,9 @@ def printTable(List1, List2):
 if __name__ == '__main__':
     random.seed(0)
     print("Generate txt in ImageSets.")
-    xmlfilepath = "../VOC/Annotations"
-    saveBasePath = "../VOC/ImageSets/Main"
-    temp_xml = os.listdir(xmlfilepath)
+    xml_file_path = "../VOC/Annotations"
+    save_base_path = "../VOC/ImageSets/Main"
+    temp_xml = os.listdir(xml_file_path)
     total_xml = []
     for xml in temp_xml:
         if xml.endswith(".xml"):
@@ -57,10 +57,10 @@ if __name__ == '__main__':
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
-    ftrainval = open(os.path.join(saveBasePath, "trainval.txt"), "w")
-    ftest = open(os.path.join(saveBasePath, "test.txt"), "w")
-    ftrain = open(os.path.join(saveBasePath, "train.txt"), "w")
-    fval = open(os.path.join(saveBasePath, "val.txt"), "w")
+    ftrainval = open(os.path.join(save_base_path, "trainval.txt"), "w")
+    ftest = open(os.path.join(save_base_path, "test.txt"), "w")
+    ftrain = open(os.path.join(save_base_path, "train.txt"), "w")
+    fval = open(os.path.join(save_base_path, "val.txt"), "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
@@ -97,7 +97,7 @@ if __name__ == '__main__':
         for j in range(len(tableData[i])):
             if len(tableData[i][j]) > colWidths[i]:
                 colWidths[i] = len(tableData[i][j])
-    printTable(tableData, colWidths)
+    print_table(tableData, colWidths)
     if photo_nums[0] <= 500:
         print("The dataset is too small.")
     if np.sum(nums) == 0:

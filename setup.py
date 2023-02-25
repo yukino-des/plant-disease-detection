@@ -20,7 +20,6 @@ setup_kwargs = {
     "packages": find_packages(),
     "url": "https://github.com/yukin-des/plant-disease-detection.git",
     "version": "0.0.1",
-    # VOC/JPEGImages/0a5bc3ac046a487f4ae911f98452d61e.jpg
     "install_requires": ["matplotlib==3.7.0"
                          "numpy==1.24.2"
                          "onnx==1.13.0"

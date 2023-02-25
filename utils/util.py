@@ -4,7 +4,7 @@ from PIL import Image
 from torch.hub import load_state_dict_from_url
 
 
-def cvtColor(image):
+def cvt_color(image):
     if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
         return image
     else:
@@ -70,3 +70,10 @@ def download_weights(backbone, model_dir="./data"):
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     load_state_dict_from_url(url, model_dir)
+
+
+def logistic(x):
+    if np.all(x >= 0):
+        return 1.0 / (1 + np.exp(-x))
+    else:
+        return np.exp(x) / (1 + np.exp(x))

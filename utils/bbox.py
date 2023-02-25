@@ -35,22 +35,22 @@ class DecodeBox:
             h = prediction[..., 3]
             conf = torch.sigmoid(prediction[..., 4])
             pred_cls = torch.sigmoid(prediction[..., 5:])
-            FloatTensor = torch.cuda.FloatTensor if x.is_cuda else torch.FloatTensor
-            LongTensor = torch.cuda.LongTensor if x.is_cuda else torch.LongTensor
+            float_tensor = torch.cuda.FloatTensor if x.is_cuda else torch.FloatTensor
+            long_tensor = torch.cuda.LongTensor if x.is_cuda else torch.LongTensor
             grid_x = torch.linspace(0, input_width - 1, input_width).repeat(input_height, 1).repeat(
-                batch_size * len(self.anchors_mask[i]), 1, 1).view(x.shape).type(FloatTensor)
+                batch_size * len(self.anchors_mask[i]), 1, 1).view(x.shape).type(float_tensor)
             grid_y = torch.linspace(0, input_height - 1, input_height).repeat(input_width, 1).t().repeat(
-                batch_size * len(self.anchors_mask[i]), 1, 1).view(y.shape).type(FloatTensor)
-            anchor_w = FloatTensor(scaled_anchors).index_select(1, LongTensor([0]))
-            anchor_h = FloatTensor(scaled_anchors).index_select(1, LongTensor([1]))
+                batch_size * len(self.anchors_mask[i]), 1, 1).view(y.shape).type(float_tensor)
+            anchor_w = float_tensor(scaled_anchors).index_select(1, long_tensor([0]))
+            anchor_h = float_tensor(scaled_anchors).index_select(1, long_tensor([1]))
             anchor_w = anchor_w.repeat(batch_size, 1).repeat(1, 1, input_height * input_width).view(w.shape)
             anchor_h = anchor_h.repeat(batch_size, 1).repeat(1, 1, input_height * input_width).view(h.shape)
-            pred_boxes = FloatTensor(prediction[..., :4].shape)
+            pred_boxes = float_tensor(prediction[..., :4].shape)
             pred_boxes[..., 0] = x.data + grid_x
             pred_boxes[..., 1] = y.data + grid_y
             pred_boxes[..., 2] = torch.exp(w.data) * anchor_w
             pred_boxes[..., 3] = torch.exp(h.data) * anchor_h
-            _scale = torch.Tensor([input_width, input_height, input_width, input_height]).type(FloatTensor)
+            _scale = torch.Tensor([input_width, input_height, input_width, input_height]).type(float_tensor)
             output = torch.cat((pred_boxes.view(batch_size, -1, 4) / _scale,
                                 conf.view(batch_size, -1, 1), pred_cls.view(batch_size, -1, self.num_classes)), -1)
             outputs.append(output.data)
@@ -111,7 +111,6 @@ class DecodeBox:
                 max_detections = detections_class[keep]
                 output[i] = max_detections if output[i] is None else torch.cat([output[i], max_detections])
             if output[i] is not None:
-                # fixme
                 output[i] = output[i].cpu().numpy()
                 box_xy, box_wh = (output[i][:, 0:2] + output[i][:, 2:4]) / 2, output[i][:, 2:4] - output[i][:, 0:2]
                 output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape, letterbox_image)

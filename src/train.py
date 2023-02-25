@@ -7,10 +7,10 @@ from torch.backends import cudnn
 from torch.utils.data import DataLoader
 from utils.callbacks import EvalCallback, LossHistory
 from utils.dataloader import YoloDataset, yolo_dataset_collate
-from utils.utils import download_weights, get_anchors, get_classes, show_config
-from utils.utils_fit import fit_one_epoch
+from utils.util import download_weights, get_anchors, get_classes, show_config
+from utils.fit import fit_one_epoch
 from utils.yolov4 import YoloBody
-from utils.yolov4_training import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
+from utils.train import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
 
 if __name__ == '__main__':
     # todo update `Cuda = True`
@@ -119,9 +119,9 @@ if __name__ == '__main__':
                          focal_loss,
                          focal_alpha,
                          focal_gamma)
+    time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y_%m_%d_%H_%M_%S")
+    log_dir = os.path.join(save_dir, "loss_" + str(time_str))
     if local_rank == 0:
-        time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y_%m_%d_%H_%M_%S")
-        log_dir = os.path.join(save_dir, "loss_" + str(time_str))
         loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     else:
         loss_history = None

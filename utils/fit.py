@@ -15,7 +15,7 @@ def fit_one_epoch(model_train,
                   epoch_step_val,
                   gen,
                   gen_val,
-                  Epoch,
+                  _epoch_,
                   cuda,
                   fp16,
                   scaler,
@@ -26,7 +26,7 @@ def fit_one_epoch(model_train,
     val_loss = 0
     if local_rank == 0:
         print("Start Train")
-        pbar = tqdm(total=epoch_step, desc=f"Epoch {epoch + 1}/{Epoch}", postfix=dict, mininterval=0.3)
+        pbar = tqdm(total=epoch_step, desc=f"Epoch {epoch + 1}/{_epoch_}", postfix=dict, mininterval=0.3)
     model_train.train()
     for iteration, batch in enumerate(gen):
         if iteration >= epoch_step:
@@ -67,7 +67,7 @@ def fit_one_epoch(model_train,
         pbar.close()
         print("Finish Train")
         print("Start Validation")
-        pbar = tqdm(total=epoch_step_val, desc=f"Epoch {epoch + 1}/{Epoch}", postfix=dict, mininterval=0.3)
+        pbar = tqdm(total=epoch_step_val, desc=f"Epoch {epoch + 1}/{_epoch_}", postfix=dict, mininterval=0.3)
     model_train.eval()
     for iteration, batch in enumerate(gen_val):
         if iteration >= epoch_step_val:
@@ -93,9 +93,9 @@ def fit_one_epoch(model_train,
         print("Finish Validation")
         loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
         eval_callback.on_epoch_end(epoch + 1, model_train)
-        print("Epoch:" + str(epoch + 1) + "/" + str(Epoch))
+        print("Epoch:" + str(epoch + 1) + "/" + str(_epoch_))
         print("Total Loss: %.3f || Val Loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
-        if (epoch + 1) % save_period == 0 or epoch + 1 == Epoch:
+        if (epoch + 1) % save_period == 0 or epoch + 1 == _epoch_:
             torch.save(model.state_dict(), os.path.join(save_dir, "ep%03d-loss%.3f-val_loss%.3f.pth" % (
                 epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
         if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):

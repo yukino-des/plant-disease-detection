@@ -1,17 +1,17 @@
 import os
 from PIL import Image
 from tqdm import tqdm
-from utils.utils import get_classes
-from utils.utils_map import get_map
+from utils.util import get_classes
+from utils.map import get_map
 from utils.yolov4 import YOLO
 from xml.etree import ElementTree as ET
 
 if __name__ == '__main__':
     classes_path = "../data/voc_classes.txt"
-    MINOVERLAP = 0.5
+    min_overlap = 0.5
     confidence = 0.001
     nms_iou = 0.5
-    score_threhold = 0.5
+    score_threshold = 0.5
     map_vis = False
     maps_out_path = "../tmp/maps_out"
     image_ids = open("../VOC/ImageSets/Main/test.txt").read().strip().split()
@@ -59,5 +59,5 @@ if __name__ == '__main__':
                     new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
     print("Get ground truth result done.")
     print("Get map.")
-    get_map(MINOVERLAP, True, score_threhold=score_threhold, path=maps_out_path)
+    get_map(min_overlap, True, score_threshold=score_threshold, path=maps_out_path)
     print("Get map done.")

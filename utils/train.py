@@ -42,10 +42,10 @@ class YOLOLoss(nn.Module):
         result = (result <= t_max).float() * result + (result > t_max).float() * t_max
         return result
 
-    def MSELoss(self, pred, target):
+    def mse_loss(self, pred, target):
         return torch.pow(pred - target, 2)
 
-    def BCELoss(self, pred, target):
+    def bce_loss(self, pred, target):
         epsilon = 1e-7
         pred = self.clip_by_tensor(pred, epsilon, 1.0 - epsilon)
         output = - target * torch.log(pred) - (1.0 - target) * torch.log(1.0 - pred)
@@ -117,16 +117,16 @@ class YOLOLoss(nn.Module):
         if n != 0:
             ciou = self.box_ciou(pred_boxes, y_true[..., :4]).type_as(x)
             loss_loc = torch.mean((1 - ciou)[obj_mask])
-            loss_cls = torch.mean(self.BCELoss(pred_cls[obj_mask], y_true[..., 5:][obj_mask]))
+            loss_cls = torch.mean(self.bce_loss(pred_cls[obj_mask], y_true[..., 5:][obj_mask]))
             loss += loss_loc * self.box_ratio + loss_cls * self.cls_ratio
         if self.focal_loss:
             pos_neg_ratio = torch.where(obj_mask, torch.ones_like(conf) * self.alpha,
                                         torch.ones_like(conf) * (1 - self.alpha))
             hard_easy_ratio = torch.where(obj_mask, torch.ones_like(conf) - conf, conf) ** self.gamma
-            loss_conf = torch.mean((self.BCELoss(conf, obj_mask.type_as(conf)) * pos_neg_ratio * hard_easy_ratio)[
+            loss_conf = torch.mean((self.bce_loss(conf, obj_mask.type_as(conf)) * pos_neg_ratio * hard_easy_ratio)[
                                        noobj_mask.bool() | obj_mask]) * self.focal_loss_ratio
         else:
-            loss_conf = torch.mean(self.BCELoss(conf, obj_mask.type_as(conf))[noobj_mask.bool() | obj_mask])
+            loss_conf = torch.mean(self.bce_loss(conf, obj_mask.type_as(conf))[noobj_mask.bool() | obj_mask])
         loss += loss_conf * self.balance[l] * self.obj_ratio
         return loss
 
@@ -139,10 +139,10 @@ class YOLOLoss(nn.Module):
         box_b = torch.zeros_like(_box_b)
         box_a[:, 0], box_a[:, 1], box_a[:, 2], box_a[:, 3] = b1_x1, b1_y1, b1_x2, b1_y2
         box_b[:, 0], box_b[:, 1], box_b[:, 2], box_b[:, 3] = b2_x1, b2_y1, b2_x2, b2_y2
-        A = box_a.size(0)
-        B = box_b.size(0)
-        max_xy = torch.min(box_a[:, 2:].unsqueeze(1).expand(A, B, 2), box_b[:, 2:].unsqueeze(0).expand(A, B, 2))
-        min_xy = torch.max(box_a[:, :2].unsqueeze(1).expand(A, B, 2), box_b[:, :2].unsqueeze(0).expand(A, B, 2))
+        a = box_a.size(0)
+        b = box_b.size(0)
+        max_xy = torch.min(box_a[:, 2:].unsqueeze(1).expand(a, b, 2), box_b[:, 2:].unsqueeze(0).expand(a, b, 2))
+        min_xy = torch.max(box_a[:, :2].unsqueeze(1).expand(a, b, 2), box_b[:, :2].unsqueeze(0).expand(a, b, 2))
         inter = torch.clamp((max_xy - min_xy), min=0)
         inter = inter[:, :, 0] * inter[:, :, 1]
         area_a = ((box_a[:, 2] - box_a[:, 0]) * (box_a[:, 3] - box_a[:, 1])).unsqueeze(1).expand_as(inter)
@@ -250,10 +250,8 @@ def get_lr_scheduler(lr_decay_type,
         elif iters >= total_iters - no_aug_iter:
             lr = min_lr
         else:
-            lr = min_lr + 0.5 * (lr - min_lr) * (
-                    1.0 + math.cos(
-                math.pi * (iters - warmup_total_iters) / (total_iters - warmup_total_iters - no_aug_iter))
-            )
+            lr = min_lr + 0.5 * (lr - min_lr) * (1.0 + math.cos(
+                math.pi * (iters - warmup_total_iters) / (total_iters - warmup_total_iters - no_aug_iter)))
         return lr
 
     def step_lr(lr, decay_rate, step_size, iters):
