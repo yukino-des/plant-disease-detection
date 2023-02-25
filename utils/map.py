@@ -36,17 +36,6 @@ def error(msg):
     sys.exit(0)
 
 
-def is_float_between_0_and_1(value):
-    try:
-        val = float(value)
-        if 0.0 < val < 1.0:
-            return True
-        else:
-            return False
-    except ValueError:
-        return False
-
-
 def voc_ap(rec, prec):
     rec.insert(0, 0.0)
     rec.append(1.0)
@@ -73,21 +62,6 @@ def file_lines_to_list(path):
     return content
 
 
-def draw_text_in_image(img, text, pos, color, line_width):
-    font = cv2.FONT_HERSHEY_PLAIN
-    font_scale = 1
-    line_type = 1
-    bottom_left_corner_of_text = pos
-    cv2.putText(img, text,
-                bottom_left_corner_of_text,
-                font,
-                font_scale,
-                color,
-                line_type)
-    text_width, _ = cv2.getTextSize(text, font, font_scale, line_type)[0]
-    return img, (line_width + text_width)
-
-
 def adjust_axes(r, t, fig, axes):
     bb = t.get_window_extent(renderer=r)
     text_width_inches = bb.width / fig.dpi
@@ -98,13 +72,7 @@ def adjust_axes(r, t, fig, axes):
     axes.set_xlim([x_lim[0], x_lim[1] * propotion])
 
 
-def draw_plot_func(dictionary,
-                   n_classes,
-                   window_title,
-                   plot_title,
-                   x_label,
-                   output_path,
-                   plot_color, ):
+def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color):
     sorted_dic_by_value = sorted(dictionary.items(), key=operator.itemgetter(1))
     sorted_keys, sorted_values = zip(*sorted_dic_by_value)
     plt.barh(range(n_classes), sorted_values, color=plot_color)

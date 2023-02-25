@@ -37,7 +37,8 @@ class YoloDataset(Dataset):
 
     def __getitem__(self, index):
         index = index % self.length
-        if self.mosaic and self.rand() < self.mosaic_prob and self.epoch_now < self.epoch_length * self.special_aug_ratio:
+        if self.mosaic and self.rand() < self.mosaic_prob and self.epoch_now < (
+                self.epoch_length * self.special_aug_ratio):
             lines = sample(self.annotation_lines, 3)
             lines.append(self.annotation_lines[index])
             shuffle(lines)
@@ -210,7 +211,6 @@ class YoloDataset(Dataset):
                 dx = int(w * min_offset_x)
                 dy = int(h * min_offset_y) - nh
             new_image = Image.new("RGB", (w, h), (128, 128, 128))
-            # fixme
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)
             index = index + 1

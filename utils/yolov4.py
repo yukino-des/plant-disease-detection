@@ -168,13 +168,6 @@ class YOLO(object):
         "cuda": False
     }
 
-    @classmethod
-    def get_defaults(cls, n):
-        if n in cls._defaults:
-            return cls._defaults[n]
-        else:
-            return "Unrecognized attribute name "" + n + """
-
     def __init__(self, **kwargs):
         self.classes_path = ""
         self.anchors_path = ""

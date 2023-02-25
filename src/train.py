@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from utils.callbacks import EvalCallback, LossHistory
 from utils.dataloader import YoloDataset, yolo_dataset_collate
 from utils.util import download_weights, get_anchors, get_classes, show_config
-from utils.fit import fit_one_epoch
+from utils.train import fit_one_epoch
 from utils.yolov4 import YoloBody
 from utils.train import YOLOLoss, get_lr_scheduler, set_optimizer_lr, weights_init
 
