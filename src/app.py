@@ -2,7 +2,7 @@ import os
 import shutil
 import sys
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from starlette.responses import FileResponse
@@ -20,11 +20,10 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "X-Requested-With"],
 )
-yolo = YOLO()
 
 
 @app.post("/upload", response_model=dict)
-def upload(file=None):
+def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.split(".")
@@ -46,7 +45,6 @@ def upload(file=None):
 
 @app.get("/tmp/{fpath:path}", response_class=FileResponse)
 def tmp(fpath):
-    print(fpath)
     return FileResponse(path=os.path.join("../tmp/", fpath), headers={"Content-Type": "image/png"})
 
 
@@ -56,4 +54,5 @@ if __name__ == "__main__":
     dirs = ["../tmp/imgs", "../tmp/imgs_out", "../tmp/maps_out", "../tmp/original", "../tmp/detected"]
     for _dir_ in dirs:
         os.makedirs(_dir_, exist_ok=True)
+    yolo = YOLO()
     uvicorn.run(app, host="0.0.0.0", port=8081)
