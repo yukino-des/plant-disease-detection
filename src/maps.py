@@ -12,17 +12,14 @@ if __name__ == '__main__':
     confidence = 0.001
     nms_iou = 0.5
     score_threshold = 0.5
-    map_vis = False
     maps_out_path = "../tmp/maps_out"
     image_ids = open("../VOC/ImageSets/Main/test.txt").read().strip().split()
     if not os.path.exists(maps_out_path):
         os.makedirs(maps_out_path)
     if not os.path.exists(os.path.join(maps_out_path, "ground-truth")):
         os.makedirs(os.path.join(maps_out_path, "ground-truth"))
-    if not os.path.exists(os.path.join(maps_out_path, "detection-results")):
-        os.makedirs(os.path.join(maps_out_path, "detection-results"))
-    if not os.path.exists(os.path.join(maps_out_path, "images-optional")):
-        os.makedirs(os.path.join(maps_out_path, "images-optional"))
+    if not os.path.exists(os.path.join(maps_out_path, "detection")):
+        os.makedirs(os.path.join(maps_out_path, "detection"))
     class_names, _ = get_classes(classes_path)
     print("Load model.")
     yolo = YOLO(confidence=confidence, nms_iou=nms_iou)
@@ -31,8 +28,6 @@ if __name__ == '__main__':
     for image_id in tqdm(image_ids):
         image_path = "../VOC/JPEGImages/" + image_id + ".jpg"
         image = Image.open(image_path)
-        if map_vis:
-            image.save(os.path.join(maps_out_path, "images-optional/" + image_id + ".jpg"))
         yolo.get_map_txt(image_id, image, class_names, maps_out_path)
     print("Get predict result done.")
     print("Get ground truth result.")
