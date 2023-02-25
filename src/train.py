@@ -23,7 +23,7 @@ if __name__ == "__main__":
     mixup = True
     mixup_prob = 0.5
     special_aug_ratio = 0.7
-    # ---------- `optimizer_type = "adam"` ----------
+    # ---------- `optimizer_type = "adam"` ---------- #
     init_epoch = 0  # update `init_epoch` if training is interrupted
     freeze_epoch = 50
     freeze_batch_size = 16  # 8
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     momentum = 0.937
     weight_decay = 0
     lr_decay_type = "cos"  # "step"
-    # ---------- `optimizer_type = "sgd"` ----------
+    # ---------- `optimizer_type = "sgd"` ---------- #
     """
     init_epoch = 0
     freeze_epoch = 50

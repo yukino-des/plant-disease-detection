@@ -34,7 +34,6 @@ defaults = {
     "confidence": 0.5,
     "nms_iou": 0.3,
     "letterbox_image": False,
-    # todo update `"cuda": True`
     "cuda": cuda_avai()
 }
 
