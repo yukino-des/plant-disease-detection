@@ -10,7 +10,6 @@ from torch.utils.data import DataLoader
 from xml.etree import ElementTree as ET
 
 proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(proj_dir)
 if not sys.path.__contains__(proj_dir):
     sys.path.append(proj_dir)
 from utils.util import (available, download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback,
@@ -100,12 +99,9 @@ if __name__ == "__main__":
     cuda = available()
     if cuda:
         defaults["cuda"] = True
-    while True:
-        ctn = input("Continue (y/n)? ")
-        if ctn == "n" or ctn == "N":
-            exit(0)
-        if ctn == "y" or ctn == "Y":
-            break
+    ctn = input("Continue (y/n)? ")
+    if ctn != "y" and ctn != "Y":
+        exit(0)
     classes_path = "../data/classes.txt"
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
