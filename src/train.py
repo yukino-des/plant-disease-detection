@@ -17,13 +17,13 @@ if __name__ == "__main__":
     classes_path = "../data/classes.txt"
     trainval_percent = 0.9
     train_percent = 0.9
-    voc_sets = ["train", "val"]
     classes, _ = get_classes(classes_path)
-    photo_nums = np.zeros(len(voc_sets))
+    photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
-    xml_file_path = "../VOC/Annotations"
-    save_base_path = "../VOC/ImageSets/Main"
-    temp_xml = os.listdir(xml_file_path)
+    annotations = "../VOC/Annotations"
+    image_sets = "../VOC/ImageSets/Main"
+    os.makedirs(image_sets, exist_ok=True)
+    temp_xml = os.listdir(annotations)
     total_xml = []
     for xml in temp_xml:
         if xml.endswith(".xml"):
@@ -34,10 +34,10 @@ if __name__ == "__main__":
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
-    ftrainval = open(os.path.join(save_base_path, "trainval.txt"), "w")
-    ftest = open(os.path.join(save_base_path, "test.txt"), "w")
-    ftrain = open(os.path.join(save_base_path, "train.txt"), "w")
-    fval = open(os.path.join(save_base_path, "val.txt"), "w")
+    ftrainval = open(os.path.join(image_sets, "trainval.txt"), "w")
+    ftest = open(os.path.join(image_sets, "test.txt"), "w")
+    ftrain = open(os.path.join(image_sets, "train.txt"), "w")
+    fval = open(os.path.join(image_sets, "val.txt"), "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     fval.close()
     ftest.close()
     type_index = 0
-    for image_set in voc_sets:
+    for image_set in ["train", "val"]:
         image_ids = open("../VOC/ImageSets/Main/%s.txt" % image_set,
                          encoding="utf-8").read().strip().split()
         list_file = open("%s.txt" % image_set, "w", encoding="utf-8")
