@@ -3,14 +3,20 @@ import numpy as np
 import os
 import random
 import torch
+import sys
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
+from xml.etree import ElementTree as ET
+
+proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(proj_dir)
+if not sys.path.__contains__(proj_dir):
+    sys.path.append(proj_dir)
 from utils.util import (available, download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback,
                         LossHistory)
 from utils.yolo import (defaults, fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
                         YoloBody, YoloDataset, YOLOLoss)
-from xml.etree import ElementTree as ET
 
 if __name__ == "__main__":
     random.seed(0)
@@ -91,12 +97,15 @@ if __name__ == "__main__":
         print("The dataset is too small.")
     if np.sum(nums) == 0:
         print("../data/voc_class.txt error.")
-    ctn = input("Continue (y/n)? ")
-    if ctn == "n" or ctn == "N":
-        exit(0)
     cuda = available()
     if cuda:
         defaults["cuda"] = True
+    while True:
+        ctn = input("Continue (y/n)? ")
+        if ctn == "n" or ctn == "N":
+            exit(0)
+        if ctn == "y" or ctn == "Y":
+            break
     classes_path = "../data/classes.txt"
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]

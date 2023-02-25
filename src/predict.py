@@ -1,9 +1,15 @@
 import cv2
 import numpy as np
 import os
+import sys
 import time
 from PIL import Image
 from tqdm import tqdm
+
+proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(proj_dir)
+if not sys.path.__contains__(proj_dir):
+    sys.path.append(proj_dir)
 from utils.yolo import YOLO
 
 if __name__ == "__main__":

@@ -1,9 +1,15 @@
 import os
 from PIL import Image
+import sys
 from tqdm import tqdm
+from xml.etree import ElementTree as ET
+
+proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+print(proj_dir)
+if not sys.path.__contains__(proj_dir):
+    sys.path.append(proj_dir)
 from utils.util import get_classes, get_map
 from utils.yolo import YOLO
-from xml.etree import ElementTree as ET
 
 if __name__ == "__main__":
     classes_path = "../data/classes.txt"

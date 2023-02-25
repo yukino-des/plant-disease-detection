@@ -2,11 +2,14 @@ import os
 import shutil
 import sys
 import uvicorn
-from fastapi import FastAPI, UploadFile
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from starlette.responses import FileResponse
-from typing import Union
+
+proj_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if not sys.path.__contains__(proj_dir):
+    sys.path.append(proj_dir)
 from utils.yolo import YOLO
 
 app = FastAPI()
@@ -21,7 +24,7 @@ yolo = YOLO()
 
 
 @app.post("/upload", response_model=dict)
-def upload(file: Union[UploadFile, None] = None):
+def upload(file=None):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.split(".")
