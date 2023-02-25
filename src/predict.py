@@ -12,25 +12,19 @@ if __name__ == '__main__':
     # mode = "img"
     crop = True
     count = True
-
     # mode = "video"
     video_save_path = "tmp/416.avi"
     video_fps = 25.0
-
     # mode = "fps"
     test_interval = 100
-
     # mode = "heatmap"
     heatmap_save_path = "../tmp/heatmap.png"
-
     # mode = "onnx"
     simplify = True
     onnx_save_path = "../data/models.onnx"
-
     # mode = "dir"
     dir_origin_path = "../tmp/imgs"
     dir_save_path = "../tmp/imgs_out"
-
     if mode == "img":
         img = input("Input image path:")
         try:
@@ -40,7 +34,6 @@ if __name__ == '__main__':
         else:
             r_image, _ = yolo.detect_image(image, crop=crop, count=count)
             r_image.show()
-
     elif mode == "video":
         video_path = input("Input video path, input 0 to call camera:")
         capture = cv2.VideoCapture(0 if video_path == "0" else video_path)
@@ -77,13 +70,11 @@ if __name__ == '__main__':
         print("Save to " + video_save_path)
         out.release()
         cv2.destroyAllWindows()
-
     elif mode == "fps":
         fps_image_path = input("Input image path:")
         img = Image.open(fps_image_path)
         tact_time = yolo.get_fps(img, test_interval)
         print(str(tact_time) + " seconds, " + str(1 / tact_time) + " FPS, @batch_size 1")
-
     elif mode == "heatmap":
         img = input("Input image path:")
         try:
@@ -92,10 +83,8 @@ if __name__ == '__main__':
             print("Open error!")
         else:
             yolo.detect_heatmap(image, heatmap_save_path)
-
     elif mode == "onnx":
         yolo.convert_to_onnx(simplify, onnx_save_path)
-
     elif mode == "dir":
         img_names = os.listdir(dir_origin_path)
         for img_name in tqdm(img_names):
@@ -107,6 +96,5 @@ if __name__ == '__main__':
                 if not os.path.exists(dir_save_path):
                     os.makedirs(dir_save_path)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
-
     else:
         raise AssertionError("Use mode: 'img', 'video', 'fps', 'heatmap', 'onnx', 'dir'.")

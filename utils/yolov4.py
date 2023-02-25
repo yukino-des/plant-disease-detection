@@ -1,6 +1,6 @@
 import colorsys
 import cv2
-import matplotlib.pyplot as plt
+import matplotlib
 import numpy as np
 import onnx
 import onnxsim
@@ -8,11 +8,14 @@ import os
 import time
 import torch
 from collections import OrderedDict
+from matplotlib import pyplot as plt
 from PIL import ImageDraw, ImageFont
 from torch import nn
 from utils.mobilenetv2 import mobilenet_v2
 from utils.util import cvt_color, get_anchors, get_classes, preprocess_input, resize_image, show_config, logistic
 from utils.bbox import DecodeBox
+
+matplotlib.use("TkAgg")
 
 
 class MobileNetV2(nn.Module):
@@ -155,7 +158,7 @@ class YoloBody(nn.Module):
 
 class YOLO(object):
     _defaults = {
-        "model_path": "../data/best_epoch_weights.pth",
+        "model_path": "../data/best.pth",
         "classes_path": "../data/voc_classes.txt",
         "anchors_path": "../data/yolo_anchors.txt",
         "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],

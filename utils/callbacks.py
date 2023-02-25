@@ -58,12 +58,12 @@ class LossHistory:
                      "green",
                      linestyle="--",
                      linewidth=2,
-                     label="smooth train loss")
+                     label="train loss")
             plt.plot(iters,
                      signal.savgol_filter(self.val_loss, num, 3),
                      "#8B4513",
                      linestyle="--", linewidth=2,
-                     label="smooth val loss")
+                     label="val loss")
         except:
             pass
         plt.grid(True)

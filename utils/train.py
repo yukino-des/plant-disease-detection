@@ -15,7 +15,6 @@ class YOLOLoss(nn.Module):
                  input_shape,
                  cuda,
                  anchors_mask=None,
-                 label_smoothing=0,
                  focal_loss=False,
                  alpha=0.25,
                  gamma=2):
@@ -27,7 +26,6 @@ class YOLOLoss(nn.Module):
         self.bbox_attrs = 5 + num_classes
         self.input_shape = input_shape
         self.anchors_mask = anchors_mask
-        self.label_smoothing = label_smoothing
         self.balance = [0.4, 1.0, 4]
         self.box_ratio = 0.05
         self.obj_ratio = 5 * (input_shape[0] * input_shape[1]) / (416 ** 2)
@@ -38,6 +36,12 @@ class YOLOLoss(nn.Module):
         self.gamma = gamma
         self.ignore_threshold = 0.5
         self.cuda = cuda
+
+    def clip_by_tensor(self, t, t_min, t_max):
+        t = t.float()
+        result = (t >= t_min).float() * t + (t < t_min).float() * t_min
+        result = (result <= t_max).float() * result + (result > t_max).float() * t_max
+        return result
 
     def bce_loss(self, pred, target):
         epsilon = 1e-7
@@ -76,9 +80,6 @@ class YOLOLoss(nn.Module):
         alpha = v / torch.clamp((1.0 - iou + v), min=1e-6)
         ciou = ciou - alpha * v
         return ciou
-
-    # def smooth_labels(self, y_true, label_smoothing, num_classes):
-    #     return y_true * (1.0 - label_smoothing) + label_smoothing / num_classes
 
     def forward(self, l, _input, targets=None):
         bs = _input.size(0)
@@ -284,7 +285,6 @@ def fit_one_epoch(model_train,
                   gen_val,
                   _epoch_,
                   cuda,
-                  fp16,
                   scaler,
                   save_period,
                   save_dir,
@@ -304,27 +304,14 @@ def fit_one_epoch(model_train,
                 images = images.cuda(local_rank)
                 targets = [ann.cuda(local_rank) for ann in targets]
         optimizer.zero_grad()
-        if not fp16:
-            outputs = model_train(images)
-            loss_value_all = 0
-            for l in range(len(outputs)):
-                loss_item = yolo_loss(l, outputs[l], targets)
-                loss_value_all += loss_item
-            loss_value = loss_value_all
-            loss_value.backward()
-            optimizer.step()
-        else:
-            from torch.cuda.amp import autocast
-            with autocast():
-                outputs = model_train(images)
-                loss_value_all = 0
-                for l in range(len(outputs)):
-                    loss_item = yolo_loss(l, outputs[l], targets)
-                    loss_value_all += loss_item
-                loss_value = loss_value_all
-            scaler.scale(loss_value).backward()
-            scaler.step(optimizer)
-            scaler.update()
+        outputs = model_train(images)
+        loss_value_all = 0
+        for l in range(len(outputs)):
+            loss_item = yolo_loss(l, outputs[l], targets)
+            loss_value_all += loss_item
+        loss_value = loss_value_all
+        loss_value.backward()
+        optimizer.step()
         loss += loss_value.item()
         if local_rank == 0:
             pbar.set_postfix(**{"loss": loss / (iteration + 1),
@@ -366,6 +353,6 @@ def fit_one_epoch(model_train,
             torch.save(model.state_dict(), os.path.join(save_dir, "ep%03d-loss%.3f-val_loss%.3f.pth" % (
                 epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
         if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-            print("best_epoch_weights.pth saved.")
-            torch.save(model.state_dict(), os.path.join(save_dir, "best_epoch_weights.pth"))
-        torch.save(model.state_dict(), os.path.join(save_dir, "last_epoch_weights.pth"))
+            print("best.pth saved.")
+            torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
+        torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
