@@ -33,7 +33,7 @@ def print_table(l1, l2):
         print()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     random.seed(0)
     classes_path = "../data/classes.txt"
     trainval_percent = 0.9

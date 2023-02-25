@@ -6,9 +6,9 @@ from PIL import Image
 from tqdm import tqdm
 from utils.yolo import YOLO
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     yolo = YOLO()
-    mode = input("Input mode in ['img', 'video', 'fps', 'heatmap', 'onnx', 'dir']: ")
+    mode = input("Input mode (img, video, fps, heatmap, onnx, dir): ")
     # mode = "img"
     crop = True
     count = True

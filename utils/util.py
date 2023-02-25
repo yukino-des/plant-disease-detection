@@ -16,7 +16,10 @@ from torchvision.ops import nms
 from tqdm import tqdm
 from scipy import signal
 
-matplotlib.use("TkAgg")
+if os.name == "nt":
+    matplotlib.use("Agg")
+else:
+    matplotlib.use("TkAgg")
 
 
 def adjust_axes(r, t, fig, axes):
@@ -639,7 +642,7 @@ class EvalCallback:
         self.maps = [0]
         self.epochs = [0]
         if self.eval_flag:
-            with open(os.path.join(self.log_dir, "epoch_map.txt"), "a") as f:
+            with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
                 f.write(str(0))
                 f.write("\n")
 
@@ -704,7 +707,7 @@ class EvalCallback:
             temp_map = get_map(self.min_overlap, False, path=self.maps_out_path)
             self.maps.append(temp_map)
             self.epochs.append(epoch)
-            with open(os.path.join(self.log_dir, "epoch_map.txt"), "a") as f:
+            with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
                 f.write(str(temp_map))
                 f.write("\n")
             plt.figure()
@@ -714,7 +717,7 @@ class EvalCallback:
             plt.ylabel("Map %s" % str(self.min_overlap))
             plt.title("A Map Curve")
             plt.legend(loc="upper right")
-            plt.savefig(os.path.join(self.log_dir, "epoch_map.png"))
+            plt.savefig(os.path.join(self.log_dir, "map.png"))
             plt.cla()
             plt.close("all")
             print("Get map done.")
@@ -739,10 +742,10 @@ class LossHistory:
             os.makedirs(self.log_dir)
         self.losses.append(loss)
         self.val_loss.append(val_loss)
-        with open(os.path.join(self.log_dir, "epoch_loss.txt"), "a") as f:
+        with open(os.path.join(self.log_dir, "loss.txt"), "a") as f:
             f.write(str(loss))
             f.write("\n")
-        with open(os.path.join(self.log_dir, "epoch_val_loss.txt"), "a") as f:
+        with open(os.path.join(self.log_dir, "val_loss.txt"), "a") as f:
             f.write(str(val_loss))
             f.write("\n")
         self.writer.add_scalar("loss", loss, epoch)
@@ -769,6 +772,6 @@ class LossHistory:
         plt.xlabel("Epoch")
         plt.ylabel("Loss")
         plt.legend(loc="upper right")
-        plt.savefig(os.path.join(self.log_dir, "epoch_loss.png"))
+        plt.savefig(os.path.join(self.log_dir, "loss.png"))
         plt.cla()
         plt.close("all")

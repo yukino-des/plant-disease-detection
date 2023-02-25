@@ -1,11 +1,15 @@
 import glob
 import matplotlib
 import numpy as np
+import os
 from matplotlib import pyplot as plt
 from tqdm import tqdm
 from xml.etree import ElementTree as ET
 
-matplotlib.use("TkAgg")
+if os.name == "nt":
+    matplotlib.use("Agg")
+else:
+    matplotlib.use("TkAgg")
 
 
 def cas_iou(box, cluster):
@@ -65,7 +69,7 @@ def load_data(path):
     return np.array(data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     np.random.seed(0)
     input_shape = [416, 416]
     anchors_num = 9

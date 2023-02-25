@@ -20,7 +20,24 @@ from utils.mobilenet import mobilenet_v2
 from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
                         resize_image, show_config)
 
-matplotlib.use("TkAgg")
+if os.name == "nt":
+    matplotlib.use("Agg")
+else:
+    matplotlib.use("TkAgg")
+
+defaults = {
+    "model_path": "../data/best.pth",
+    "classes_path": "../data/classes.txt",
+    "anchors_path": "../data/anchors.txt",
+    "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],
+    "input_shape": [416, 416],
+    "backbone": "mobilenetv2",
+    "confidence": 0.5,
+    "nms_iou": 0.3,
+    "letterbox_image": False,
+    # todo update `"cuda": True`
+    "cuda": False
+}
 
 
 def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
@@ -48,6 +65,7 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
                   epoch_step_val, gen, gen_val, _epoch_, cuda, save_period, save_dir, local_rank=0):
     loss = 0
     val_loss = 0
+    pbar = None
     if local_rank == 0:
         print("Start Train")
         pbar = tqdm(total=epoch_step, desc=f"Epoch {epoch + 1}/{_epoch_}", postfix=dict, mininterval=0.3)
@@ -71,8 +89,7 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         optimizer.step()
         loss += loss_value.item()
         if local_rank == 0:
-            pbar.set_postfix(**{"loss": loss / (iteration + 1),
-                                "lr": get_lr(optimizer)})
+            pbar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
             pbar.update(1)
     if local_rank == 0:
         pbar.close()
@@ -251,19 +268,6 @@ class Upsample(nn.Module):
 
 
 class YOLO(object):
-    _defaults = {
-        "model_path": "../data/best.pth",
-        "classes_path": "../data/classes.txt",
-        "anchors_path": "../data/anchors.txt",
-        "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],
-        "input_shape": [416, 416],
-        "backbone": "mobilenetv2",
-        "confidence": 0.5,
-        "nms_iou": 0.3,
-        "letterbox_image": False,
-        # todo update `"cuda": True`
-        "cuda": False
-    }
 
     def __init__(self, **kwargs):
         self.classes_path = ""
@@ -276,10 +280,10 @@ class YOLO(object):
         self.letterbox_image = False
         self.confidence = 0
         self.nms_iou = 0
-        self.__dict__.update(self._defaults)
+        self.__dict__.update(defaults)
         for name, value in kwargs.items():
             setattr(self, name, value)
-            self._defaults[name] = value
+            defaults[name] = value
         self.class_names, self.num_classes = get_classes(self.classes_path)
         self.anchors, self.num_anchors = get_anchors(self.anchors_path)
         self.bbox_util = DecodeBox(self.anchors,
@@ -290,7 +294,7 @@ class YOLO(object):
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        show_config(**self._defaults)
+        show_config(**defaults)
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes, self.backbone)
@@ -438,7 +442,7 @@ class YOLO(object):
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
-        print("Save to " + heatmap_save_path)
+        print(heatmap_save_path + "saved.")
 
     def convert_to_onnx(self, simplify, model_path):
         self.generate(onnx=True)
@@ -739,6 +743,8 @@ class YoloDataset(Dataset):
                 nw = int(scale * w)
                 nh = int(nw / new_ar)
             image = image.resize((nw, nh), Image.BICUBIC)
+            dx = 0
+            dy = 0
             if index == 0:
                 dx = int(w * min_offset_x) - nw
                 dy = int(h * min_offset_y) - nh

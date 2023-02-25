@@ -5,7 +5,7 @@ from utils.util import get_classes, get_map
 from utils.yolo import YOLO
 from xml.etree import ElementTree as ET
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     classes_path = "../data/classes.txt"
     min_overlap = 0.5
     confidence = 0.001
@@ -25,7 +25,6 @@ if __name__ == '__main__':
         image_path = "../VOC/JPEGImages/" + image_id + ".jpg"
         image = Image.open(image_path)
         yolo.get_map_txt(image_id, image, class_names, maps_out_path)
-    for image_id in tqdm(image_ids):
         with open(os.path.join(maps_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
             root = ET.parse("../VOC/Annotations/" + image_id + ".xml").getroot()
             for obj in root.findall("object"):
