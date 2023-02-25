@@ -15,8 +15,8 @@ if __name__ == '__main__':
     classes_path = "../data/classes.txt"
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-    # todo update `model_path = "../data/best.pth"` if training is interrupted
-    model_path = "../data/best.pth"
+    # todo update `model_path = "../data/_best.pth"` if training is interrupted
+    model_path = "../data/pretrain.pth"
     input_shape = [416, 416]
     backbone = "mobilenetv2"
     pretrained = False
@@ -26,28 +26,28 @@ if __name__ == '__main__':
     mixup_prob = 0.5
     special_aug_ratio = 0.7
     # ---------- `optimizer_type = "adam"` ----------
-    Init_Epoch = 0  # update `Init_Epoch` if training is interrupted
-    Freeze_Epoch = 50
-    Freeze_batch_size = 16  # 8
+    init_epoch = 0  # update `init_epoch` if training is interrupted
+    freeze_epoch = 50
+    freeze_batch_size = 16  # 8
     unfreeze_epoch = 100
-    Unfreeze_batch_size = 8
-    Freeze_Train = True
-    Init_lr = 1e-3
-    Min_lr = Init_lr * 0.01
+    unfreeze_batch_size = 8
+    freeze_Train = True
+    init_lr = 1e-3
+    min_lr = init_lr * 0.01
     optimizer_type = "adam"
     momentum = 0.937
     weight_decay = 0
     lr_decay_type = "cos"  # "step"
     # ---------- `optimizer_type = "sgd"` ----------
     """
-    Init_Epoch = 0
-    Freeze_Epoch = 50
-    Freeze_batch_size = 16
+    init_epoch = 0
+    freeze_epoch = 50
+    freeze_batch_size = 16
     unfreeze_epoch = 300
-    Unfreeze_batch_size = 8
-    Freeze_Train = True
-    Init_lr = 1e-2
-    Min_lr = Init_lr * 0.01
+    unfreeze_batch_size = 8
+    freeze_Train = True
+    init_lr = 1e-2
+    min_lr = init_lr * 0.01
     optimizer_type = "sgd"
     momentum = 0.937
     weight_decay = 5e-4
@@ -110,28 +110,28 @@ if __name__ == '__main__':
     num_val = len(val_lines)
     if local_rank == 0:
         show_config(classes_path=classes_path, anchors_path=anchors_path, anchors_mask=anchors_mask,
-                    model_path=model_path, input_shape=input_shape, Init_Epoch=Init_Epoch, Freeze_Epoch=Freeze_Epoch,
-                    unfreeze_epoch=unfreeze_epoch, Freeze_batch_size=Freeze_batch_size,
-                    Unfreeze_batch_size=Unfreeze_batch_size, Freeze_Train=Freeze_Train, Init_lr=Init_lr, Min_lr=Min_lr,
+                    model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
+                    unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
+                    unfreeze_batch_size=unfreeze_batch_size, freeze_Train=freeze_Train, init_lr=init_lr, min_lr=min_lr,
                     optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type,
                     save_period=save_period, save_dir=save_dir, num_workers=num_workers, num_train=num_train,
                     num_val=num_val)
         wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
-        total_step = num_train // Unfreeze_batch_size * unfreeze_epoch
+        total_step = num_train // unfreeze_batch_size * unfreeze_epoch
         if total_step <= wanted_step:
-            if num_train // Unfreeze_batch_size == 0:
+            if num_train // unfreeze_batch_size == 0:
                 raise ValueError("The dataset is too small.")
     if True:
         UnFreeze_flag = False
-        if Freeze_Train:
+        if freeze_Train:
             for param in model.backbone.parameters():
                 param.requires_grad = False
-        batch_size = Freeze_batch_size if Freeze_Train else Unfreeze_batch_size
+        batch_size = freeze_batch_size if freeze_Train else unfreeze_batch_size
         nbs = 64
         lr_limit_max = 1e-3 if optimizer_type in ["adam", "adamw"] else 5e-2
         lr_limit_min = 3e-4 if optimizer_type in ["adam", "adamw"] else 5e-4
-        Init_lr_fit = min(max(batch_size / nbs * Init_lr, lr_limit_min), lr_limit_max)
-        Min_lr_fit = min(max(batch_size / nbs * Min_lr, lr_limit_min * 1e-2), lr_limit_max * 1e-2)
+        Init_lr_fit = min(max(batch_size / nbs * init_lr, lr_limit_min), lr_limit_max)
+        Min_lr_fit = min(max(batch_size / nbs * min_lr, lr_limit_min * 1e-2), lr_limit_max * 1e-2)
         pg0, pg1, pg2 = [], [], []
         for k, v in model.named_modules():
             if hasattr(v, "bias") and isinstance(v.bias, nn.Parameter):
@@ -169,14 +169,14 @@ if __name__ == '__main__':
                                          log_dir, cuda, eval_flag=eval_flag, period=eval_period)
         else:
             eval_callback = None
-        for epoch in range(Init_Epoch, unfreeze_epoch):
-            if epoch >= Freeze_Epoch and not UnFreeze_flag and Freeze_Train:
-                batch_size = Unfreeze_batch_size
+        for epoch in range(init_epoch, unfreeze_epoch):
+            if epoch >= freeze_epoch and not UnFreeze_flag and freeze_Train:
+                batch_size = unfreeze_batch_size
                 nbs = 64
                 lr_limit_max = 1e-3 if optimizer_type in ["adam", "adamw"] else 5e-2
                 lr_limit_min = 3e-4 if optimizer_type in ["adam", "adamw"] else 5e-4
-                Init_lr_fit = min(max(batch_size / nbs * Init_lr, lr_limit_min), lr_limit_max)
-                Min_lr_fit = min(max(batch_size / nbs * Min_lr, lr_limit_min * 1e-2), lr_limit_max * 1e-2)
+                Init_lr_fit = min(max(batch_size / nbs * init_lr, lr_limit_min), lr_limit_max)
+                Min_lr_fit = min(max(batch_size / nbs * min_lr, lr_limit_min * 1e-2), lr_limit_max * 1e-2)
                 lr_scheduler_func = get_lr_scheduler(lr_decay_type, Init_lr_fit, Min_lr_fit, unfreeze_epoch)
                 for param in model.backbone.parameters():
                     param.requires_grad = True
