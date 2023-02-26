@@ -3,6 +3,8 @@ src/*.txt
 VOC/ImageSets/Main/*.txt
 
 
+build/
 .idea/
+plant_disease_detection_3181137349.egg-info/
 tmp/
 VOC/.tmp.driveupload/
