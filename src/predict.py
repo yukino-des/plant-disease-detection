@@ -14,7 +14,6 @@ if __name__ == "__main__":
     mode = input("Input mode (img, video, fps, heatmap, onnx, dir): ")
     # mode = "img"
     crop = True
-    count = True
     # mode = "video"
     video_save_path = "tmp/416.avi"
     video_fps = 25.0
@@ -35,7 +34,7 @@ if __name__ == "__main__":
         except:
             print("Open error.")
         else:
-            r_image, _ = yolo.detect_image(image, crop=crop, count=count)
+            r_image, _ = yolo.detect_image(image, crop=crop)
             r_image.show()
     elif mode == "video":
         video_path = input("Input video path, input 0 to call camera: ")

@@ -10,13 +10,12 @@ from torch.utils.data import DataLoader
 from xml.etree import ElementTree as ET
 
 sys.path.append(os.path.dirname(sys.path[0]))
-from utils.util import (available, download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback,
-                        LossHistory)
-from utils.yolo import (defaults, fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
+from utils.util import download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
+from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
                         YoloBody, YoloDataset, YOLOLoss)
 
 if __name__ == "__main__":
-    random.seed(0)
+    random.seed(416)
     classes_path = "../data/classes.txt"
     trainval_percent = 0.9
     train_percent = 0.9
@@ -45,10 +44,7 @@ if __name__ == "__main__":
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
             ftrainval.write(name)
-            if i in train:
-                ftrain.write(name)
-            else:
-                fval.write(name)
+            ftrain.write(name) if i in train else fval.write(name)
         else:
             ftest.write(name)
     ftrainval.close()
@@ -57,8 +53,7 @@ if __name__ == "__main__":
     ftest.close()
     type_index = 0
     for image_set in ["train", "val"]:
-        image_ids = open("../VOC/ImageSets/Main/%s.txt" % image_set,
-                         encoding="utf-8").read().strip().split()
+        image_ids = open("../VOC/ImageSets/Main/%s.txt" % image_set,encoding="utf-8").read().strip().split()
         list_file = open("%s.txt" % image_set, "w", encoding="utf-8")
         for image_id in image_ids:
             list_file.write("../VOC/JPEGImages/%s.jpg" % image_id)
@@ -94,9 +89,6 @@ if __name__ == "__main__":
         print("The dataset is too small.")
     if np.sum(nums) == 0:
         print("../data/voc_class.txt error.")
-    cuda = available()
-    if cuda:
-        defaults["cuda"] = True
     ctn = input("Continue (y/n)? ")
     if ctn != "y" and ctn != "Y":
         exit(0)
@@ -112,10 +104,10 @@ if __name__ == "__main__":
     mixup = True
     mixup_prob = 0.5
     special_aug_ratio = 0.7
-    # ---------- `optimizer_type = "adam"` ---------- #
+    # optimizer_type = "adam"
     init_epoch = 0  # update `init_epoch` if training is interrupted
     freeze_epoch = 50
-    freeze_batch_size = 16  # 8
+    freeze_batch_size = 16
     unfreeze_epoch = 100
     unfreeze_batch_size = 8
     freeze_train = True
@@ -125,7 +117,7 @@ if __name__ == "__main__":
     momentum = 0.937
     weight_decay = 0
     lr_decay_type = "cos"  # "step"
-    # ---------- `optimizer_type = "sgd"` ---------- #
+    # optimizer_type = "sgd"
     """
     init_epoch = 0
     freeze_epoch = 50
@@ -177,6 +169,7 @@ if __name__ == "__main__":
         if local_rank == 0:
             print("\nSuccess:", str(load_key)[:500], "\nSuccess Num:", len(load_key))
             print("\nFail:", str(no_load_key)[:500], "\nFail Num:", len(no_load_key))
+    cuda = torch.cuda.is_available()
     yolo_loss = YOLOLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y%m%d%H%M%S")
     log_dir = os.path.join(save_dir, "loss" + str(time_str))

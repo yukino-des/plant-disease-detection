@@ -34,8 +34,7 @@ defaults = {
     "input_shape": [416, 416],
     "confidence": 0.5,
     "nms_iou": 0.3,
-    "letterbox_image": False,
-    "cuda": False
+    "cuda": torch.cuda.is_available()
 }
 
 
@@ -269,8 +268,7 @@ class YOLO(object):
         self.input_shape = []
         self.anchors_mask = []
         self.model_path = ""
-        self.cuda = False
-        self.letterbox_image = False
+        self.cuda = torch.cuda.is_available()
         self.confidence = 0
         self.nms_iou = 0
         self.__dict__.update(defaults)
@@ -299,10 +297,10 @@ class YOLO(object):
                 self.net = nn.DataParallel(self.net)
                 self.net = self.net.cuda()
 
-    def detect_image(self, image, crop=False, count=False):
+    def detect_image(self, image, crop=False):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
+        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
@@ -311,7 +309,7 @@ class YOLO(object):
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
             results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, self.letterbox_image, conf_thres=self.confidence,
+                                                         image_shape, conf_thres=self.confidence,
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return image, {}
@@ -320,11 +318,10 @@ class YOLO(object):
             top_boxes = results[0][:, :4]
         font = ImageFont.truetype(font="../data/simhei.ttf", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
-        if count:
-            for i in range(self.num_classes):
-                num = np.sum(top_label == i)
-                if num > 0:
-                    print(self.class_names[i] + ": ", num)
+        for i in range(self.num_classes):
+            num = np.sum(top_label == i)
+            if num > 0:
+                print(self.class_names[i] + ": ", num)
         if crop:
             for i, c in list(enumerate(top_label)):
                 top, left, bottom, right = top_boxes[i]
@@ -370,7 +367,7 @@ class YOLO(object):
     def get_fps(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
+        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
@@ -379,14 +376,14 @@ class YOLO(object):
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
             self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape, image_shape,
-                                               self.letterbox_image, conf_thres=self.confidence, nms_thres=self.nms_iou)
+                                               conf_thres=self.confidence, nms_thres=self.nms_iou)
         t1 = time.time()
         for _ in range(test_interval):
             with torch.no_grad():
                 outputs = self.net(images)
                 outputs = self.bbox_util.decode_box(outputs)
                 self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                   image_shape, self.letterbox_image, conf_thres=self.confidence,
+                                                   image_shape, conf_thres=self.confidence,
                                                    nms_thres=self.nms_iou)
         t2 = time.time()
         tact_time = (t2 - t1) / test_interval
@@ -394,7 +391,7 @@ class YOLO(object):
 
     def detect_heatmap(self, image, heatmap_save_path):
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
+        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
@@ -439,7 +436,7 @@ class YOLO(object):
         f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
+        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
@@ -448,7 +445,7 @@ class YOLO(object):
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
             results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, self.letterbox_image, conf_thres=self.confidence,
+                                                         image_shape, conf_thres=self.confidence,
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return

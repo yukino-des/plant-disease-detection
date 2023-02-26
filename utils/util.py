@@ -32,11 +32,6 @@ def adjust_axes(r, t, fig, axes):
     axes.set_xlim([x_lim[0], x_lim[1] * propotion])
 
 
-def available():
-    avai = input("Is cuda available (y/n)? ")
-    return avai == "y" or avai == "Y"
-
-
 def cvt_color(image):
     if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
         return image
@@ -468,18 +463,10 @@ def print_table(l1, l2):
         print()
 
 
-def resize_image(image, size, letterbox_image):
+def resize_image(image, size):
     iw, ih = image.size
     w, h = size
-    if letterbox_image:
-        scale = min(w / iw, h / ih)
-        nw = int(iw * scale)
-        nh = int(ih * scale)
-        image = image.resize((nw, nh), Image.BICUBIC)
-        new_image = Image.new("RGB", size, (128, 128, 128))
-        new_image.paste(image, ((w - nw) // 2, (h - nh) // 2))
-    else:
-        new_image = image.resize((w, h), Image.BICUBIC)
+    new_image = image.resize((w, h), Image.BICUBIC)
     return new_image
 
 
@@ -565,17 +552,11 @@ class DecodeBox:
             outputs.append(output.data)
         return outputs
 
-    def yolo_correct_boxes(self, box_xy, box_wh, input_shape, image_shape, letterbox_image):
+    def yolo_correct_boxes(self, box_xy, box_wh, input_shape, image_shape):
         box_yx = box_xy[..., ::-1]
         box_hw = box_wh[..., ::-1]
         input_shape = np.array(input_shape)
         image_shape = np.array(image_shape)
-        if letterbox_image:
-            new_shape = np.round(image_shape * np.min(input_shape / image_shape))
-            offset = (input_shape - new_shape) / 2. / input_shape
-            scale = input_shape / new_shape
-            box_yx = (box_yx - offset) * scale
-            box_hw *= scale
         box_mins = box_yx - (box_hw / 2.)
         box_maxes = box_yx + (box_hw / 2.)
         boxes = np.concatenate([box_mins[..., 0:1], box_mins[..., 1:2], box_maxes[..., 0:1], box_maxes[..., 1:2]],
@@ -587,7 +568,6 @@ class DecodeBox:
                             num_classes,
                             input_shape,
                             image_shape,
-                            letterbox_image,
                             conf_thres=0.5,
                             nms_thres=0.4):
         box_corner = prediction.new(prediction.shape)
@@ -622,14 +602,14 @@ class DecodeBox:
             if output[i] is not None:
                 output[i] = output[i].cpu().numpy()
                 box_xy, box_wh = (output[i][:, 0:2] + output[i][:, 2:4]) / 2, output[i][:, 2:4] - output[i][:, 0:2]
-                output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape, letterbox_image)
+                output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape)
         return output
 
 
 class EvalCallback:
     def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_out_path="../tmp/.maps_out", max_boxes=100, confidence=0.05, nms_iou=0.5, letterbox_image=True,
-                 min_overlap=0.5, eval_flag=True, period=1):
+                 maps_out_path="../tmp/.maps_out", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+                 eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net
         self.input_shape = input_shape
@@ -644,7 +624,6 @@ class EvalCallback:
         self.max_boxes = max_boxes
         self.confidence = confidence
         self.nms_iou = nms_iou
-        self.letterbox_image = letterbox_image
         self.min_overlap = min_overlap
         self.eval_flag = eval_flag
         self.period = period
@@ -661,7 +640,7 @@ class EvalCallback:
         f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]), self.letterbox_image)
+        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
         image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
@@ -670,7 +649,7 @@ class EvalCallback:
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
             results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, self.letterbox_image, conf_thres=self.confidence,
+                                                         image_shape, conf_thres=self.confidence,
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return
