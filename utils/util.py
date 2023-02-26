@@ -251,7 +251,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
             nd = len(dr_data)
             tp = [0] * nd
             fp = [0] * nd
-            score = [0] * nd
+            score = [0.0] * nd
             score_threshold_idx = 0
             for idx, detection in enumerate(dr_data):
                 file_id = detection["file_id"]
@@ -596,7 +596,7 @@ class DecodeBox:
         box_corner[:, :, 2] = prediction[:, :, 0] + prediction[:, :, 2] / 2
         box_corner[:, :, 3] = prediction[:, :, 1] + prediction[:, :, 3] / 2
         prediction[:, :, :4] = box_corner[:, :, :4]
-        output = [None for _ in range(len(prediction))]
+        output: list = [None]
         for i, image_pred in enumerate(prediction):
             class_conf, class_pred = torch.max(image_pred[:, 5:5 + num_classes], 1, keepdim=True)
             conf_mask = (image_pred[:, 4] * class_conf[:, 0] >= conf_thres).squeeze()
