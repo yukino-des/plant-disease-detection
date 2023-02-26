@@ -15,6 +15,7 @@ from PIL import Image, ImageDraw, ImageFont
 from random import sample, shuffle
 from torch import nn
 from torch.utils.data.dataset import Dataset
+from typing import Any
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
 from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
@@ -77,11 +78,11 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
                 targets = [ann.cuda(local_rank) for ann in targets]
         optimizer.zero_grad()
         outputs = model_train(images)
-        loss_value_all = 0
+        loss_sum = 0
         for l in range(len(outputs)):
             loss_item = yolo_loss(l, outputs[l], targets)
-            loss_value_all += loss_item
-        loss_value = loss_value_all
+            loss_sum += loss_item
+        loss_value: Any = loss_sum
         loss_value.backward()
         optimizer.step()
         loss += loss_value.item()
@@ -309,26 +310,21 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
-                                                         self.num_classes,
-                                                         self.input_shape,
-                                                         image_shape,
-                                                         self.letterbox_image,
-                                                         conf_thres=self.confidence,
+            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
+                                                         image_shape, self.letterbox_image, conf_thres=self.confidence,
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return image, {}
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font="../data/simhei.ttf",
-                                  size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
+        font = ImageFont.truetype(font="../data/simhei.ttf", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
         if count:
             for i in range(self.num_classes):
                 num = np.sum(top_label == i)
                 if num > 0:
-                    print(self.class_names[i] + ":", num)
+                    print(self.class_names[i] + ": ", num)
         if crop:
             for i, c in list(enumerate(top_label)):
                 top, left, bottom, right = top_boxes[i]
@@ -382,24 +378,15 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
-                                               self.num_classes,
-                                               self.input_shape,
-                                               image_shape,
-                                               self.letterbox_image,
-                                               conf_thres=self.confidence,
-                                               nms_thres=self.nms_iou)
+            self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape, image_shape,
+                                               self.letterbox_image, conf_thres=self.confidence, nms_thres=self.nms_iou)
         t1 = time.time()
         for _ in range(test_interval):
             with torch.no_grad():
                 outputs = self.net(images)
                 outputs = self.bbox_util.decode_box(outputs)
-                self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
-                                                   self.num_classes,
-                                                   self.input_shape,
-                                                   image_shape,
-                                                   self.letterbox_image,
-                                                   conf_thres=self.confidence,
+                self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
+                                                   image_shape, self.letterbox_image, conf_thres=self.confidence,
                                                    nms_thres=self.nms_iou)
         t2 = time.time()
         tact_time = (t2 - t1) / test_interval
@@ -437,23 +424,13 @@ class YOLO(object):
         im = torch.zeros(1, 3, *self.input_shape).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        torch.onnx.export(self.net,
-                          im,
-                          f=model_path,
-                          verbose=False,
-                          opset_version=12,
-                          training=torch.onnx.TrainingMode.EVAL,
-                          do_constant_folding=True,
-                          input_names=input_layer_names,
-                          output_names=output_layer_names,
-                          dynamic_axes=None)
+        torch.onnx.export(self.net, im, f=model_path, verbose=False, opset_version=12,
+                          training=torch.onnx.TrainingMode.EVAL, do_constant_folding=True,
+                          input_names=input_layer_names, output_names=output_layer_names, dynamic_axes=None)
         model_onnx = onnx.load(model_path)
         onnx.checker.check_model(model_onnx)
         if simplify:
-            model_onnx, check = onnxsim.simplify(
-                model_onnx,
-                dynamic_input_shape=False,
-                input_shapes=None)
+            model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
             assert check, "assert check failed"
             onnx.save(model_onnx, model_path)
         print(model_path + " saved.")
@@ -470,12 +447,8 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1),
-                                                         self.num_classes,
-                                                         self.input_shape,
-                                                         image_shape,
-                                                         self.letterbox_image,
-                                                         conf_thres=self.confidence,
+            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
+                                                         image_shape, self.letterbox_image, conf_thres=self.confidence,
                                                          nms_thres=self.nms_iou)
             if results[0] is None:
                 return
@@ -602,7 +575,7 @@ class YoloDataset(Dataset):
             dx = (w - nw) // 2
             dy = (h - nh) // 2
             image = image.resize((nw, nh), Image.BICUBIC)
-            new_image = Image.new("RGB", (w, h), (128, 128, 128))
+            new_image: Any = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image, np.float32)
             if len(box) > 0:
@@ -739,7 +712,7 @@ class YoloDataset(Dataset):
             elif index == 3:
                 dx = int(w * min_offset_x)
                 dy = int(h * min_offset_y) - nh
-            new_image = Image.new("RGB", (w, h), (128, 128, 128))
+            new_image: Any = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)
             index = index + 1
@@ -811,7 +784,7 @@ class YOLOLoss(nn.Module):
         self.ignore_threshold = 0.5
         self.cuda = cuda
 
-    def clip_by_tensor(self, t, t_min, t_max):
+    def clip_by_tensor(self, t: torch.Tensor, t_min: float, t_max: float):
         t = t.float()
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         result = (result <= t_max).float() * result + (result > t_max).float() * t_max
