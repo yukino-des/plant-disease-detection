@@ -520,10 +520,7 @@ class DecodeBox:
             stride_w = self.input_shape[1] / input_width
             scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
                               self.anchors[self.anchors_mask[i]]]
-            prediction = _input.view(batch_size,
-                                     len(self.anchors_mask[i]),
-                                     self.bbox_attrs,
-                                     input_height,
+            prediction = _input.view(batch_size, len(self.anchors_mask[i]), self.bbox_attrs, input_height,
                                      input_width).permute(0, 1, 3, 4, 2).contiguous()
             x = torch.sigmoid(prediction[..., 0])
             y = torch.sigmoid(prediction[..., 1])
@@ -547,8 +544,8 @@ class DecodeBox:
             pred_boxes[..., 2] = torch.exp(w.data) * anchor_w
             pred_boxes[..., 3] = torch.exp(h.data) * anchor_h
             _scale = torch.Tensor([input_width, input_height, input_width, input_height]).type(float_tensor)
-            output = torch.cat((pred_boxes.view(batch_size, -1, 4) / _scale,
-                                conf.view(batch_size, -1, 1), pred_cls.view(batch_size, -1, self.num_classes)), -1)
+            output = torch.cat((pred_boxes.view(batch_size, -1, 4) / _scale, conf.view(batch_size, -1, 1),
+                                pred_cls.view(batch_size, -1, self.num_classes)), -1)
             outputs.append(output.data)
         return outputs
 
@@ -564,12 +561,7 @@ class DecodeBox:
         boxes *= np.concatenate([image_shape, image_shape], axis=-1)
         return boxes
 
-    def non_max_suppression(self, prediction,
-                            num_classes,
-                            input_shape,
-                            image_shape,
-                            conf_thres=0.5,
-                            nms_thres=0.4):
+    def non_max_suppression(self, prediction, num_classes, input_shape, image_shape, conf_thres=0.5, nms_thres=0.4):
         box_corner = prediction.new(prediction.shape)
         box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
         box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
@@ -592,11 +584,7 @@ class DecodeBox:
                 detections = detections.cuda()
             for c in unique_labels:
                 detections_class = detections[detections[:, -1] == c]
-                keep = nms(
-                    detections_class[:, :4],
-                    detections_class[:, 4] * detections_class[:, 5],
-                    nms_thres
-                )
+                keep = nms(detections_class[:, :4], detections_class[:, 4] * detections_class[:, 5], nms_thres)
                 max_detections = detections_class[keep]
                 output[i] = max_detections if output[i] is None else torch.cat([output[i], max_detections])
             if output[i] is not None:

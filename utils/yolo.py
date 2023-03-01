@@ -15,7 +15,6 @@ from PIL import Image, ImageDraw, ImageFont
 from random import sample, shuffle
 from torch import nn
 from torch.utils.data.dataset import Dataset
-from typing import Any
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
 from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
@@ -38,25 +37,35 @@ defaults = {
 }
 
 
+# 标准卷积
 def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
     pad = (kernel_size - 1) // 2 if kernel_size else 0
     return nn.Sequential(OrderedDict([
         ("conv", nn.Conv2d(filter_in, filter_out,
-                           kernel_size=kernel_size, stride=stride, padding=pad, groups=groups, bias=False)),
-        ("bn", nn.BatchNorm2d(filter_out)),
-        ("relu", nn.ReLU6(inplace=True)),
-    ]))
+                           kernel_size=kernel_size,
+                           stride=stride,
+                           padding=pad,
+                           groups=groups,
+                           bias=False)),  # 3x3标准卷积
+        ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
+        ("relu", nn.ReLU6(inplace=True))]))  # 激活
 
 
+# 深度可分离卷积
 def conv_dw(filter_in, filter_out, stride=1):
     return nn.Sequential(
-        nn.Conv2d(filter_in, filter_in, 3, stride, 1, groups=filter_in, bias=False),
-        nn.BatchNorm2d(filter_in),
-        nn.ReLU6(inplace=True),
-        nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),
-        nn.BatchNorm2d(filter_out),
-        nn.ReLU6(inplace=True),
-    )
+        nn.Conv2d(filter_in, filter_in,
+                  kernel_size=3,
+                  stride=stride,
+                  padding=1,
+                  groups=filter_in,
+                  bias=False),  # 3x3深度卷积
+        nn.BatchNorm2d(filter_in),  # 批量归一化
+        nn.ReLU6(inplace=True),  # 激活
+        nn.Conv2d(filter_in, filter_out, 1, 1, 0,
+                  bias=False),  # 1x1点卷积
+        nn.BatchNorm2d(filter_out),  # 批量归一化
+        nn.ReLU6(inplace=True))  # 激活
 
 
 def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
@@ -81,7 +90,7 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         for l in range(len(outputs)):
             loss_item = yolo_loss(l, outputs[l], targets)
             loss_sum += loss_item
-        loss_value: Any = loss_sum
+        loss_value = loss_sum
         loss_value.backward()
         optimizer.step()
         loss += loss_value.item()
@@ -144,8 +153,7 @@ def make3conv(filters_list, in_filters):
     return nn.Sequential(
         conv2d(in_filters, filters_list[0], 1),
         conv_dw(filters_list[0], filters_list[1]),
-        conv2d(filters_list[1], filters_list[0], 1),
-    )
+        conv2d(filters_list[1], filters_list[0], 1))
 
 
 def make5conv(filters_list, in_filters):
@@ -154,8 +162,7 @@ def make5conv(filters_list, in_filters):
         conv_dw(filters_list[0], filters_list[1]),
         conv2d(filters_list[1], filters_list[0], 1),
         conv_dw(filters_list[0], filters_list[1]),
-        conv2d(filters_list[1], filters_list[0], 1),
-    )
+        conv2d(filters_list[1], filters_list[0], 1))
 
 
 def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
@@ -277,9 +284,7 @@ class YOLO(object):
             defaults[name] = value
         self.class_names, self.num_classes = get_classes(self.classes_path)
         self.anchors, self.num_anchors = get_anchors(self.anchors_path)
-        self.bbox_util = DecodeBox(self.anchors,
-                                   self.num_classes,
-                                   (self.input_shape[0], self.input_shape[1]),
+        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
                                    self.anchors_mask)
         hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
@@ -445,8 +450,7 @@ class YOLO(object):
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
             results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, conf_thres=self.confidence,
-                                                         nms_thres=self.nms_iou)
+                                                         image_shape, self.confidence, self.nms_iou)
             if results[0] is None:
                 return
             top_label = np.array(results[0][:, 6], dtype="int32")
@@ -572,7 +576,7 @@ class YoloDataset(Dataset):
             dx = (w - nw) // 2
             dy = (h - nh) // 2
             image = image.resize((nw, nh), Image.BICUBIC)
-            new_image: Any = Image.new("RGB", (w, h), (128, 128, 128))
+            new_image = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image, np.float32)
             if len(box) > 0:
@@ -709,7 +713,7 @@ class YoloDataset(Dataset):
             elif index == 3:
                 dx = int(w * min_offset_x)
                 dy = int(h * min_offset_y) - nh
-            new_image: Any = Image.new("RGB", (w, h), (128, 128, 128))
+            new_image = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image)
             index = index + 1

@@ -3,9 +3,9 @@ from setuptools import setup, find_packages
 with open("README.md", "r", encoding="utf-8") as readme:
     long_description = readme.read()
 classifiers = [
-    "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
-    "Operating System :: Unix"
+    "Operating System :: Unix",
+    "Programming Language :: Python :: 3"
 ]
 setup_kwargs = {
     "author": "yukino-des",
