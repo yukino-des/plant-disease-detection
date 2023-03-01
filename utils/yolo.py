@@ -428,7 +428,7 @@ class YOLO(object):
         print(model_path + " saved.")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "dr/" + image_id + ".txt"), "w")
+        f = open(os.path.join(maps_out_path, ".dr/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))

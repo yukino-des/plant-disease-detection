@@ -113,8 +113,8 @@ def get_lr(optimizer):
 
 
 def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
-    gt_path = os.path.join(path, "gt")  # ground_truth
-    dr_path = os.path.join(path, "dr")  # detection_results
+    gt_path = os.path.join(path, ".gt")  # ground_truth
+    dr_path = os.path.join(path, ".dr")  # detection_results
     temp_files_path = os.path.join(path, ".temp_files")
     results_files_path = os.path.join(path, "results")
     if not os.path.exists(temp_files_path):
@@ -612,7 +612,7 @@ class EvalCallback:
                 f.write("\n")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "dr/" + image_id + ".txt"), "w", encoding="utf-8")
+        f = open(os.path.join(maps_out_path, ".dr/" + image_id + ".txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
@@ -652,17 +652,17 @@ class EvalCallback:
             self.net = model_eval
             if not os.path.exists(self.maps_out_path):
                 os.makedirs(self.maps_out_path)
-            if not os.path.exists(os.path.join(self.maps_out_path, "gt")):
-                os.makedirs(os.path.join(self.maps_out_path, "gt"))
-            if not os.path.exists(os.path.join(self.maps_out_path, "dr")):
-                os.makedirs(os.path.join(self.maps_out_path, "dr"))
+            if not os.path.exists(os.path.join(self.maps_out_path, ".gt")):
+                os.makedirs(os.path.join(self.maps_out_path, ".gt"))
+            if not os.path.exists(os.path.join(self.maps_out_path, ".dr")):
+                os.makedirs(os.path.join(self.maps_out_path, ".dr"))
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
                 image_id = os.path.basename(line[0]).split(".")[0]
                 image = Image.open(line[0])
                 gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
                 self.get_map_txt(image_id, image, self.class_names, self.maps_out_path)
-                with open(os.path.join(self.maps_out_path, "gt/" + image_id + ".txt"), "w") as new_f:
+                with open(os.path.join(self.maps_out_path, ".gt/" + image_id + ".txt"), "w") as new_f:
                     for box in gt_boxes:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]

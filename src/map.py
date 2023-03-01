@@ -18,15 +18,15 @@ if __name__ == "__main__":
     maps_out_path = "../tmp/maps_out"
     image_ids = open("../VOC/ImageSets/Main/test.txt").read().strip().split()
     os.makedirs(maps_out_path, exist_ok=True)
-    os.makedirs(os.path.join(maps_out_path, "gt"), exist_ok=True)
-    os.makedirs(os.path.join(maps_out_path, "dr"), exist_ok=True)
+    os.makedirs(os.path.join(maps_out_path, ".gt"), exist_ok=True)
+    os.makedirs(os.path.join(maps_out_path, ".dr"), exist_ok=True)
     class_names, _ = get_classes(classes_path)
     yolo = YOLO(confidence=confidence, nms_iou=nms_iou)
     for image_id in tqdm(image_ids):
         image_path = "../VOC/JPEGImages/" + image_id + ".jpg"
         image = Image.open(image_path)
         yolo.get_map_txt(image_id, image, class_names, maps_out_path)
-        with open(os.path.join(maps_out_path, "gt/" + image_id + ".txt"), "w") as new_f:
+        with open(os.path.join(maps_out_path, ".gt/" + image_id + ".txt"), "w") as new_f:
             root = ET.parse("../VOC/Annotations/" + image_id + ".xml").getroot()
             for obj in root.findall("object"):
                 difficult_flag = False
