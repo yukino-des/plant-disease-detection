@@ -150,19 +150,17 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=
 
 
 def make3conv(filters_list, in_filters):
-    return nn.Sequential(
-        conv2d(in_filters, filters_list[0], 1),
-        conv_dw(filters_list[0], filters_list[1]),
-        conv2d(filters_list[1], filters_list[0], 1))
+    return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
+                         conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1))
 
 
 def make5conv(filters_list, in_filters):
-    return nn.Sequential(
-        conv2d(in_filters, filters_list[0], 1),
-        conv_dw(filters_list[0], filters_list[1]),
-        conv2d(filters_list[1], filters_list[0], 1),
-        conv_dw(filters_list[0], filters_list[1]),
-        conv2d(filters_list[1], filters_list[0], 1))
+    return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
+                         conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1),
+                         conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1))
 
 
 def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
@@ -202,11 +200,7 @@ def yolo_dataset_collate(batch):
 
 
 def yolo_head(filters_list, in_filters):
-    m = nn.Sequential(
-        conv_dw(in_filters, filters_list[0]),
-        nn.Conv2d(filters_list[0], filters_list[1], 1),
-    )
-    return m
+    return nn.Sequential(conv_dw(in_filters, filters_list[0]), nn.Conv2d(filters_list[0], filters_list[1], 1))
 
 
 def yolox_warm_cos_lr(lr, min_lr, total_iters, warmup_total_iters, warmup_lr_start, no_aug_iter, iters):
@@ -248,10 +242,8 @@ class SpatialPyramidPooling(nn.Module):
 class Upsample(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(Upsample, self).__init__()
-        self.upsample = nn.Sequential(
-            conv2d(in_channels, out_channels, 1),
-            nn.Upsample(scale_factor=2, mode="nearest")
-        )
+        self.upsample = nn.Sequential(conv2d(in_channels, out_channels, 1),
+                                      nn.Upsample(scale_factor=2, mode="nearest"))
 
     def forward(self, x, ):
         x = self.upsample(x)
@@ -303,9 +295,8 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, conf_thres=self.confidence,
-                                                         nms_thres=self.nms_iou)
+            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
+                                                         self.confidence, self.nms_iou)
             if results[0] is None:
                 return image, {}
             top_label = np.array(results[0][:, 6], dtype="int32")
@@ -370,16 +361,15 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape, image_shape,
-                                               conf_thres=self.confidence, nms_thres=self.nms_iou)
+            self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape, self.confidence,
+                                               self.nms_iou)
         t1 = time.time()
         for _ in range(test_interval):
             with torch.no_grad():
                 outputs = self.net(images)
                 outputs = self.bbox_util.decode_box(outputs)
-                self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                   image_shape, conf_thres=self.confidence,
-                                                   nms_thres=self.nms_iou)
+                self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
+                                                   self.confidence, self.nms_iou)
         t2 = time.time()
         tact_time = (t2 - t1) / test_interval
         return tact_time
@@ -411,7 +401,7 @@ class YOLO(object):
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
         print(heatmap_save_path + " saved.")
 
-    def convert_to_onnx(self, simplify, model_path):
+    def convert_to_onnx(self, model_path):
         self.generate(onnx=True)
         im = torch.zeros(1, 3, *self.input_shape).to("cpu")
         input_layer_names = ["images"]
@@ -421,10 +411,9 @@ class YOLO(object):
                           input_names=input_layer_names, output_names=output_layer_names, dynamic_axes=None)
         model_onnx = onnx.load(model_path)
         onnx.checker.check_model(model_onnx)
-        if simplify:
-            model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
-            assert check, "assert check failed"
-            onnx.save(model_onnx, model_path)
+        model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
+        assert check, "assert check failed"
+        onnx.save(model_onnx, model_path)
         print(model_path + " saved.")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
@@ -439,8 +428,8 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, self.confidence, self.nms_iou)
+            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
+                                                         self.confidence, self.nms_iou)
             if results[0] is None:
                 return
             top_label = np.array(results[0][:, 6], dtype="int32")
@@ -754,8 +743,8 @@ class YoloDataset(Dataset):
 
 
 class YOLOLoss(nn.Module):
-    def __init__(self, anchors, num_classes, input_shape, cuda, anchors_mask=None,
-                 focal_loss=False, alpha=0.25, gamma=2):
+    def __init__(self, anchors, num_classes, input_shape, cuda, anchors_mask=None, focal_loss=False, alpha=0.25,
+                 gamma=2):
         super(YOLOLoss, self).__init__()
         if anchors_mask is None:
             anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
@@ -826,11 +815,8 @@ class YOLOLoss(nn.Module):
         stride_h = self.input_shape[0] / in_h
         stride_w = self.input_shape[1] / in_w
         scaled_anchors = [(a_w / stride_w, a_h / stride_h) for a_w, a_h in self.anchors]
-        prediction = _input.view(bs,
-                                 len(self.anchors_mask[l]),
-                                 self.bbox_attrs,
-                                 in_h,
-                                 in_w).permute(0, 1, 3, 4, 2).contiguous()
+        prediction = _input.view(bs, len(self.anchors_mask[l]), self.bbox_attrs, in_h, in_w).permute(
+            0, 1, 3, 4, 2).contiguous()
         x = torch.sigmoid(prediction[..., 0])
         y = torch.sigmoid(prediction[..., 1])
         w = prediction[..., 2]

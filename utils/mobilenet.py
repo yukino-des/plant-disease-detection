@@ -20,7 +20,7 @@ def mobilenet_v2(pretrained=False, progress=True):
     return model
 
 
-class ConvBNReLU(nn.Sequential):
+class ConvBNReLU(nn.Sequential):  # 3x3深度卷积 + 批量归一化 + ReLU激活
     def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1):
         padding = (kernel_size - 1) // 2
         super(ConvBNReLU, self).__init__(
@@ -29,7 +29,7 @@ class ConvBNReLU(nn.Sequential):
             nn.ReLU6(inplace=True))
 
 
-class InvertedResidual(nn.Module):
+class InvertedResidual(nn.Module):  # 倒残差
     def __init__(self, inp, oup, stride, expand_ratio):
         super(InvertedResidual, self).__init__()
         self.stride = stride

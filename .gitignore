@@ -1,5 +1,6 @@
 *.docx
 src/*.txt
+src/_.jpg
 VOC/ImageSets/Main/*.txt
 
 

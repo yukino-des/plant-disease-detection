@@ -22,7 +22,6 @@ if __name__ == "__main__":
     # mode = "heatmap"
     heatmap_save_path = "../tmp/heatmap.png"
     # mode = "onnx"
-    simplify = True
     onnx_save_path = "../data/model.onnx"
     # mode = "dir"
     dir_path = "../tmp/imgs"
@@ -85,7 +84,7 @@ if __name__ == "__main__":
         else:
             yolo.detect_heatmap(image, heatmap_save_path)
     elif mode == "onnx":
-        yolo.convert_to_onnx(simplify, onnx_save_path)
+        yolo.convert_to_onnx(onnx_save_path)
     elif mode == "dir":
         img_names = os.listdir(dir_path)
         for img_name in tqdm(img_names):

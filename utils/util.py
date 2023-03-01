@@ -112,13 +112,12 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
+def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out"):
     gt_path = os.path.join(path, ".gt")  # ground_truth
     dr_path = os.path.join(path, ".dr")  # detection_results
     temp_files_path = os.path.join(path, ".temp_files")
     results_files_path = os.path.join(path, "results")
-    if not os.path.exists(temp_files_path):
-        os.makedirs(temp_files_path)
+    os.makedirs(temp_files_path, exist_ok=True)
     if os.path.exists(results_files_path):
         shutil.rmtree(results_files_path)
     else:
@@ -326,7 +325,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(results_files_path + "/AP/" + class_name + ".png")
+                fig.savefig(os.path.join(results_files_path, "AP", class_name + ".png"))
                 plt.cla()
                 plt.plot(score, f1, "-", color="orangered")
                 plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
@@ -335,7 +334,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(results_files_path + "/F1/" + class_name + ".png")
+                fig.savefig(os.path.join(results_files_path, "F1", class_name + ".png"))
                 plt.cla()
                 plt.plot(score, rec, "-H", color="gold")
                 plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
@@ -344,7 +343,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(results_files_path + "/recall/" + class_name + ".png")
+                fig.savefig(os.path.join(results_files_path, "recall", class_name + ".png"))
                 plt.cla()
                 plt.plot(score, prec, "-s", color="palevioletred")
                 plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
@@ -353,11 +352,10 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(results_files_path + "/precision/" + class_name + ".png")
+                fig.savefig(os.path.join(results_files_path, "precision", class_name + ".png"))
                 plt.cla()
         if n_classes == 0:
             raise ValueError("../data/classes.txt error.")
-            return 0
         results_file.write("\nmAP of all classes\n")
         _map = sum_ap / n_classes
         text = "mAP = {0:.2f}%".format(_map * 100)
@@ -392,7 +390,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
     if draw_plot:
         window_title = "ground-truth"
         plot_title = "ground-truth\n"
-        plot_title += "(" + str(len(ground_truth_files_list)) + " files and " + str(n_classes) + " classes)"
+        plot_title += str(len(ground_truth_files_list)) + " images; " + str(n_classes) + " classes"
         x_label = "Number of objects per class"
         output_path = results_files_path + "/ground-truth.png"
         plot_color = "forestgreen"
@@ -536,10 +534,9 @@ class DecodeBox:
             outputs.append(output.data)
         return outputs
 
-    def yolo_correct_boxes(self, box_xy, box_wh, input_shape, image_shape):
+    def yolo_correct_boxes(self, box_xy, box_wh, image_shape):
         box_yx = box_xy[..., ::-1]
         box_hw = box_wh[..., ::-1]
-        input_shape = np.array(input_shape)
         image_shape = np.array(image_shape)
         box_mins = box_yx - (box_hw / 2.)
         box_maxes = box_yx + (box_hw / 2.)
@@ -548,7 +545,7 @@ class DecodeBox:
         boxes *= np.concatenate([image_shape, image_shape], axis=-1)
         return boxes
 
-    def non_max_suppression(self, prediction, num_classes, input_shape, image_shape, conf_thres=0.5, nms_thres=0.4):
+    def non_max_suppression(self, prediction, num_classes, image_shape, conf_thres=0.5, nms_thres=0.4):
         box_corner = prediction.new(prediction.shape)
         box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
         box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
@@ -577,7 +574,7 @@ class DecodeBox:
             if output[i] is not None:
                 output[i] = output[i].cpu().numpy()
                 box_xy, box_wh = (output[i][:, 0:2] + output[i][:, 2:4]) / 2, output[i][:, 2:4] - output[i][:, 0:2]
-                output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, input_shape, image_shape)
+                output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, image_shape)
         return output
 
 
@@ -623,9 +620,8 @@ class EvalCallback:
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, self.input_shape,
-                                                         image_shape, conf_thres=self.confidence,
-                                                         nms_thres=self.nms_iou)
+            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
+                                                         self.confidence, self.nms_iou)
             if results[0] is None:
                 return
             top_label = np.array(results[0][:, 6], dtype="int32")
@@ -650,12 +646,9 @@ class EvalCallback:
     def on_epoch_end(self, epoch, model_eval):
         if epoch % self.period == 0 and self.eval_flag:
             self.net = model_eval
-            if not os.path.exists(self.maps_out_path):
-                os.makedirs(self.maps_out_path)
-            if not os.path.exists(os.path.join(self.maps_out_path, ".gt")):
-                os.makedirs(os.path.join(self.maps_out_path, ".gt"))
-            if not os.path.exists(os.path.join(self.maps_out_path, ".dr")):
-                os.makedirs(os.path.join(self.maps_out_path, ".dr"))
+            os.makedirs(self.maps_out_path, exist_ok=True)
+            os.makedirs(os.path.join(self.maps_out_path, ".gt"), exist_ok=True)
+            os.makedirs(os.path.join(self.maps_out_path, ".dr"), exist_ok=True)
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
                 image_id = os.path.basename(line[0]).split(".")[0]
