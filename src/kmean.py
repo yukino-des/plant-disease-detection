@@ -86,7 +86,7 @@ if __name__ == "__main__":
     print("../tmp/kmeans.jpg saved.")
     cluster = cluster[np.argsort(cluster[:, 0] * cluster[:, 1])]
     print("avg_ratio: {:.2f}".format(avg_iou(data, cluster)))
-    print(cluster)
+    print(f"cluster:\n{cluster}")
     f = open("../tmp/anchors.txt", "w")
     row = np.shape(cluster)[0]
     for i in range(row):

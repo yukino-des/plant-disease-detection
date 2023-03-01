@@ -1,10 +1,6 @@
 from torch import nn
 from torch.hub import load_state_dict_from_url
 
-model_urls = {
-    "mobilenet_v2": "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-}
-
 
 def make_divisible(v, divisor, min_value=None):
     if min_value is None:
@@ -18,7 +14,8 @@ def make_divisible(v, divisor, min_value=None):
 def mobilenet_v2(pretrained=False, progress=True):
     model = MobileNetV2()
     if pretrained:
-        state_dict = load_state_dict_from_url(model_urls["mobilenet_v2"], model_dir="data", progress=progress)
+        state_dict = load_state_dict_from_url("https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
+                                              model_dir="data", progress=progress)
         model.load_state_dict(state_dict)
     return model
 
@@ -42,10 +39,9 @@ class InvertedResidual(nn.Module):
         layers = []
         if expand_ratio != 1:
             layers.append(ConvBNReLU(inp, hidden_dim, kernel_size=1))
-        layers.extend([
-            ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim),
-            nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
-            nn.BatchNorm2d(oup)])
+        layers.extend([ConvBNReLU(hidden_dim, hidden_dim, stride=stride, groups=hidden_dim),
+                       nn.Conv2d(hidden_dim, oup, 1, 1, 0, bias=False),
+                       nn.BatchNorm2d(oup)])
         self.conv = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -65,7 +61,7 @@ class MobileNetV2(nn.Module):
             inverted_residual_setting = [[1, 16, 1, 1], [6, 24, 2, 2], [6, 32, 3, 2], [6, 64, 4, 2], [6, 96, 3, 1],
                                          [6, 160, 3, 2], [6, 320, 1, 1]]
         if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
-            raise ValueError("len of inverted_residual_setting ERROR!")
+            raise ValueError("Length of `inverted_residual_setting` error.")
         input_channel = make_divisible(input_channel * width_mult, round_nearest)
         self.last_channel = make_divisible(last_channel * max(1.0, width_mult), round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]

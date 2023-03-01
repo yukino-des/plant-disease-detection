@@ -113,8 +113,8 @@ def get_lr(optimizer):
 
 
 def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
-    gt_path = os.path.join(path, "ground-truth")
-    dr_path = os.path.join(path, "detection")
+    gt_path = os.path.join(path, "gt")  # ground_truth
+    dr_path = os.path.join(path, "dr")  # detection_results
     temp_files_path = os.path.join(path, ".temp_files")
     results_files_path = os.path.join(path, "results")
     if not os.path.exists(temp_files_path):
@@ -124,10 +124,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
     else:
         os.makedirs(results_files_path)
     if draw_plot:
-        try:
-            matplotlib.use("TkAgg")
-        except:
-            pass
         os.makedirs(os.path.join(results_files_path, "AP"))
         os.makedirs(os.path.join(results_files_path, "F1"))
         os.makedirs(os.path.join(results_files_path, "recall"))
@@ -313,14 +309,6 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
             rounded_prec = ["%.2f" % elem for elem in prec]
             rounded_rec = ["%.2f" % elem for elem in rec]
             results_file.write(text + "\nprecision: " + str(rounded_prec) + "\nrecall: " + str(rounded_rec) + "\n\n")
-            if len(prec) > 0:
-                print(text + "; score_threshold=" + str(score_threshold) + "; F1=" + "{0:.2f}".format(
-                    f1[score_threshold_idx]) + "; recall=" + "{0:.2f}%".format(
-                    rec[score_threshold_idx] * 100) + "; precision=" + "{0:.2f}%".format(
-                    prec[score_threshold_idx] * 100))
-            else:
-                print(text + "; score_threshold=" + str(
-                    score_threshold) + "; " + "F1=0.00; recall=0.00%; precision=0.00%")
             ap_dictionary[class_name] = ap
             n_images = counter_images_per_class[class_name]
             lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
@@ -342,7 +330,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 plt.cla()
                 plt.plot(score, f1, "-", color="orangered")
                 plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("Score_Threshold")
+                plt.xlabel("score_threshold")
                 plt.ylabel("F1")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
@@ -351,7 +339,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 plt.cla()
                 plt.plot(score, rec, "-H", color="gold")
                 plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("Score_Threshold")
+                plt.xlabel("score_threshold")
                 plt.ylabel("recall")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
@@ -360,7 +348,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 plt.cla()
                 plt.plot(score, prec, "-s", color="palevioletred")
                 plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("Score_Threshold")
+                plt.xlabel("score_threshold")
                 plt.ylabel("precision")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
@@ -368,11 +356,11 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
                 fig.savefig(results_files_path + "/precision/" + class_name + ".png")
                 plt.cla()
         if n_classes == 0:
-            print("../data/classes.txt error.")
+            raise ValueError("../data/classes.txt error.")
             return 0
         results_file.write("\nmAP of all classes\n")
-        _map_ = sum_ap / n_classes
-        text = "mAP = {0:.2f}%".format(_map_ * 100)
+        _map = sum_ap / n_classes
+        text = "mAP = {0:.2f}%".format(_map * 100)
         results_file.write(text + "\n")
         print(text)
     shutil.rmtree(temp_files_path)
@@ -416,12 +404,12 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="./maps_out"):
         plot_color = "royalblue"
         draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP"
-        plot_title = "mAP={0:.2f}%".format(_map_ * 100)
+        plot_title = "mAP={0:.2f}%".format(_map * 100)
         x_label = "Average precision"
         output_path = results_files_path + "/mAP.png"
         plot_color = "royalblue"
         draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-    return _map_
+    return _map
 
 
 def logistic(x):
@@ -471,7 +459,6 @@ def resize_image(image, size):
 
 
 def show_config(**kwargs):
-    print("configurations: ")
     print("-" * 70)
     print("|%25s | %40s|" % ("keys", "values"))
     print("-" * 70)
@@ -625,7 +612,7 @@ class EvalCallback:
                 f.write("\n")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w", encoding="utf-8")
+        f = open(os.path.join(maps_out_path, "dr/" + image_id + ".txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
@@ -665,17 +652,17 @@ class EvalCallback:
             self.net = model_eval
             if not os.path.exists(self.maps_out_path):
                 os.makedirs(self.maps_out_path)
-            if not os.path.exists(os.path.join(self.maps_out_path, "ground-truth")):
-                os.makedirs(os.path.join(self.maps_out_path, "ground-truth"))
-            if not os.path.exists(os.path.join(self.maps_out_path, "detection")):
-                os.makedirs(os.path.join(self.maps_out_path, "detection"))
+            if not os.path.exists(os.path.join(self.maps_out_path, "gt")):
+                os.makedirs(os.path.join(self.maps_out_path, "gt"))
+            if not os.path.exists(os.path.join(self.maps_out_path, "dr")):
+                os.makedirs(os.path.join(self.maps_out_path, "dr"))
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
                 image_id = os.path.basename(line[0]).split(".")[0]
                 image = Image.open(line[0])
                 gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
                 self.get_map_txt(image_id, image, self.class_names, self.maps_out_path)
-                with open(os.path.join(self.maps_out_path, "ground-truth/" + image_id + ".txt"), "w") as new_f:
+                with open(os.path.join(self.maps_out_path, "gt/" + image_id + ".txt"), "w") as new_f:
                     for box in gt_boxes:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]
@@ -696,7 +683,6 @@ class EvalCallback:
             plt.savefig(os.path.join(self.log_dir, "map.png"))
             plt.cla()
             plt.close("all")
-            print("Get map done.")
             shutil.rmtree(self.maps_out_path)
 
 

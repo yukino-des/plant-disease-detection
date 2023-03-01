@@ -32,7 +32,7 @@ if __name__ == "__main__":
         try:
             image = Image.open(img)
         except:
-            print("Open error.")
+            pass
         else:
             r_image, _ = yolo.detect_image(image, crop=crop)
             r_image.show()
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         out = cv2.VideoWriter(video_save_path, fourcc, video_fps, size)
         ref, frame = capture.read()
         if not ref:
-            raise ValueError("Failed to read the camera/video!")
+            raise ValueError("Failed to read the camera/video.")
         fps = 0.0
         while True:
             t1 = time.time()
@@ -75,13 +75,13 @@ if __name__ == "__main__":
         fps_image_path = input("Input image path: ")
         img = Image.open(fps_image_path)
         tact_time = yolo.get_fps(img, test_interval)
-        print(str(tact_time) + " seconds, " + str(1 / tact_time) + " FPS, @batch_size 1")
+        print(str(tact_time) + " seconds, " + str(1 / tact_time) + " fps, @batch_size 1")
     elif mode == "heatmap":
         img = input("Input image path: ")
         try:
             image = Image.open(img)
         except:
-            print("Open error.")
+            pass
         else:
             yolo.detect_heatmap(image, heatmap_save_path)
     elif mode == "onnx":

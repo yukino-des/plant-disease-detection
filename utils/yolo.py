@@ -124,13 +124,13 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         pbar.close()
         loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
         eval_callback.on_epoch_end(epoch + 1, model_train)
-        print("Epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
-        print("Total Loss: %.3f; Val Loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
+        print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
+        print("total loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
         if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
             torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
                 epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
         if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-            print("best.pth saved.")
+            print(f"{defaults['model_path']} saved.")
             torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
         torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
 
@@ -173,30 +173,20 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
 
 def step_lr(lr, decay_rate, step_size, iters):
     if step_size < 1:
-        raise ValueError("step_size must above 1.")
+        raise ValueError("Let step_size >= 1.")
     n = iters // step_size
     return lr * decay_rate ** n
 
 
-def weights_init(net, init_type="normal", init_gain=0.02):
+def weights_init(net):
     def init_func(m):
         classname = m.__class__.__name__
         if hasattr(m, "weight") and classname.find("Conv") != -1:
-            if init_type == "normal":
-                torch.nn.init.normal_(m.weight.data, 0.0, init_gain)
-            elif init_type == "xavier":
-                torch.nn.init.xavier_normal_(m.weight.data, gain=init_gain)
-            elif init_type == "kaiming":
-                torch.nn.init.kaiming_normal_(m.weight.data, a=0, mode="fan_in")
-            elif init_type == "orthogonal":
-                torch.nn.init.orthogonal_(m.weight.data, gain=init_gain)
-            else:
-                raise NotImplementedError("initialization method [%s] is not implemented" % init_type)
+            torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
         elif classname.find("BatchNorm2d") != -1:
             torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
             torch.nn.init.constant_(m.bias.data, 0.0)
 
-    print("init_type: %s" % init_type)
     net.apply(init_func)
 
 
@@ -438,7 +428,7 @@ class YOLO(object):
         print(model_path + " saved.")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, "detection/" + image_id + ".txt"), "w")
+        f = open(os.path.join(maps_out_path, "dr/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
