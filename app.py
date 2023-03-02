@@ -1,6 +1,5 @@
 import os
 import shutil
-import sys
 import uvicorn
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,21 +28,20 @@ def upload(file: UploadFile):
         r_image, image_info = yolo.detect_image(Image.open(original_path))
         r_image.save(detected_path, quality=95, subsampling=0)
         return {"status": 1,
-                "image_url": "http://127.0.0.1:8081//" + original_path,
-                "draw_url": "http://127.0.0.1:8081//" + detected_path,
+                "image_url": "http://127.0.0.1:8081/" + original_path,
+                "draw_url": "http://127.0.0.1:8081/" + detected_path,
                 "image_info": image_info}
 
 
 @app.get("/tmp/{fpath:path}", response_class=FileResponse)
 def tmp(fpath):
-    return FileResponse(path=os.path.join("tmp/", fpath), headers={"Content-Type": "image/png"})
+    print(fpath)
+    return FileResponse(os.path.join("tmp", fpath), headers={"Content-Type": "image/png"})
 
 
 if __name__ == "__main__":
-    os.chdir(sys.path[0])
     shutil.rmtree("tmp", ignore_errors=True)
-    for _dir in ["tmp/imgs", "tmp/imgs_out", "tmp/videos_out", "tmp/maps_out", "tmp/original",
-                 "tmp/detected"]:
+    for _dir in ["tmp/imgs", "tmp/imgs_out", "tmp/videos_out", "tmp/maps_out", "tmp/original", "tmp/detected"]:
         os.makedirs(_dir, exist_ok=True)
     yolo = YOLO()
     uvicorn.run(app, host="0.0.0.0", port=8081)
