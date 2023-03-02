@@ -1,5 +1,4 @@
 *.docx
-*.txt
 VOC/ImageSets/Main/*.txt
 
 .idea/
