@@ -339,8 +339,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
         if n_classes == 0:
             raise ValueError("data/classes.txt error.")
         results_file.write("\nmAP of all classes\n")
-        _map = sum_ap / n_classes
-        text = "mAP={:.2f}%".format(_map * 100)
+        mAP = sum_ap / n_classes
+        text = "mAP={:.2f}%".format(mAP * 100)
         results_file.write(text + "\n")
         print(text)
     shutil.rmtree(temp_files_path)
@@ -384,12 +384,12 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
         plot_color = "royalblue"
         draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP"
-        plot_title = "mAP={:.2f}%".format(_map * 100)
+        plot_title = "mAP={:.2f}%".format(mAP * 100)
         x_label = "average precision"
         output_path = results_files_path + "/mAP.png"
         plot_color = "royalblue"
         draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-    return _map
+    return mAP
 
 
 def logistic(x):
@@ -575,7 +575,7 @@ class EvalCallback:
         self.period = period
         self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
                                    self.anchors_mask)
-        self.maps = [0]
+        self.maps = [0.0]
         self.epochs = [0]
         if self.eval_flag:
             with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
