@@ -53,7 +53,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     for i, val in enumerate(sorted_values):
         str_val = " " + str(val)
         if val < 1.0:
-            str_val = " {0:.2f}".format(val)
+            str_val = " {0:%.2f}" % val
         t = plt.text(val, i, str_val, color=plot_color, va="center", fontweight="bold")
         if i == (len(sorted_values) - 1):
             adjust_axes(r, t, fig, axes)
@@ -294,8 +294,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                 f1_text = class_name + "; F1=0.00"
                 recall_text = class_name + "; recall=0.00%"
                 precision_text = class_name + "; precision=0.00%"
-            rounded_prec = ["%.2f".format(elem for elem in prec)]
-            rounded_rec = ["%.2f".format(elem for elem in rec)]
+            rounded_prec = ["%.2f" % elem for elem in prec]
+            rounded_rec = ["%.2f" % elem for elem in rec]
             results_file.write(text + "\nprecision: " + str(rounded_prec) + "\nrecall: " + str(rounded_rec) + "\n\n")
             ap_dictionary[class_name] = ap
             n_images = counter_images_per_class[class_name]
@@ -442,7 +442,7 @@ def resize_image(image, size):
 def show_config(dictionary):
     print("-" * 60)
     for key, value in dictionary.items():
-        print("|%20s | %35s|".format(str(key), str(value)))
+        print("|%20s | %35s|" % (str(key), str(value)))
     print("-" * 60)
 
 

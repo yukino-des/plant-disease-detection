@@ -46,8 +46,8 @@ if __name__ == "__main__":
             frame = np.array(image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
-            print("fps=%.2f".format(fps))
-            frame = cv2.putText(frame, "fps= %.2f".format(fps), (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            print("fps=%.2f" % fps)
+            frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             cv2.imshow("video", frame)
             c = cv2.waitKey(1) & 0xff
             out.write(frame)

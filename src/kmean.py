@@ -49,21 +49,17 @@ def kmeans(box, k):
 
 def load_data(path):
     data = []
-    for xml_file in tqdm(glob.glob("{}/*xml".format(path))):
+    for xml_file in tqdm(glob.glob(f"{path}/*xml")):
         tree = ET.parse(xml_file)
         height = int(tree.findtext("./size/height"))
         width = int(tree.findtext("./size/width"))
         if height <= 0 or width <= 0:
             continue
         for obj in tree.iter("object"):
-            xmin = int(float(obj.findtext("bndbox/xmin"))) / width
-            ymin = int(float(obj.findtext("bndbox/ymin"))) / height
-            xmax = int(float(obj.findtext("bndbox/xmax"))) / width
-            ymax = int(float(obj.findtext("bndbox/ymax"))) / height
-            xmin = np.float64(xmin)
-            ymin = np.float64(ymin)
-            xmax = np.float64(xmax)
-            ymax = np.float64(ymax)
+            xmin = np.float64(int(float(obj.findtext("bndbox/xmin"))) / width)
+            ymin = np.float64(int(float(obj.findtext("bndbox/ymin"))) / height)
+            xmax = np.float64(int(float(obj.findtext("bndbox/xmax"))) / width)
+            ymax = np.float64(int(float(obj.findtext("bndbox/ymax"))) / height)
             data.append([xmax - xmin, ymax - ymin])
     return np.array(data)
 
@@ -89,8 +85,8 @@ if __name__ == "__main__":
     row = np.shape(cluster)[0]
     for i in range(row):
         if i == 0:
-            xy = "%d,%d".format(cluster[i][0], cluster[i][1])
+            xy = "%d,%d" % (cluster[i][0], cluster[i][1])
         else:
-            xy = ", %d,%d".format(cluster[i][0], cluster[i][1])
+            xy = ", %d,%d" % (cluster[i][0], cluster[i][1])
         f.write(xy)
     f.close()
