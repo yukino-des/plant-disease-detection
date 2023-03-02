@@ -6,7 +6,6 @@ import numpy as np
 import operator
 import os
 import shutil
-import sys
 import torch
 from matplotlib import pyplot as plt
 from PIL import Image
@@ -33,11 +32,9 @@ def adjust_axes(r, t, fig, axes):
 
 
 def cvt_color(image):
-    if len(np.shape(image)) == 3 and np.shape(image)[2] == 3:
-        return image
-    else:
+    if len(np.shape(image)) != 3 or np.shape(image)[2] != 3:
         image = image.convert("RGB")
-        return image
+    return image
 
 
 def download_weights(model_dir="../data"):
@@ -77,11 +74,6 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     fig.tight_layout()
     fig.savefig(output_path)
     plt.close()
-
-
-def error(msg):
-    print(msg)
-    sys.exit(0)
 
 
 def file_lines_to_list(path):
@@ -128,7 +120,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         os.makedirs(os.path.join(results_files_path, "precision"))
     ground_truth_files_list = glob.glob(gt_path + "/*.txt")
     if len(ground_truth_files_list) == 0:
-        error("Error: No ground-truth files found!")
+        raise FileNotFoundError("Ground-truth files not found error.")
     ground_truth_files_list.sort()
     gt_counter_per_class = {}
     counter_images_per_class = {}
@@ -137,8 +129,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         file_id = os.path.basename(os.path.normpath(file_id))
         temp_path = os.path.join(dr_path, (file_id + ".txt"))
         if not os.path.exists(temp_path):
-            error_msg = "Error. File not found: {}\n".format(temp_path)
-            error(error_msg)
+            raise FileNotFoundError(f"File not found error: {temp_path}.\n")
         lines_list = file_lines_to_list(txt_file)
         bounding_boxes = []
         is_difficult = False
@@ -189,7 +180,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                     else:
                         counter_images_per_class[class_name] = 1
                     already_seen_classes.append(class_name)
-        with open(temp_files_path + "/" + file_id + "_ground_truth.json", "w") as outfile:
+        with open(os.path.join(temp_files_path, f"{file_id}_ground_truth.json"), "w") as outfile:
             json.dump(bounding_boxes, outfile)
     gt_classes = list(gt_counter_per_class.keys())
     gt_classes = sorted(gt_classes)
@@ -201,11 +192,10 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         for txt_file in dr_files_list:
             file_id = txt_file.split(".txt", 1)[0]
             file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = os.path.join(gt_path, (file_id + ".txt"))
+            temp_path = os.path.join(gt_path, file_id + ".txt")
             if class_index == 0:
                 if not os.path.exists(temp_path):
-                    error_msg = "Error. File not found: {}\n".format(temp_path)
-                    error(error_msg)
+                    raise FileNotFoundError(f"File not found error: {temp_path}.\n")
             lines = file_lines_to_list(txt_file)
             for line in lines:
                 try:
@@ -225,17 +215,17 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                     bbox = left + " " + top + " " + right + " " + bottom
                     bounding_boxes.append({"confidence": confidence, "file_id": file_id, "bbox": bbox})
         bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
-        with open(temp_files_path + "/" + class_name + "_dr.json", "w") as outfile:
+        with open(os.path.join(temp_files_path, f"{class_name}_dr.json"), "w") as outfile:
             json.dump(bounding_boxes, outfile)
     sum_ap = 0.0
     ap_dictionary = {}
     lamr_dictionary = {}
-    with open(results_files_path + "/results.txt", "w") as results_file:
+    with open(f"{results_files_path}/results.txt", "w") as results_file:
         results_file.write("AP and precision/recall per class\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0
-            dr_file = temp_files_path + "/" + class_name + "_dr.json"
+            dr_file = os.path.join(temp_files_path, f"{class_name}_dr.json")
             dr_data = json.load(open(dr_file))
             nd = len(dr_data)
             tp = [0] * nd
@@ -247,7 +237,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threshold:
                     score_threshold_idx = idx
-                gt_file = temp_files_path + "/" + file_id + "_ground_truth.json"
+                gt_file = os.path.join(temp_files_path, f"{file_id}_ground_truth.json")
                 ground_truth_data = json.load(open(gt_file))
                 ovmax = -1
                 gt_match = -1
@@ -304,8 +294,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                 f1_text = class_name + "; F1=0.00"
                 recall_text = class_name + "; recall=0.00%"
                 precision_text = class_name + "; precision=0.00%"
-            rounded_prec = ["%.2f" % elem for elem in prec]
-            rounded_rec = ["%.2f" % elem for elem in rec]
+            rounded_prec = ["%.2f".format(elem for elem in prec)]
+            rounded_rec = ["%.2f".format(elem for elem in rec)]
             results_file.write(text + "\nprecision: " + str(rounded_prec) + "\nrecall: " + str(rounded_rec) + "\n\n")
             ap_dictionary[class_name] = ap
             n_images = counter_images_per_class[class_name]
@@ -372,14 +362,14 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                 det_counter_per_class[class_name] = 1
     dr_classes = list(det_counter_per_class.keys())
     with open(results_files_path + "/results.txt", "a") as results_file:
-        results_file.write("\nNumber of ground-truth objects per class\n")
+        results_file.write("\nnumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
             results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
     with open(results_files_path + "/results.txt", "a") as results_file:
-        results_file.write("\nNumber of detected objects per class\n")
+        results_file.write("\nnumber of detected objects per class\n")
         for class_name in sorted(dr_classes):
             n_det = det_counter_per_class[class_name]
             text = class_name + ": " + str(n_det)
@@ -390,7 +380,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         window_title = "ground-truth"
         plot_title = "ground-truth\n"
         plot_title += str(len(ground_truth_files_list)) + " images; " + str(n_classes) + " classes"
-        x_label = "Number of objects per class"
+        x_label = "number of objects per class"
         output_path = results_files_path + "/ground-truth.png"
         plot_color = "forestgreen"
         draw_plot_func(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
@@ -402,7 +392,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP"
         plot_title = "mAP={0:.2f}%".format(_map * 100)
-        x_label = "Average precision"
+        x_label = "average precision"
         output_path = results_files_path + "/mAP.png"
         plot_color = "royalblue"
         draw_plot_func(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
@@ -434,11 +424,6 @@ def log_average_miss_rate(precision, fp_cumsum, num_images):
     return lamr, mr, fppi
 
 
-def preprocess_input(image):
-    image /= 255.0
-    return image
-
-
 def print_table(l1, l2):
     for i in range(len(l1[0])):
         print("|", end=" ")
@@ -454,10 +439,10 @@ def resize_image(image, size):
     return new_image
 
 
-def show_config(map):
+def show_config(dictionary):
     print("-" * 60)
-    for key, value in map.items():
-        print("|%20s | %35s|" % (str(key), str(value)))
+    for key, value in dictionary.items():
+        print("|%20s | %35s|".format(str(key), str(value)))
     print("-" * 60)
 
 
@@ -605,11 +590,11 @@ class EvalCallback:
                 f.write("\n")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, ".dr/" + image_id + ".txt"), "w", encoding="utf-8")
+        f = open(os.path.join(maps_out_path, f".dr/{image_id}.txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -634,8 +619,8 @@ class EvalCallback:
             top, left, bottom, right = box
             if predicted_class not in class_names:
                 continue
-            f.write("%s %s %s %s %s %s\n" % (
-                predicted_class, score[:6], str(int(left)), str(int(top)), str(int(right)), str(int(bottom))))
+            f.write(f"{predicted_class} {score[:6]} "
+                    f"{str(int(left))} {str(int(top))} {str(int(right))} {str(int(bottom))}\n")
         f.close()
         return
 
@@ -651,11 +636,11 @@ class EvalCallback:
                 image = Image.open(line[0])
                 gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
                 self.get_map_txt(image_id, image, self.class_names, self.maps_out_path)
-                with open(os.path.join(self.maps_out_path, ".gt/" + image_id + ".txt"), "w") as new_f:
+                with open(os.path.join(self.maps_out_path, f".gt/{image_id}.txt"), "w") as new_f:
                     for box in gt_boxes:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]
-                        new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
+                        new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
             temp_map = get_map(self.min_overlap, False, path=self.maps_out_path)
             self.maps.append(temp_map)
             self.epochs.append(epoch)
@@ -665,9 +650,9 @@ class EvalCallback:
             plt.figure()
             plt.plot(self.epochs, self.maps, "red", linewidth=2, label="train map")
             plt.grid(True)
-            plt.xlabel("Epoch")
-            plt.ylabel("Map %s" % str(self.min_overlap))
-            plt.title("A Map Curve")
+            plt.xlabel("epoch")
+            plt.ylabel(f"map {str(self.min_overlap)}")
+            plt.title("a map curve")
             plt.legend(loc="upper right")
             plt.savefig(os.path.join(self.log_dir, "map.png"))
             plt.cla()
@@ -708,10 +693,7 @@ class LossHistory:
         plt.plot(iters, self.losses, "red", linewidth=2, label="train loss")
         plt.plot(iters, self.val_loss, "coral", linewidth=2, label="val loss")
         try:
-            if len(self.losses) < 25:
-                num = 5
-            else:
-                num = 15
+            num = 5 if len(self.losses) < 25 else 15
             plt.plot(iters, signal.savgol_filter(self.losses, num, 3), "green", linestyle="--", linewidth=2,
                      label="train loss")
             plt.plot(iters, signal.savgol_filter(self.val_loss, num, 3), "#8B4513", linestyle="--", linewidth=2,
@@ -719,8 +701,8 @@ class LossHistory:
         except:
             pass
         plt.grid(True)
-        plt.xlabel("Epoch")
-        plt.ylabel("Loss")
+        plt.xlabel("epoch")
+        plt.ylabel("loss")
         plt.legend(loc="upper right")
         plt.savefig(os.path.join(self.log_dir, "loss.png"))
         plt.cla()

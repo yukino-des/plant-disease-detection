@@ -1,9 +1,9 @@
-import datetime
 import numpy as np
 import os
 import random
 import torch
 import sys
+from datetime import datetime
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
@@ -16,16 +16,13 @@ from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weigh
 
 if __name__ == "__main__":
     random.seed(0)
-    classes_path = "../data/classes.txt"
     trainval_percent = 0.9
     train_percent = 0.9
-    classes, _ = get_classes(classes_path)
+    classes, _ = get_classes("../data/classes.txt")
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
-    annotations = "../VOC/Annotations"
-    image_sets = "../VOC/ImageSets/Main"
-    os.makedirs(image_sets, exist_ok=True)
-    temp_xml = os.listdir(annotations)
+    os.makedirs("../VOC/ImageSets/Main", exist_ok=True)
+    temp_xml = os.listdir("../VOC/Annotations")
     total_xml = []
     for xml in temp_xml:
         if xml.endswith(".xml"):
@@ -36,10 +33,10 @@ if __name__ == "__main__":
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
-    ftrainval = open(os.path.join(image_sets, "trainval.txt"), "w")
-    ftest = open(os.path.join(image_sets, "test.txt"), "w")
-    ftrain = open(os.path.join(image_sets, "train.txt"), "w")
-    fval = open(os.path.join(image_sets, "val.txt"), "w")
+    ftrainval = open("../VOC/ImageSets/Main/trainval.txt", "w")
+    ftest = open("../VOC/ImageSets/Main/test.txt", "w")
+    ftrain = open("../VOC/ImageSets/Main/train.txt", "w")
+    fval = open("../VOC/ImageSets/Main/val.txt", "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
@@ -53,11 +50,11 @@ if __name__ == "__main__":
     ftest.close()
     type_index = 0
     for image_set in ["train", "val"]:
-        image_ids = open("../VOC/ImageSets/Main/%s.txt" % image_set, encoding="utf-8").read().strip().split()
-        list_file = open("%s.txt" % image_set, "w", encoding="utf-8")
+        image_ids = open(f"../VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
+        list_file = open(f"{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
-            list_file.write("../VOC/JPEGImages/%s.jpg" % image_id)
-            in_file = open("../VOC/Annotations/%s.xml" % image_id, encoding="utf-8")
+            list_file.write(f"../VOC/JPEGImages/{image_id}.jpg")
+            in_file = open(f"../VOC/Annotations/{image_id}.xml", encoding="utf-8")
             tree = ET.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
@@ -88,7 +85,7 @@ if __name__ == "__main__":
     if photo_nums[0] <= 500:
         raise ValueError("Dataset not qualified.")
     if np.sum(nums) == 0:
-        raise ValueError(f"{classes_path} error.")
+        raise ValueError("../data/classes.txt error.")
     ctn = input("Continue (y/n)? ")
     if ctn != "y" and ctn != "Y":
         exit(0)
@@ -127,7 +124,7 @@ if __name__ == "__main__":
     val_annotation_path = "val.txt"
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    class_names, num_classes = get_classes(classes_path)
+    class_names, num_classes = get_classes("../data/classes.txt")
     anchors, num_anchors = get_anchors(anchors_path)
     model = YoloBody(anchors_mask, num_classes, pretrained=pretrained)
     if pretrained:
@@ -145,7 +142,7 @@ if __name__ == "__main__":
         model.load_state_dict(model_dict)
     cuda = torch.cuda.is_available()
     yolo_loss = YOLOLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
-    time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y%m%d%H%M%S")
+    time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
     log_dir = os.path.join(save_dir, "loss" + str(time_str))
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     model_train = model.train()
@@ -159,7 +156,7 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    show_config({"classes_path": classes_path,
+    show_config({"classes_path": "../data/classes.txt",
                  "anchors_path": anchors_path,
                  "anchors_mask": anchors_mask,
                  "model_path": model_path,
@@ -219,7 +216,8 @@ if __name__ == "__main__":
                                 mixup=mixup, mosaic_prob=mosaic_prob, mixup_prob=mixup_prob, train=True,
                                 special_aug_ratio=special_aug_ratio)
     val_dataset = YoloDataset(val_lines, input_shape, num_classes, epoch_length=unfreeze_epoch, mosaic=False,
-                              mixup=False, mosaic_prob=0, mixup_prob=0, train=False, special_aug_ratio=0)
+                              mixup=False, mosaic_prob=0, mixup_prob=0, train=False,
+                              special_aug_ratio=0)
     train_sampler = None
     val_sampler = None
     shuffle = True

@@ -10,24 +10,21 @@ from utils.util import get_classes, get_map
 from utils.yolo import YOLO
 
 if __name__ == "__main__":
-    classes_path = "../data/classes.txt"
     min_overlap = 0.5
     confidence = 0.001
     nms_iou = 0.5
     score_threshold = 0.5
-    maps_out_path = "../tmp/maps_out"
     image_ids = open("../VOC/ImageSets/Main/test.txt").read().strip().split()
-    os.makedirs(maps_out_path, exist_ok=True)
-    os.makedirs(os.path.join(maps_out_path, ".gt"), exist_ok=True)
-    os.makedirs(os.path.join(maps_out_path, ".dr"), exist_ok=True)
-    class_names, _ = get_classes(classes_path)
+    os.makedirs("../tmp/maps_out/.gt", exist_ok=True)
+    os.makedirs("../tmp/maps_out/.dr", exist_ok=True)
+    class_names, _ = get_classes("../data/classes.txt")
     yolo = YOLO(confidence=confidence, nms_iou=nms_iou)
     for image_id in tqdm(image_ids):
-        image_path = "../VOC/JPEGImages/" + image_id + ".jpg"
+        image_path = f"../VOC/JPEGImages/{image_id}.jpg"
         image = Image.open(image_path)
-        yolo.get_map_txt(image_id, image, class_names, maps_out_path)
-        with open(os.path.join(maps_out_path, ".gt/" + image_id + ".txt"), "w") as new_f:
-            root = ET.parse("../VOC/Annotations/" + image_id + ".xml").getroot()
+        yolo.get_map_txt(image_id, image, class_names, "../tmp/maps_out")
+        with open(f"../tmp/maps_out/.gt/{image_id}.txt", "w") as new_f:
+            root = ET.parse(f"../VOC/Annotations/{image_id}.xml").getroot()
             for obj in root.findall("object"):
                 difficult_flag = False
                 if obj.find("difficult") is not None:
@@ -43,7 +40,7 @@ if __name__ == "__main__":
                 right = bndbox.find("xmax").text
                 bottom = bndbox.find("ymax").text
                 if difficult_flag:
-                    new_f.write("%s %s %s %s %s difficult\n" % (obj_name, left, top, right, bottom))
+                    new_f.write(f"{obj_name} {left} {top} {right} {bottom} difficult\n")
                 else:
-                    new_f.write("%s %s %s %s %s\n" % (obj_name, left, top, right, bottom))
-    get_map(min_overlap, True, score_threshold=score_threshold, path=maps_out_path)
+                    new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
+    get_map(min_overlap, True, score_threshold=score_threshold, path="../tmp/maps_out")

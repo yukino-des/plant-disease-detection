@@ -18,5 +18,5 @@ if __name__ == "__main__":
     flops, params = profile(m.to(device), (dummy_input,), verbose=False)
     flops = flops * 2
     flops, params = clever_format([flops, params], "%.3f")
-    print("Total flops: %s" % flops)
-    print("Total params: %s" % params)
+    print(f"Total flops: {flops}")
+    print(f"Total params: {params}")

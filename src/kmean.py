@@ -18,8 +18,7 @@ def cas_iou(box, cluster):
     intersection = x * y
     area1 = box[0] * box[1]
     area2 = cluster[:, 0] * cluster[:, 1]
-    iou = intersection / (area1 + area2 - intersection)
-    return iou
+    return intersection / (area1 + area2 - intersection)
 
 
 def avg_iou(box, cluster):
@@ -73,8 +72,7 @@ if __name__ == "__main__":
     np.random.seed(0)
     input_shape = [416, 416]
     anchors_num = 9
-    path = "../VOC/Annotations"
-    data = load_data(path)
+    data = load_data("../VOC/Annotations")
     cluster, near = kmeans(data, anchors_num)
     data = data * np.array([input_shape[1], input_shape[0]])
     cluster = cluster * np.array([input_shape[1], input_shape[0]])
@@ -91,8 +89,8 @@ if __name__ == "__main__":
     row = np.shape(cluster)[0]
     for i in range(row):
         if i == 0:
-            xy = "%d,%d" % (cluster[i][0], cluster[i][1])
+            xy = "%d,%d".format(cluster[i][0], cluster[i][1])
         else:
-            xy = ", %d,%d" % (cluster[i][0], cluster[i][1])
+            xy = ", %d,%d".format(cluster[i][0], cluster[i][1])
         f.write(xy)
     f.close()

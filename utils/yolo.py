@@ -17,7 +17,7 @@ from torch import nn
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
-from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, preprocess_input,
+from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic,
                         resize_image, show_config)
 
 if os.name == "nt":
@@ -108,9 +108,9 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
     loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
     eval_callback.on_epoch_end(epoch + 1, model_train)
     print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
-    print("total loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
+    print("total loss: %.3f; val loss: %.3f".format(loss / epoch_step, val_loss / epoch_step_val))
     if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
-        torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
+        torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth".format(
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
         print("../data/best.pth saved.")
@@ -154,7 +154,7 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
 
 def step_lr(lr, decay_rate, step_size, iters):
     if step_size < 1:
-        raise ValueError("Let step_size >= 1.")
+        raise ValueError("step_size error.")
     n = iters // step_size
     return lr * decay_rate ** n
 
@@ -218,8 +218,7 @@ class SpatialPyramidPooling(nn.Module):
 
     def forward(self, x):
         features = [maxpool(x) for maxpool in self.maxpools[::-1]]
-        features = torch.cat(features + [x], dim=1)
-        return features
+        return torch.cat(features + [x], dim=1)
 
 
 class Upsample(nn.Module):
@@ -229,14 +228,13 @@ class Upsample(nn.Module):
                                       nn.Upsample(scale_factor=2, mode="nearest"))
 
     def forward(self, x, ):
-        x = self.upsample(x)
-        return x
+        return self.upsample(x)
 
 
 class YOLO(object):
     def __init__(self, confidence=0.5, nms_iou=0.3):
-        self.classes_path = "../data/classes.txt",
-        self.anchors_path = "../data/anchors.txt",
+        self.classes_path = "../data/classes.txt"
+        self.anchors_path = "../data/anchors.txt"
         self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.model_path = "../data/best.pth"
@@ -276,7 +274,7 @@ class YOLO(object):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -341,7 +339,7 @@ class YOLO(object):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -364,7 +362,7 @@ class YOLO(object):
     def detect_heatmap(self, image, heatmap_save_path):
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -408,7 +406,7 @@ class YOLO(object):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(preprocess_input(np.array(image_data, dtype="float32")), (2, 0, 1)), 0)
+        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
             if self.cuda:
@@ -429,8 +427,8 @@ class YOLO(object):
             top, left, bottom, right = box
             if predicted_class not in class_names:
                 continue
-            f.write("%s %s %s %s %s %s\n" % (
-                predicted_class, score[:6], str(int(left)), str(int(top)), str(int(right)), str(int(bottom))))
+            f.write(f"{predicted_class} {score[:6]} "
+                    f"{str(int(left))} {str(int(top))} {str(int(right))} {str(int(bottom))}\n")
         f.close()
         return
 
@@ -516,7 +514,7 @@ class YoloDataset(Dataset):
                 image, box = self.get_random_data_with_mixup(image, box, image_2, box_2)
         else:
             image, box = self.get_random_data(self.annotation_lines[index], self.input_shape, random=self.train)
-        image = np.transpose(preprocess_input(np.array(image, dtype=np.float32)), (2, 0, 1))
+        image = np.transpose(np.array(image, dtype=np.float32) / 255.0, (2, 0, 1))
         box = np.array(box, dtype=np.float32)
         if len(box) != 0:
             box[:, [0, 2]] = box[:, [0, 2]] / self.input_shape[1]
