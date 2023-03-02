@@ -1,16 +1,12 @@
 import os
 import shutil
 import sys
-
 import uvicorn
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from PIL import Image
 from starlette.responses import FileResponse
-
-sys.path.append(os.path.dirname(sys.path[0]))
-os.chdir(sys.path[0])
-from utils.yolo import YOLO
+from yolo import YOLO
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["GET", "POST"],
@@ -22,8 +18,8 @@ def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.split(".")
-    original_path = os.path.join("../tmp/original", file.filename)
-    detected_path = os.path.join("../tmp/detected", f"{file_name}.png")
+    original_path = os.path.join("tmp/original", file.filename)
+    detected_path = os.path.join("tmp/detected", f"{file_name}.png")
     try:
         with open(original_path, "wb+") as buffer:
             shutil.copyfileobj(file.file, buffer)
@@ -40,13 +36,14 @@ def upload(file: UploadFile):
 
 @app.get("/tmp/{fpath:path}", response_class=FileResponse)
 def tmp(fpath):
-    return FileResponse(path=os.path.join("../tmp/", fpath), headers={"Content-Type": "image/png"})
+    return FileResponse(path=os.path.join("tmp/", fpath), headers={"Content-Type": "image/png"})
 
 
 if __name__ == "__main__":
-    shutil.rmtree("../tmp", ignore_errors=True)
-    for _dir in ["../tmp/imgs", "../tmp/imgs_out", "../tmp/videos_out", "../tmp/maps_out", "../tmp/original",
-                 "../tmp/detected"]:
+    os.chdir(sys.path[0])
+    shutil.rmtree("tmp", ignore_errors=True)
+    for _dir in ["tmp/imgs", "tmp/imgs_out", "tmp/videos_out", "tmp/maps_out", "tmp/original",
+                 "tmp/detected"]:
         os.makedirs(_dir, exist_ok=True)
-    yolo = YOLO(classes_path="../data/classes_zh.txt")
+    yolo = YOLO()
     uvicorn.run(app, host="0.0.0.0", port=8081)

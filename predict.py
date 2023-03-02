@@ -1,17 +1,14 @@
 import cv2
 import numpy as np
 import os
-import sys
 import time
 from datetime import datetime
 from PIL import Image
 from tqdm import tqdm
-
-sys.path.append(os.path.dirname(sys.path[0]))
-from utils.yolo import YOLO
+from yolo import YOLO
 
 if __name__ == "__main__":
-    yolo = YOLO(classes_path="../data/classes_zh.txt")
+    yolo = YOLO()
     mode = input("Input mode in img, video, fps, heatmap, onnx, dir: ")
     crop = True
     fps_interval = 100  # mode = "fps"
@@ -24,12 +21,12 @@ if __name__ == "__main__":
         else:
             r_image, _ = yolo.detect_image(image, crop=crop)
             r_image.show()
-            r_image.save(os.path.join("../tmp/imgs_out", img.split(".")[-2] + ".png"), quality=95, subsampling=0)
+            r_image.save(os.path.join("tmp/imgs_out", img.split(".")[-2] + ".png"), quality=95, subsampling=0)
     elif mode == "video":
         video_path = input("Input video path: ")
         capture = cv2.VideoCapture(0 if video_path == "" else video_path)
-        os.makedirs("../tmp/videos_out", exist_ok=True)
-        video_save_path = f"../tmp/videos_out/{datetime.strftime(datetime.now(), '%H%M%S')}.avi"
+        os.makedirs("tmp/videos_out", exist_ok=True)
+        video_save_path = f"tmp/videos_out/{datetime.strftime(datetime.now(), '%H%M%S')}.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         out = cv2.VideoWriter(video_save_path, fourcc, 25.0, size)
@@ -71,19 +68,19 @@ if __name__ == "__main__":
         except:
             pass
         else:
-            yolo.detect_heatmap(image, "../tmp/heatmap.png")
+            yolo.detect_heatmap(image, "tmp/heatmap.png")
     elif mode == "onnx":
-        yolo.convert_to_onnx("../data/model.onnx")
+        yolo.convert_to_onnx("data/model.onnx")
     elif mode == "dir":
-        img_names = os.listdir("../tmp/imgs")
+        img_names = os.listdir("tmp/imgs")
         for img_name in tqdm(img_names):
             if img_name.lower().endswith(
                     (".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff")):
-                image_path = os.path.join("../tmp/imgs", img_name)
+                image_path = os.path.join("tmp/imgs", img_name)
                 image = Image.open(image_path)
                 r_image, _ = yolo.detect_image(image)
-                os.makedirs("../tmp/imgs_out", exist_ok=True)
-                r_image.save(os.path.join("../tmp/imgs_out", img_name.replace(".jpg", ".png")), quality=95,
+                os.makedirs("tmp/imgs_out", exist_ok=True)
+                r_image.save(os.path.join("tmp/imgs_out", img_name.replace(".jpg", ".png")), quality=95,
                              subsampling=0)
     else:
         raise AssertionError("Use mode in img, video, fps, heatmap, onnx, dir.")

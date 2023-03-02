@@ -16,8 +16,8 @@ from random import sample, shuffle
 from torch import nn
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
-from utils.mobilenet import mobilenet_v2
-from utils.util import cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, resize_image, show_config
+from mobilenet import mobilenet_v2
+from util import cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, resize_image, show_config
 
 if os.name == "nt":
     matplotlib.use("Agg")
@@ -101,7 +101,7 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-        print("../data/best.pth saved.")
+        print("data/best.pth saved.")
         torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
     torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
 
@@ -208,13 +208,13 @@ class Upsample(nn.Module):
 
 
 class YOLO(object):
-    def __init__(self, classes_path="../data/classes.txt", confidence=0.5, nms_iou=0.3):
-        self.anchors_path = "../data/anchors.txt"
+    def __init__(self, confidence=0.5, nms_iou=0.3):
+        self.anchors_path = "data/anchors.txt"
         self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-        self.model_path = "../data/best.pth"
+        self.model_path = "data/best.pth"
         self.cuda = torch.cuda.is_available()
-        self.classes_path = classes_path
+        self.classes_path = "data/classes.txt"
         self.confidence = confidence
         self.nms_iou = nms_iou
         self.class_names, self.num_classes = get_classes(self.classes_path)
@@ -262,7 +262,7 @@ class YOLO(object):
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font="../data/simhei.ttf", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
+        font = ImageFont.truetype(font="data/simhei.ttf", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
         if crop:
             for i, c in list(enumerate(top_label)):
@@ -271,7 +271,7 @@ class YOLO(object):
                 left = max(0, np.floor(left).astype("int32"))
                 bottom = min(image.size[1], np.floor(bottom).astype("int32"))
                 right = min(image.size[0], np.floor(right).astype("int32"))
-                dir_save_path = "../tmp/imgs_out"
+                dir_save_path = "tmp/imgs_out"
                 os.makedirs(dir_save_path, exist_ok=True)
                 crop_image = image.crop([left, top, right, bottom])
                 crop_image.save(os.path.join(dir_save_path, "crop_" + str(i) + ".png"), quality=95, subsampling=0)

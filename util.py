@@ -46,7 +46,7 @@ def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, out
     for i, val in enumerate(sorted_values):
         str_val = " " + str(val)
         if val < 1.0:
-            str_val = " {0:%.2f}" % val
+            str_val = " {:.2f}".format(val)
         t = plt.text(val, i, str_val, color=plot_color, va="center", fontweight="bold")
         if i == (len(sorted_values) - 1):
             adjust_axes(r, t, fig, axes)
@@ -96,7 +96,7 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out"):
+def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
     gt_path = os.path.join(path, ".gt")  # ground_truth
     dr_path = os.path.join(path, ".dr")  # detection_results
     temp_files_path = os.path.join(path, ".temp_files")
@@ -278,11 +278,11 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
             f1 = np.array(rec) * np.array(prec) * 2 / np.where((np.array(prec) + np.array(rec)) == 0, 1,
                                                                (np.array(prec) + np.array(rec)))
             sum_ap += ap
-            text = class_name + "; AP={0:.2f}%".format(ap * 100)
+            text = class_name + "; AP={:.2f}%".format(ap * 100)
             if len(prec) > 0:
-                f1_text = class_name + "; F1=" + "{0:.2f}".format(f1[score_threshold_idx])
-                recall_text = class_name + "; recall=" + "{0:.2f}%".format(rec[score_threshold_idx] * 100)
-                precision_text = class_name + "; precision=" + "{0:.2f}%".format(prec[score_threshold_idx] * 100)
+                f1_text = class_name + "; F1=" + "{:.2f}".format(f1[score_threshold_idx])
+                recall_text = class_name + "; recall=" + "{:.2f}%".format(rec[score_threshold_idx] * 100)
+                precision_text = class_name + "; precision=" + "{:.2f}%".format(prec[score_threshold_idx] * 100)
             else:
                 f1_text = class_name + "; F1=0.00"
                 recall_text = class_name + "; recall=0.00%"
@@ -337,10 +337,10 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
                 fig.savefig(os.path.join(results_files_path, "precision", class_name + ".png"))
                 plt.cla()
         if n_classes == 0:
-            raise ValueError("../data/classes.txt error.")
+            raise ValueError("data/classes.txt error.")
         results_file.write("\nmAP of all classes\n")
         _map = sum_ap / n_classes
-        text = "mAP = {0:.2f}%".format(_map * 100)
+        text = "mAP={:.2f}%".format(_map * 100)
         results_file.write(text + "\n")
         print(text)
     shutil.rmtree(temp_files_path)
@@ -357,7 +357,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
     with open(results_files_path + "/results.txt", "a") as results_file:
         results_file.write("\nnumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
-            results_file.write(class_name + ": " + str(gt_counter_per_class[class_name]) + "\n")
+            results_file.write(f"{class_name}: str(gt_counter_per_class[class_name])\n")
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
@@ -366,8 +366,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         for class_name in sorted(dr_classes):
             n_det = det_counter_per_class[class_name]
             text = class_name + ": " + str(n_det)
-            text += " (tp: " + str(count_true_positives[class_name])
-            text += ", fp: " + str(n_det - count_true_positives[class_name]) + ")\n"
+            text += f" (tp: {str(count_true_positives[class_name])}"
+            text += f", fp: {str(n_det - count_true_positives[class_name])})\n"
             results_file.write(text)
     if draw_plot:
         window_title = "ground-truth"
@@ -384,7 +384,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="../tmp/maps_out")
         plot_color = "royalblue"
         draw_plot_func(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP"
-        plot_title = "mAP={0:.2f}%".format(_map * 100)
+        plot_title = "mAP={:.2f}%".format(_map * 100)
         x_label = "average precision"
         output_path = results_files_path + "/mAP.png"
         plot_color = "royalblue"
@@ -554,7 +554,7 @@ class DecodeBox:
 
 class EvalCallback:
     def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_out_path="../tmp/.maps_out", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+                 maps_out_path="tmp/.maps_out", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
                  eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net

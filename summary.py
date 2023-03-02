@@ -1,11 +1,7 @@
-import os
-import sys
 import torch
 from thop import clever_format, profile
 from torchsummary import summary
-
-sys.path.append(os.path.dirname(sys.path[0]))
-from utils.yolo import YoloBody
+from yolo import YoloBody
 
 if __name__ == "__main__":
     input_shape = [416, 416]

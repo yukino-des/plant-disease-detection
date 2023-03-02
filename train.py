@@ -2,27 +2,24 @@ import numpy as np
 import os
 import random
 import torch
-import sys
 from datetime import datetime
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
+from util import get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
+from yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, yolo_dataset_collate, YoloBody, YoloDataset,
+                  YOLOLoss)
 from xml.etree import ElementTree as ET
-
-sys.path.append(os.path.dirname(sys.path[0]))
-from utils.util import get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
-from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, yolo_dataset_collate,
-                        YoloBody, YoloDataset, YOLOLoss)
 
 if __name__ == "__main__":
     random.seed(0)
     trainval_percent = 0.9
     train_percent = 0.9
-    classes, _ = get_classes("../data/classes.txt")
+    classes, _ = get_classes("data/classes.txt")
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
-    os.makedirs("../VOC/ImageSets/Main", exist_ok=True)
-    temp_xml = os.listdir("../VOC/Annotations")
+    os.makedirs("VOC/ImageSets/Main", exist_ok=True)
+    temp_xml = os.listdir("VOC/Annotations")
     total_xml = []
     for xml in temp_xml:
         if xml.endswith(".xml"):
@@ -33,10 +30,10 @@ if __name__ == "__main__":
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
-    ftrainval = open("../VOC/ImageSets/Main/trainval.txt", "w")
-    ftest = open("../VOC/ImageSets/Main/test.txt", "w")
-    ftrain = open("../VOC/ImageSets/Main/train.txt", "w")
-    fval = open("../VOC/ImageSets/Main/val.txt", "w")
+    ftrainval = open("VOC/ImageSets/Main/trainval.txt", "w")
+    ftest = open("VOC/ImageSets/Main/test.txt", "w")
+    ftrain = open("VOC/ImageSets/Main/train.txt", "w")
+    fval = open("VOC/ImageSets/Main/val.txt", "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
@@ -50,11 +47,11 @@ if __name__ == "__main__":
     ftest.close()
     type_index = 0
     for image_set in ["train", "val"]:
-        image_ids = open(f"../VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
+        image_ids = open(f"VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
         list_file = open(f"{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
-            list_file.write(f"../VOC/JPEGImages/{image_id}.jpg")
-            in_file = open(f"../VOC/Annotations/{image_id}.xml", encoding="utf-8")
+            list_file.write(f"VOC/JPEGImages/{image_id}.jpg")
+            in_file = open(f"VOC/Annotations/{image_id}.xml", encoding="utf-8")
             tree = ET.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
@@ -85,12 +82,12 @@ if __name__ == "__main__":
     if photo_nums[0] <= 500:
         raise ValueError("Dataset not qualified.")
     if np.sum(nums) == 0:
-        raise ValueError("../data/classes.txt error.")
+        raise ValueError("data/classes.txt error.")
     ctn = input("Continue (y/n)? ")
     if ctn != "y" and ctn != "Y":
         exit(0)
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-    # todo update `model_path = "../data/best.pth"` if training is interrupted.
+    # todo update `model_path = "data/best.pth"` if training is interrupted.
     model_path = ""
     # todo update `init_epoch` if training is interrupted.
     init_epoch = 0
@@ -115,15 +112,15 @@ if __name__ == "__main__":
     focal_alpha = 0.25
     focal_gamma = 2
     save_period = 10
-    save_dir = "../data"
+    save_dir = "data"
     eval_period = 10
     num_workers = 2
     train_annotation_path = "train.txt"
     val_annotation_path = "val.txt"
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    class_names, num_classes = get_classes("../data/classes.txt")
-    anchors, num_anchors = get_anchors("../data/anchors.txt")
+    class_names, num_classes = get_classes("data/classes.txt")
+    anchors, num_anchors = get_anchors("data/anchors.txt")
     model = YoloBody(anchors_mask, num_classes)
     if model_path != "":
         model_dict = model.state_dict()
@@ -150,8 +147,8 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    show_config({"classes_path": "../data/classes.txt",
-                 "anchors_path": "../data/anchors.txt",
+    show_config({"classes_path": "data/classes.txt",
+                 "anchors_path": "data/anchors.txt",
                  "anchors_mask": anchors_mask,
                  "model_path": model_path,
                  "input_shape": input_shape,
