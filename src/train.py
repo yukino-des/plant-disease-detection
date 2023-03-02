@@ -89,9 +89,6 @@ if __name__ == "__main__":
         raise ValueError("Dataset not qualified.")
     if np.sum(nums) == 0:
         raise ValueError(f"{classes_path} error.")
-    ctn = input("Continue (y/n)? ")
-    if ctn != "y" and ctn != "Y":
-        exit(0)
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 
@@ -135,7 +132,6 @@ if __name__ == "__main__":
     val_annotation_path = "val.txt"
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    local_rank = 0
     class_names, num_classes = get_classes(classes_path)
     anchors, num_anchors = get_anchors(anchors_path)
     model = YoloBody(anchors_mask, num_classes, pretrained=pretrained)
@@ -156,10 +152,7 @@ if __name__ == "__main__":
     yolo_loss = YOLOLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.datetime.strftime(datetime.datetime.now(), "%Y%m%d%H%M%S")
     log_dir = os.path.join(save_dir, "loss" + str(time_str))
-    if local_rank == 0:
-        loss_history = LossHistory(log_dir, model, input_shape=input_shape)
-    else:
-        loss_history = None
+    loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     model_train = model.train()
     if cuda:
         model_train = torch.nn.DataParallel(model)
@@ -171,35 +164,35 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    if local_rank == 0:
-        show_config({
-            "classes_path": classes_path,
-            "anchors_path": anchors_path,
-            "anchors_mask": anchors_mask,
-            "model_path": model_path,
-            "input_shape": input_shape,
-            "init_epoch": init_epoch,
-            "freeze_epoch": freeze_epoch,
-            "unfreeze_epoch": unfreeze_epoch,
-            "freeze_batch_size": freeze_batch_size,
-            "unfreeze_batch_size": unfreeze_batch_size,
-            "freeze_train": freeze_train,
-            "init_lr": init_lr,
-            "min_lr": min_lr,
-            "optimizer_type": optimizer_type,
-            "momentum": momentum,
-            "lr_decay_type": lr_decay_type,
-            "save_period": save_period,
-            "save_dir": save_dir,
-            "num_workers": num_workers,
-            "num_train": num_train,
-            "num_val": num_val
-        })
-        wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
-        total_step = num_train // unfreeze_batch_size * unfreeze_epoch
-        if total_step <= wanted_step:
-            if num_train // unfreeze_batch_size == 0:
-                raise ValueError("Dataset not qualified.")
+    show_config({"classes_path": classes_path,
+                 "anchors_path": anchors_path,
+                 "anchors_mask": anchors_mask,
+                 "model_path": model_path,
+                 "input_shape": input_shape,
+                 "init_epoch": init_epoch,
+                 "freeze_epoch": freeze_epoch,
+                 "unfreeze_epoch": unfreeze_epoch,
+                 "freeze_batch_size": freeze_batch_size,
+                 "unfreeze_batch_size": unfreeze_batch_size,
+                 "freeze_train": freeze_train,
+                 "init_lr": init_lr,
+                 "min_lr": min_lr,
+                 "optimizer_type": optimizer_type,
+                 "momentum": momentum,
+                 "lr_decay_type": lr_decay_type,
+                 "save_period": save_period,
+                 "save_dir": save_dir,
+                 "num_workers": num_workers,
+                 "num_train": num_train,
+                 "num_val": num_val,
+                 "cuda": torch.cuda.is_available()})
+    wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
+    total_step = num_train // unfreeze_batch_size * unfreeze_epoch
+    if total_step <= wanted_step and num_train // unfreeze_batch_size == 0:
+        raise ValueError("Dataset not qualified.")
+    ctn = input("Continue (y/n)? ")
+    if ctn != "y" and ctn != "Y":
+        exit(0)
     unfreeze_flag = False
     if freeze_train:
         for param in model.backbone.parameters():
@@ -242,11 +235,8 @@ if __name__ == "__main__":
                      pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=train_sampler)
     gen_val = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
                          pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=val_sampler)
-    if local_rank == 0:
-        eval_callback = EvalCallback(model, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines,
-                                     log_dir, cuda, eval_flag=eval_flag, period=eval_period)
-    else:
-        eval_callback = None
+    eval_callback = EvalCallback(model, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines,
+                                 log_dir, cuda, eval_flag=eval_flag, period=eval_period)
     for epoch in range(init_epoch, unfreeze_epoch):
         if epoch >= freeze_epoch and not unfreeze_flag and freeze_train:
             batch_size = unfreeze_batch_size
@@ -273,6 +263,5 @@ if __name__ == "__main__":
         gen_val.dataset.epoch_now = epoch
         set_optimizer_lr(optimizer, lr_scheduler_func, epoch)
         fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
-                      epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir, local_rank)
-    if local_rank == 0:
-        loss_history.writer.close()
+                      epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir)
+    loss_history.writer.close()

@@ -69,12 +69,10 @@ def conv_dw(filter_in, filter_out, stride=1):
 
 
 def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
-                  epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir, local_rank=0):
+                  epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir):
     loss = 0
     val_loss = 0
-    pbar = None
-    if local_rank == 0:
-        pbar = tqdm(total=epoch_step, desc=f"Epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+    pbar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
     model_train.train()
     for iteration, batch in enumerate(gen):
         if iteration >= epoch_step:
@@ -82,8 +80,8 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         images, targets = batch[0], batch[1]
         with torch.no_grad():
             if cuda:
-                images = images.cuda(local_rank)
-                targets = [ann.cuda(local_rank) for ann in targets]
+                images = images.cuda(0)
+                targets = [ann.cuda(0) for ann in targets]
         optimizer.zero_grad()
         outputs = model_train(images)
         loss_sum = 0
@@ -94,12 +92,10 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         loss_value.backward()
         optimizer.step()
         loss += loss_value.item()
-        if local_rank == 0:
-            pbar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
-            pbar.update(1)
-    if local_rank == 0:
-        pbar.close()
-        pbar = tqdm(total=epoch_step_val, desc=f"Epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+        pbar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
+        pbar.update(1)
+    pbar.close()
+    pbar = tqdm(total=epoch_step_val, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
     model_train.eval()
     for iteration, batch in enumerate(gen_val):
         if iteration >= epoch_step_val:
@@ -107,8 +103,8 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         images, targets = batch[0], batch[1]
         with torch.no_grad():
             if cuda:
-                images = images.cuda(local_rank)
-                targets = [ann.cuda(local_rank) for ann in targets]
+                images = images.cuda(0)
+                targets = [ann.cuda(0) for ann in targets]
             optimizer.zero_grad()
             outputs = model_train(images)
             loss_value_all = 0
@@ -117,22 +113,20 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
                 loss_value_all += loss_item
             loss_value = loss_value_all
         val_loss += loss_value.item()
-        if local_rank == 0:
-            pbar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
-            pbar.update(1)
-    if local_rank == 0:
-        pbar.close()
-        loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
-        eval_callback.on_epoch_end(epoch + 1, model_train)
-        print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
-        print("total loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
-        if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
-            torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
-                epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
-        if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-            print(f"{defaults['model_path']} saved.")
-            torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
-        torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
+        pbar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
+        pbar.update(1)
+    pbar.close()
+    loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
+    eval_callback.on_epoch_end(epoch + 1, model_train)
+    print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
+    print("total loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
+    if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
+        torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
+            epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
+    if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
+        print(f"{defaults['model_path']} saved.")
+        torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
+    torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
 
 
 def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=0.05, warmup_lr_ratio=0.1,

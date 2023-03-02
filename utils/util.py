@@ -449,19 +449,16 @@ def print_table(l1, l2):
 
 
 def resize_image(image, size):
-    iw, ih = image.size
     w, h = size
     new_image = image.resize((w, h), Image.BICUBIC)
     return new_image
 
 
 def show_config(map):
-    print("-" * 70)
-    print("|%25s | %40s|" % ("keys", "values"))
-    print("-" * 70)
+    print("-" * 60)
     for key, value in map.items():
-        print("|%25s | %40s|" % (str(key), str(value)))
-    print("-" * 70)
+        print("|%20s | %35s|" % (str(key), str(value)))
+    print("-" * 60)
 
 
 def voc_ap(rec, prec):
