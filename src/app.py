@@ -13,10 +13,7 @@ os.chdir(sys.path[0])
 from utils.yolo import YOLO
 
 app = FastAPI()
-app.add_middleware(CORSMiddleware,
-                   allow_origins=["*"],
-                   allow_credentials=True,
-                   allow_methods=["GET", "POST"],
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["GET", "POST"],
                    allow_headers=["Content-Type", "X-Requested-With"])
 
 

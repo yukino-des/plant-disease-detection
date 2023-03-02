@@ -24,9 +24,11 @@ if __name__ == "__main__":
         else:
             r_image, _ = yolo.detect_image(image, crop=crop)
             r_image.show()
+            r_image.save(os.path.join("../tmp/imgs_out", img.split(".")[-2] + ".png"), quality=95, subsampling=0)
     elif mode == "video":
-        video_path = input("Input video path, input 0 to call camera: ")
-        capture = cv2.VideoCapture(0 if video_path == "0" else video_path)
+        video_path = input("Input video path: ")
+        capture = cv2.VideoCapture(0 if video_path == "" else video_path)
+        os.makedirs("../tmp/videos_out",exist_ok=True)
         video_save_path = f"../tmp/videos_out/{datetime.strftime(datetime.now(), '%H%M%S')}.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -36,28 +38,30 @@ if __name__ == "__main__":
             raise ValueError("Failed to read the camera/video.")
         fps = 0.0
         while True:
-            t1 = time.time()
-            ref, frame = capture.read()
-            if not ref:
-                break
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = Image.fromarray(np.uint8(frame))
-            image, _ = yolo.detect_image(frame)
-            frame = np.array(image)
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            fps = (fps + (1. / (time.time() - t1))) / 2
-            print("fps=%.2f" % fps)
-            frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            cv2.imshow("video", frame)
-            c = cv2.waitKey(1) & 0xff
-            out.write(frame)
-            if c == 27:
-                capture.release()
+            try:
+                t1 = time.time()
+                ref, frame = capture.read()
+                if not ref:
+                    break
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame = Image.fromarray(np.uint8(frame))
+                image, _ = yolo.detect_image(frame)
+                frame = np.array(image)
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                fps = (fps + (1. / (time.time() - t1))) / 2
+                print("fps=%.2f" % fps)
+                frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                cv2.imshow("video", frame)
+                c = cv2.waitKey(1) & 0xff
+                out.write(frame)
+                if c == 27:
+                    break
+            except:
                 break
         capture.release()
-        print(video_save_path + " saved")
         out.release()
         cv2.destroyAllWindows()
+        print(video_save_path + " saved")
     elif mode == "fps":
         fps_image_path = input("Input image path: ")
         img = Image.open(fps_image_path)

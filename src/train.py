@@ -92,7 +92,7 @@ if __name__ == "__main__":
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
     # update `model_path = "../data/best.pth"` if training is interrupted.
-    model_path = "../data/pretrain.pth"
+    model_path = "../data/pretrained.pth"
     # update `init_epoch` if training is interrupted.
     init_epoch = 0
     # lr_decay_type = "step"
