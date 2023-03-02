@@ -93,8 +93,7 @@ if __name__ == "__main__":
                 image_path = os.path.join(dir_path, img_name)
                 image = Image.open(image_path)
                 r_image, _ = yolo.detect_image(image)
-                if not os.path.exists(dir_save_path):
-                    os.makedirs(dir_save_path)
+                os.makedirs(dir_save_path, exist_ok=True)
                 r_image.save(os.path.join(dir_save_path, img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
     else:
         raise AssertionError("Use mode (img, video, fps, heatmap, onnx, dir).")

@@ -272,7 +272,7 @@ class YOLO(object):
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        show_config(**defaults)
+        show_config(defaults)
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes)
@@ -316,8 +316,7 @@ class YOLO(object):
                 bottom = min(image.size[1], np.floor(bottom).astype("int32"))
                 right = min(image.size[0], np.floor(right).astype("int32"))
                 dir_save_path = "../tmp/imgs_out"
-                if not os.path.exists(dir_save_path):
-                    os.makedirs(dir_save_path)
+                os.makedirs(dir_save_path, exist_ok=True)
                 crop_image = image.crop([left, top, right, bottom])
                 crop_image.save(os.path.join(dir_save_path, "crop_" + str(i) + ".png"), quality=95, subsampling=0)
                 print(dir_save_path + "/crop_" + str(i) + ".png saved.")
@@ -743,11 +742,8 @@ class YoloDataset(Dataset):
 
 
 class YOLOLoss(nn.Module):
-    def __init__(self, anchors, num_classes, input_shape, cuda, anchors_mask=None, focal_loss=False, alpha=0.25,
-                 gamma=2):
+    def __init__(self, anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss=False, alpha=0.25, gamma=2):
         super(YOLOLoss, self).__init__()
-        if anchors_mask is None:
-            anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes

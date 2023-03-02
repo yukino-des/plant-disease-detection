@@ -92,11 +92,24 @@ if __name__ == "__main__":
     ctn = input("Continue (y/n)? ")
     if ctn != "y" and ctn != "Y":
         exit(0)
-    classes_path = "../data/classes.txt"
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-    # todo update `model_path = "../data/best.pth"` if training is interrupted
-    model_path = "../data/pretrain.pth"
+
+    model_path = "../data/pretrain.pth"  # update `model_path = "../data/best.pth"`,
+    init_epoch = 0  # `init_epoch` if training is interrupted
+    lr_decay_type = "cos"  # ["cos", "step"]
+
+    optimizer_type = "adam"
+    unfreeze_epoch = 100
+    init_lr = 1e-3
+    weight_decay = 0
+    """
+    optimizer_type = "sgd"
+    unfreeze_epoch = 300
+    init_lr = 1e-2
+    weight_decay = 5e-4
+    """
+
     input_shape = [416, 416]
     pretrained = False
     mosaic = True
@@ -104,34 +117,12 @@ if __name__ == "__main__":
     mixup = True
     mixup_prob = 0.5
     special_aug_ratio = 0.7
-    # optimizer_type = "adam"
-    init_epoch = 0  # update `init_epoch` if training is interrupted
     freeze_epoch = 50
     freeze_batch_size = 16
-    unfreeze_epoch = 100
     unfreeze_batch_size = 8
     freeze_train = True
-    init_lr = 1e-3
     min_lr = init_lr * 0.01
-    optimizer_type = "adam"
     momentum = 0.937
-    weight_decay = 0
-    lr_decay_type = "cos"  # "step"
-    # optimizer_type = "sgd"
-    """
-    init_epoch = 0
-    freeze_epoch = 50
-    freeze_batch_size = 16
-    unfreeze_epoch = 300
-    unfreeze_batch_size = 8
-    freeze_train = True
-    init_lr = 1e-2
-    min_lr = init_lr * 0.01
-    optimizer_type = "sgd"
-    momentum = 0.937
-    weight_decay = 5e-4
-    lr_decay_type = "cos"  # "step"
-    """
     focal_loss = False
     focal_alpha = 0.25
     focal_gamma = 2
@@ -145,12 +136,12 @@ if __name__ == "__main__":
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     local_rank = 0
-    if pretrained:
-        download_weights()
     class_names, num_classes = get_classes(classes_path)
     anchors, num_anchors = get_anchors(anchors_path)
     model = YoloBody(anchors_mask, num_classes, pretrained=pretrained)
-    if not pretrained:
+    if pretrained:
+        download_weights()
+    else:
         weights_init(model)
     if model_path != "":
         model_dict = model.state_dict()
@@ -181,13 +172,29 @@ if __name__ == "__main__":
     num_train = len(train_lines)
     num_val = len(val_lines)
     if local_rank == 0:
-        show_config(classes_path=classes_path, anchors_path=anchors_path, anchors_mask=anchors_mask,
-                    model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
-                    unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
-                    unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,
-                    optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type,
-                    save_period=save_period, save_dir=save_dir, num_workers=num_workers, num_train=num_train,
-                    num_val=num_val)
+        show_config({
+            "classes_path": classes_path,
+            "anchors_path": anchors_path,
+            "anchors_mask": anchors_mask,
+            "model_path": model_path,
+            "input_shape": input_shape,
+            "init_epoch": init_epoch,
+            "freeze_epoch": freeze_epoch,
+            "unfreeze_epoch": unfreeze_epoch,
+            "freeze_batch_size": freeze_batch_size,
+            "unfreeze_batch_size": unfreeze_batch_size,
+            "freeze_train": freeze_train,
+            "init_lr": init_lr,
+            "min_lr": min_lr,
+            "optimizer_type": optimizer_type,
+            "momentum": momentum,
+            "lr_decay_type": lr_decay_type,
+            "save_period": save_period,
+            "save_dir": save_dir,
+            "num_workers": num_workers,
+            "num_train": num_train,
+            "num_val": num_val
+        })
         wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
         total_step = num_train // unfreeze_batch_size * unfreeze_epoch
         if total_step <= wanted_step:

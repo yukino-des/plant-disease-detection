@@ -42,8 +42,7 @@ def cvt_color(image):
 
 def download_weights(model_dir="../data"):
     url = "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth"
-    if not os.path.exists(model_dir):
-        os.makedirs(model_dir)
+    os.makedirs(model_dir, exist_ok=True)
     load_state_dict_from_url(url, model_dir)
 
 
@@ -456,11 +455,11 @@ def resize_image(image, size):
     return new_image
 
 
-def show_config(**kwargs):
+def show_config(map):
     print("-" * 70)
     print("|%25s | %40s|" % ("keys", "values"))
     print("-" * 70)
-    for key, value in kwargs.items():
+    for key, value in map.items():
         print("|%25s | %40s|" % (str(key), str(value)))
     print("-" * 70)
 
@@ -684,7 +683,7 @@ class LossHistory:
         self.log_dir = log_dir
         self.losses = []
         self.val_loss = []
-        os.makedirs(self.log_dir)
+        os.makedirs(self.log_dir, exist_ok=True)
         self.writer = SummaryWriter(self.log_dir)
         try:
             dummy_input = torch.randn(2, 3, input_shape[0], input_shape[1])
@@ -693,8 +692,7 @@ class LossHistory:
             pass
 
     def append_loss(self, epoch, loss, val_loss):
-        if not os.path.exists(self.log_dir):
-            os.makedirs(self.log_dir)
+        os.makedirs(self.log_dir, exist_ok=True)
         self.losses.append(loss)
         self.val_loss.append(val_loss)
         with open(os.path.join(self.log_dir, "loss.txt"), "a") as f:
