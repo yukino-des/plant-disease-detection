@@ -11,7 +11,7 @@ sys.path.append(os.path.dirname(sys.path[0]))
 from utils.yolo import YOLO
 
 if __name__ == "__main__":
-    yolo = YOLO()
+    yolo = YOLO(classes_path="../data/classes_zh.txt")
     mode = input("Input mode in img, video, fps, heatmap, onnx, dir: ")
     crop = True
     fps_interval = 100  # mode = "fps"
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     elif mode == "video":
         video_path = input("Input video path: ")
         capture = cv2.VideoCapture(0 if video_path == "" else video_path)
-        os.makedirs("../tmp/videos_out",exist_ok=True)
+        os.makedirs("../tmp/videos_out", exist_ok=True)
         video_save_path = f"../tmp/videos_out/{datetime.strftime(datetime.now(), '%H%M%S')}.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
@@ -38,25 +38,22 @@ if __name__ == "__main__":
             raise ValueError("Failed to read the camera/video.")
         fps = 0.0
         while True:
-            try:
-                t1 = time.time()
-                ref, frame = capture.read()
-                if not ref:
-                    break
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = Image.fromarray(np.uint8(frame))
-                image, _ = yolo.detect_image(frame)
-                frame = np.array(image)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                fps = (fps + (1. / (time.time() - t1))) / 2
-                print("fps=%.2f" % fps)
-                frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            t1 = time.time()
+            ref, frame = capture.read()
+            if not ref:
+                break
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            frame = Image.fromarray(np.uint8(frame))
+            image, _ = yolo.detect_image(frame)
+            frame = np.array(image)
+            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            fps = (fps + (1. / (time.time() - t1))) / 2
+            frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            if video_path == "":
                 cv2.imshow("video", frame)
-                c = cv2.waitKey(1) & 0xff
-                out.write(frame)
-                if c == 27:
-                    break
-            except:
+            c = cv2.waitKey(1) & 0xff
+            out.write(frame)
+            if c == 27:
                 break
         capture.release()
         out.release()

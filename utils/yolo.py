@@ -17,8 +17,7 @@ from torch import nn
 from torch.utils.data.dataset import Dataset
 from tqdm import tqdm
 from utils.mobilenet import mobilenet_v2
-from utils.util import (cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic,
-                        resize_image, show_config)
+from utils.util import cvt_color, DecodeBox, get_anchors, get_classes, get_lr, logistic, resize_image, show_config
 
 if os.name == "nt":
     matplotlib.use("Agg")
@@ -29,32 +28,21 @@ else:
 # 标准卷积
 def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
     pad = (kernel_size - 1) // 2 if kernel_size else 0
-    return nn.Sequential(OrderedDict([
-        ("conv", nn.Conv2d(filter_in, filter_out,
-                           kernel_size=kernel_size,
-                           stride=stride,
-                           padding=pad,
-                           groups=groups,
-                           bias=False)),  # 3x3标准卷积
-        ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
-        ("relu", nn.ReLU6(inplace=True))]))  # 激活
+    return nn.Sequential(OrderedDict([("conv", nn.Conv2d(filter_in, filter_out, kernel_size=kernel_size, stride=stride,
+                                                         padding=pad, groups=groups, bias=False)),  # 3x3标准卷积
+                                      ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
+                                      ("relu", nn.ReLU6(inplace=True))]))  # ReLU6激活
 
 
 # 深度可分离卷积
 def conv_dw(filter_in, filter_out, stride=1):
-    return nn.Sequential(
-        nn.Conv2d(filter_in, filter_in,
-                  kernel_size=3,
-                  stride=stride,
-                  padding=1,
-                  groups=filter_in,
-                  bias=False),  # 3x3深度卷积
-        nn.BatchNorm2d(filter_in),  # 批量归一化
-        nn.ReLU6(inplace=True),  # 激活
-        nn.Conv2d(filter_in, filter_out, 1, 1, 0,
-                  bias=False),  # 1x1点卷积
-        nn.BatchNorm2d(filter_out),  # 批量归一化
-        nn.ReLU6(inplace=True))  # 激活
+    return nn.Sequential(nn.Conv2d(filter_in, filter_in, kernel_size=3, stride=stride, padding=1, groups=filter_in,
+                                   bias=False),  # 3x3深度卷积
+                         nn.BatchNorm2d(filter_in),  # 批量归一化
+                         nn.ReLU6(inplace=True),  # ReLU6激活
+                         nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),  # 1x1点卷积
+                         nn.BatchNorm2d(filter_out),  # 批量归一化
+                         nn.ReLU6(inplace=True))  # ReLU6激活
 
 
 def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
@@ -159,18 +147,6 @@ def step_lr(lr, decay_rate, step_size, iters):
     return lr * decay_rate ** n
 
 
-def weights_init(net):
-    def init_func(m):
-        classname = m.__class__.__name__
-        if hasattr(m, "weight") and classname.find("Conv") != -1:
-            torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
-        elif classname.find("BatchNorm2d") != -1:
-            torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
-            torch.nn.init.constant_(m.bias.data, 0.0)
-
-    net.apply(init_func)
-
-
 def yolo_dataset_collate(batch):
     images = []
     bboxes = []
@@ -198,9 +174,9 @@ def yolox_warm_cos_lr(lr, min_lr, total_iters, warmup_total_iters, warmup_lr_sta
 
 
 class Backbone(nn.Module):
-    def __init__(self, pretrained=False):
+    def __init__(self):
         super(Backbone, self).__init__()
-        self.model = mobilenet_v2(pretrained=pretrained)
+        self.model = mobilenet_v2(pretrained=True)
 
     def forward(self, x):
         out3 = self.model.features[:7](x)
@@ -232,13 +208,13 @@ class Upsample(nn.Module):
 
 
 class YOLO(object):
-    def __init__(self, confidence=0.5, nms_iou=0.3):
-        self.classes_path = "../data/classes.txt"
+    def __init__(self, classes_path="../data/classes.txt", confidence=0.5, nms_iou=0.3):
         self.anchors_path = "../data/anchors.txt"
         self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.model_path = "../data/best.pth"
         self.cuda = torch.cuda.is_available()
+        self.classes_path = classes_path
         self.confidence = confidence
         self.nms_iou = nms_iou
         self.class_names, self.num_classes = get_classes(self.classes_path)
@@ -249,16 +225,14 @@ class YOLO(object):
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        show_config({
-            "classes_path": self.classes_path,
-            "anchors_path": self.anchors_path,
-            "input_shape": self.input_shape,
-            "anchors_mask": self.anchors_mask,
-            "model_path": self.model_path,
-            "cuda": self.cuda,
-            "confidence": self.confidence,
-            "nms_iou": self.nms_iou
-        })
+        show_config({"anchors_path": self.anchors_path,
+                     "input_shape": self.input_shape,
+                     "anchors_mask": self.anchors_mask,
+                     "model_path": self.model_path,
+                     "cuda": self.cuda,
+                     "classes_path": self.classes_path,
+                     "confidence": self.confidence,
+                     "nms_iou": self.nms_iou})
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes)
@@ -290,10 +264,6 @@ class YOLO(object):
             top_boxes = results[0][:, :4]
         font = ImageFont.truetype(font="../data/simhei.ttf", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
-        for i in range(self.num_classes):
-            num = np.sum(top_label == i)
-            if num > 0:
-                print(self.class_names[i] + ": ", num)
         if crop:
             for i, c in list(enumerate(top_label)):
                 top, left, bottom, right = top_boxes[i]
@@ -434,9 +404,9 @@ class YOLO(object):
 
 
 class YoloBody(nn.Module):
-    def __init__(self, anchors_mask, num_classes, pretrained=False):
+    def __init__(self, anchors_mask, num_classes):
         super(YoloBody, self).__init__()
-        self.backbone = Backbone(pretrained=pretrained)
+        self.backbone = Backbone()
         in_filters = [32, 96, 320]
         self.conv1 = make3conv([512, 1024], in_filters[2])
         self.SPP = SpatialPyramidPooling()

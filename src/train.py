@@ -10,8 +10,8 @@ from torch.utils.data import DataLoader
 from xml.etree import ElementTree as ET
 
 sys.path.append(os.path.dirname(sys.path[0]))
-from utils.util import download_weights, get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
-from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, weights_init, yolo_dataset_collate,
+from utils.util import get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
+from utils.yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, yolo_dataset_collate,
                         YoloBody, YoloDataset, YOLOLoss)
 
 if __name__ == "__main__":
@@ -89,35 +89,33 @@ if __name__ == "__main__":
     ctn = input("Continue (y/n)? ")
     if ctn != "y" and ctn != "Y":
         exit(0)
-    anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-    # update `model_path = "../data/best.pth"` if training is interrupted.
-    model_path = "../data/pretrained.pth"
-    # update `init_epoch` if training is interrupted.
+    # todo update `model_path = "../data/best.pth"` if training is interrupted.
+    model_path = ""
+    # todo update `init_epoch` if training is interrupted.
     init_epoch = 0
     # lr_decay_type = "step"
     lr_decay_type = "cos"
     # optimizer_type, unfreeze_epoch, init_lr, weight_decay = "sgd", 300, 1e-2, 5e-4
     optimizer_type, unfreeze_epoch, init_lr, weight_decay = "adam", 100, 1e-3, 0
     input_shape = [416, 416]
-    pretrained = False
-    mosaic = True
+    mosaic = True  # 是否使用马赛克数据增强
+    mixup = True  # 是否使用mixup数据增强
+    freeze_train = True  # 是否进行冻结训练，默认先冻结主干训练后解冻训练
+    focal_loss = False  # 是否使用focal loss平衡正负样本
+    eval_flag = True  # 是否在训练时对验证集进行评估
     mosaic_prob = 0.5
-    mixup = True
     mixup_prob = 0.5
     special_aug_ratio = 0.7
     freeze_epoch = 50
     freeze_batch_size = 16
     unfreeze_batch_size = 8
-    freeze_train = True
     min_lr = init_lr * 0.01
     momentum = 0.937
-    focal_loss = False
     focal_alpha = 0.25
     focal_gamma = 2
     save_period = 10
     save_dir = "../data"
-    eval_flag = True
     eval_period = 10
     num_workers = 2
     train_annotation_path = "train.txt"
@@ -125,12 +123,8 @@ if __name__ == "__main__":
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names, num_classes = get_classes("../data/classes.txt")
-    anchors, num_anchors = get_anchors(anchors_path)
-    model = YoloBody(anchors_mask, num_classes, pretrained=pretrained)
-    if pretrained:
-        download_weights()
-    else:
-        weights_init(model)
+    anchors, num_anchors = get_anchors("../data/anchors.txt")
+    model = YoloBody(anchors_mask, num_classes)
     if model_path != "":
         model_dict = model.state_dict()
         pretrained_dict = torch.load(model_path, map_location=device)
@@ -157,7 +151,7 @@ if __name__ == "__main__":
     num_train = len(train_lines)
     num_val = len(val_lines)
     show_config({"classes_path": "../data/classes.txt",
-                 "anchors_path": anchors_path,
+                 "anchors_path": "../data/anchors.txt",
                  "anchors_mask": anchors_mask,
                  "model_path": model_path,
                  "input_shape": input_shape,

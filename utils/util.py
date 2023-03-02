@@ -9,7 +9,6 @@ import shutil
 import torch
 from matplotlib import pyplot as plt
 from PIL import Image
-from torch.hub import load_state_dict_from_url
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.ops import nms
 from tqdm import tqdm
@@ -35,12 +34,6 @@ def cvt_color(image):
     if len(np.shape(image)) != 3 or np.shape(image)[2] != 3:
         image = image.convert("RGB")
     return image
-
-
-def download_weights(model_dir="../data"):
-    url = "https://download.pytorch.org/models/mobilenet_v2-b0353104.pth"
-    os.makedirs(model_dir, exist_ok=True)
-    load_state_dict_from_url(url, model_dir)
 
 
 def draw_plot_func(dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color):

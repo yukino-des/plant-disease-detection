@@ -45,8 +45,8 @@ def tmp(fpath):
 
 if __name__ == "__main__":
     shutil.rmtree("../tmp", ignore_errors=True)
-    dirs = ["../tmp/imgs", "../tmp/imgs_out", "../tmp/maps_out", "../tmp/original", "../tmp/detected"]
-    for _dir in dirs:
+    for _dir in ["../tmp/imgs", "../tmp/imgs_out", "../tmp/videos_out", "../tmp/maps_out", "../tmp/original",
+                 "../tmp/detected"]:
         os.makedirs(_dir, exist_ok=True)
-    yolo = YOLO()
+    yolo = YOLO(classes_path="../data/classes_zh.txt")
     uvicorn.run(app, host="0.0.0.0", port=8081)
