@@ -45,8 +45,8 @@ def conv_dw(filter_in, filter_out, stride=1):
                          nn.ReLU6(inplace=True))  # ReLU6激活
 
 
-def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
-                  epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir):
+def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
+              epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir):
     loss = 0
     val_loss = 0
     pbar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)

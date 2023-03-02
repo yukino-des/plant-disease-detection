@@ -7,8 +7,7 @@ from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
 from util import get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
-from yolo import (fit_one_epoch, get_lr_scheduler, set_optimizer_lr, yolo_dataset_collate, YoloBody, YoloDataset,
-                  YOLOLoss)
+from yolo import fit1epoch, get_lr_scheduler, set_optimizer_lr, yolo_dataset_collate, YoloBody, YoloDataset, YOLOLoss
 from xml.etree import ElementTree as ET
 
 if __name__ == "__main__":
@@ -243,6 +242,6 @@ if __name__ == "__main__":
         gen.dataset.epoch_now = epoch
         gen_val.dataset.epoch_now = epoch
         set_optimizer_lr(optimizer, lr_scheduler_func, epoch)
-        fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
-                      epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir)
+        fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
+                  epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir)
     loss_history.writer.close()
