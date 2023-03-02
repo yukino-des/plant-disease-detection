@@ -1,0 +1,7 @@
+*.docx
+*.txt
+VOC/ImageSets/Main/*.txt
+
+.idea/
+tmp/
+VOC/.tmp.driveupload/
