@@ -89,24 +89,19 @@ if __name__ == "__main__":
         raise ValueError("Dataset not qualified.")
     if np.sum(nums) == 0:
         raise ValueError(f"{classes_path} error.")
+    ctn = input("Continue (y/n)? ")
+    if ctn != "y" and ctn != "Y":
+        exit(0)
     anchors_path = "../data/anchors.txt"
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-
-    model_path = "../data/pretrain.pth"  # update `model_path = "../data/best.pth"`,
-    init_epoch = 0  # `init_epoch` if training is interrupted
-    lr_decay_type = "cos"  # ["cos", "step"]
-
-    optimizer_type = "adam"
-    unfreeze_epoch = 100
-    init_lr = 1e-3
-    weight_decay = 0
-    """
-    optimizer_type = "sgd"
-    unfreeze_epoch = 300
-    init_lr = 1e-2
-    weight_decay = 5e-4
-    """
-
+    # update `model_path = "../data/best.pth"` if training is interrupted.
+    model_path = "../data/pretrain.pth"
+    # update `init_epoch` if training is interrupted.
+    init_epoch = 0
+    # lr_decay_type = "step"
+    lr_decay_type = "cos"
+    # optimizer_type, unfreeze_epoch, init_lr, weight_decay = "sgd", 300, 1e-2, 5e-4
+    optimizer_type, unfreeze_epoch, init_lr, weight_decay = "adam", 100, 1e-3, 0
     input_shape = [416, 416]
     pretrained = False
     mosaic = True
@@ -190,9 +185,6 @@ if __name__ == "__main__":
     total_step = num_train // unfreeze_batch_size * unfreeze_epoch
     if total_step <= wanted_step and num_train // unfreeze_batch_size == 0:
         raise ValueError("Dataset not qualified.")
-    ctn = input("Continue (y/n)? ")
-    if ctn != "y" and ctn != "Y":
-        exit(0)
     unfreeze_flag = False
     if freeze_train:
         for param in model.backbone.parameters():

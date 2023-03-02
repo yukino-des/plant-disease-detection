@@ -25,17 +25,6 @@ if os.name == "nt":
 else:
     matplotlib.use("TkAgg")
 
-defaults = {
-    "model_path": "../data/best.pth",
-    "classes_path": "../data/classes.txt",
-    "anchors_path": "../data/anchors.txt",
-    "anchors_mask": [[6, 7, 8], [3, 4, 5], [0, 1, 2]],
-    "input_shape": [416, 416],
-    "confidence": 0.5,
-    "nms_iou": 0.3,
-    "cuda": torch.cuda.is_available()
-}
-
 
 # 标准卷积
 def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
@@ -124,7 +113,7 @@ def fit_one_epoch(model_train, model, yolo_loss, loss_history, eval_callback, op
         torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-        print(f"{defaults['model_path']} saved.")
+        print("../data/best.pth saved.")
         torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
     torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
 
@@ -245,19 +234,15 @@ class Upsample(nn.Module):
 
 
 class YOLO(object):
-    def __init__(self, **kwargs):
-        self.classes_path = ""
-        self.anchors_path = ""
-        self.input_shape = []
-        self.anchors_mask = []
-        self.model_path = ""
+    def __init__(self, confidence=0.5, nms_iou=0.3):
+        self.classes_path = "../data/classes.txt",
+        self.anchors_path = "../data/anchors.txt",
+        self.input_shape = [416, 416]
+        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
+        self.model_path = "../data/best.pth"
         self.cuda = torch.cuda.is_available()
-        self.confidence = 0
-        self.nms_iou = 0
-        self.__dict__.update(defaults)
-        for name, value in kwargs.items():
-            setattr(self, name, value)
-            defaults[name] = value
+        self.confidence = confidence
+        self.nms_iou = nms_iou
         self.class_names, self.num_classes = get_classes(self.classes_path)
         self.anchors, self.num_anchors = get_anchors(self.anchors_path)
         self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
@@ -266,7 +251,16 @@ class YOLO(object):
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        show_config(defaults)
+        show_config({
+            "classes_path": self.classes_path,
+            "anchors_path": self.anchors_path,
+            "input_shape": self.input_shape,
+            "anchors_mask": self.anchors_mask,
+            "model_path": self.model_path,
+            "cuda": self.cuda,
+            "confidence": self.confidence,
+            "nms_iou": self.nms_iou
+        })
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes)
