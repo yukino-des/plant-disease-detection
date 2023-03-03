@@ -2,7 +2,7 @@ import numpy as np
 import os
 import torch
 from datetime import datetime
-from net import EvalCallback, LossHistory, YoloBody, YoloDataset, YoloLoss
+from model import EvalCallback, LossHistory, YoloBody, YoloDataset, YoloLoss
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader

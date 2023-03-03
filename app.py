@@ -9,7 +9,7 @@ from datetime import datetime
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from matplotlib import pyplot as plt
-from net import Yolo, YoloBody
+from model import Yolo, YoloBody
 from PIL import Image
 from starlette.responses import FileResponse
 from thop import clever_format, profile
