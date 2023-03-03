@@ -90,7 +90,3 @@ class MobileNetV2(nn.Module):
         x = self.features(x)
         x = x.mean([2, 3])
         return self.classifier(x)
-
-
-if __name__ == "__main__":
-    print(mobilenet_v2())

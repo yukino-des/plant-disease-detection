@@ -146,28 +146,13 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    show_config({"classes_path": "data/classes.txt",
-                 "anchors_path": "data/anchors.txt",
-                 "anchors_mask": anchors_mask,
-                 "model_path": model_path,
-                 "input_shape": input_shape,
-                 "init_epoch": init_epoch,
-                 "freeze_epoch": freeze_epoch,
-                 "unfreeze_epoch": unfreeze_epoch,
-                 "freeze_batch_size": freeze_batch_size,
-                 "unfreeze_batch_size": unfreeze_batch_size,
-                 "freeze_train": freeze_train,
-                 "init_lr": init_lr,
-                 "min_lr": min_lr,
-                 "optimizer_type": optimizer_type,
-                 "momentum": momentum,
-                 "lr_decay_type": lr_decay_type,
-                 "save_period": save_period,
-                 "save_dir": save_dir,
-                 "num_workers": num_workers,
-                 "num_train": num_train,
-                 "num_val": num_val,
-                 "cuda": torch.cuda.is_available()})
+    show_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt", anchors_mask="anchors_mask",
+                model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
+                unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
+                unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,
+                optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type, save_period=save_period,
+                save_dir=save_dir, num_workers=num_workers, num_train=num_train, num_val=num_val,
+                cuda=torch.cuda.is_available())
     wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
     total_step = num_train // unfreeze_batch_size * unfreeze_epoch
     if total_step <= wanted_step and num_train // unfreeze_batch_size == 0:
@@ -190,11 +175,10 @@ if __name__ == "__main__":
             pg0.append(v.weight)
         elif hasattr(v, "weight") and isinstance(v.weight, nn.Parameter):
             pg1.append(v.weight)
-    optimizer = {
-        "adam": optim.Adam(pg0, init_lr_fit, betas=(momentum, 0.999)),
-        "adamw": optim.AdamW(pg0, init_lr_fit, betas=(momentum, 0.999)),
-        "sgd": optim.SGD(pg0, init_lr_fit, momentum=momentum, nesterov=True)
-    }[optimizer_type]
+    optimizer = {"adam": optim.Adam(pg0, init_lr_fit, betas=(momentum, 0.999)),
+                 "adamw": optim.AdamW(pg0, init_lr_fit, betas=(momentum, 0.999)),
+                 "sgd": optim.SGD(pg0, init_lr_fit, momentum=momentum, nesterov=True)
+                 }[optimizer_type]
     optimizer.add_param_group({"params": pg1, "weight_decay": weight_decay})
     optimizer.add_param_group({"params": pg2})
     lr_scheduler_func = get_lr_scheduler(lr_decay_type, init_lr_fit, min_lr_fit, unfreeze_epoch)
@@ -233,11 +217,9 @@ if __name__ == "__main__":
             if epoch_step == 0 or epoch_step_val == 0:
                 raise ValueError("Dataset not qualified.")
             gen = DataLoader(train_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
-                             pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate,
-                             sampler=train_sampler)
+                             pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=train_sampler)
             gen_val = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
-                                 pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate,
-                                 sampler=val_sampler)
+                                 pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=val_sampler)
             unfreeze_flag = True
         gen.dataset.epoch_now = epoch
         gen_val.dataset.epoch_now = epoch

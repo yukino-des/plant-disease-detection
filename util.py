@@ -13,6 +13,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision.ops import nms
 from tqdm import tqdm
 from scipy import signal
+from xml.etree import ElementTree as ET
 
 if os.name == "nt":
     matplotlib.use("Agg")
@@ -28,6 +29,19 @@ def adjust_axes(r, t, fig, axes):
     propotion = new_fig_width / current_fig_width
     x_lim = axes.get_xlim()
     axes.set_xlim([x_lim[0], x_lim[1] * propotion])
+
+
+def avg_iou(box, cluster):
+    return np.mean([np.max(cas_iou(box[i], cluster)) for i in range(box.shape[0])])
+
+
+def cas_iou(box, cluster):
+    x = np.minimum(cluster[:, 0], box[0])
+    y = np.minimum(cluster[:, 1], box[1])
+    intersection = x * y
+    area1 = box[0] * box[1]
+    area2 = cluster[:, 0] * cluster[:, 1]
+    return intersection / (area1 + area2 - intersection)
 
 
 def cvt_color(image):
@@ -310,8 +324,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
                 fig.savefig(os.path.join(results_files_path, "AP", class_name + ".png"))
                 plt.cla()
                 plt.plot(score, f1, "-", color="orangered")
-                plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("score_threshold")
+                plt.title("class: " + f1_text + "\nscore threshold=" + str(score_threshold))
+                plt.xlabel("score threshold")
                 plt.ylabel("F1")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
@@ -319,8 +333,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
                 fig.savefig(os.path.join(results_files_path, "F1", class_name + ".png"))
                 plt.cla()
                 plt.plot(score, rec, "-H", color="gold")
-                plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("score_threshold")
+                plt.title("class: " + recall_text + "\nscore threshold=" + str(score_threshold))
+                plt.xlabel("score threshold")
                 plt.ylabel("recall")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
@@ -328,8 +342,8 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
                 fig.savefig(os.path.join(results_files_path, "recall", class_name + ".png"))
                 plt.cla()
                 plt.plot(score, prec, "-s", color="palevioletred")
-                plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("score_threshold")
+                plt.title("class: " + precision_text + "\nscore threshold=" + str(score_threshold))
+                plt.xlabel("score threshold")
                 plt.ylabel("precision")
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
@@ -392,6 +406,45 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
     return mAP
 
 
+def kmeans(box, k):
+    row = box.shape[0]
+    distance = np.empty((row, k))
+    last_clu = np.zeros((row,))
+    np.random.seed()
+    cluster = box[np.random.choice(row, k, replace=False)]
+    iternum = 0
+    while True:
+        for i in range(row):
+            distance[i] = 1 - cas_iou(box[i], cluster)
+        near = np.argmin(distance, axis=1)
+        if (last_clu == near).all():
+            break
+        for j in range(k):
+            cluster[j] = np.median(box[near == j], axis=0)
+        last_clu = near
+        if iternum % 5 == 0:
+            print("iter: {:d}; avg_iou: {:.2f}".format(iternum, avg_iou(box, cluster)))
+        iternum += 1
+    return cluster, near
+
+
+def load_data(path):
+    data = []
+    for xml_file in tqdm(glob.glob(f"{path}/*xml")):
+        tree = ET.parse(xml_file)
+        height = int(tree.findtext("./size/height"))
+        width = int(tree.findtext("./size/width"))
+        if height <= 0 or width <= 0:
+            continue
+        for obj in tree.iter("object"):
+            xmin = np.float64(int(float(obj.findtext("bndbox/xmin"))) / width)
+            ymin = np.float64(int(float(obj.findtext("bndbox/ymin"))) / height)
+            xmax = np.float64(int(float(obj.findtext("bndbox/xmax"))) / width)
+            ymax = np.float64(int(float(obj.findtext("bndbox/ymax"))) / height)
+            data.append([xmax - xmin, ymax - ymin])
+    return np.array(data)
+
+
 def logistic(x):
     if np.all(x >= 0):
         return 1.0 / (1 + np.exp(-x))
@@ -432,10 +485,10 @@ def resize_image(image, size):
     return new_image
 
 
-def show_config(dictionary):
+def show_config(**_map):
     print("-" * 60)
-    for key, value in dictionary.items():
-        print("|%20s | %35s|" % (str(key), str(value)))
+    for k, v in _map.items():
+        print("|%20s | %35s|" % (k, str(v)))
     print("-" * 60)
 
 

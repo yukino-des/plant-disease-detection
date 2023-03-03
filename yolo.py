@@ -45,8 +45,8 @@ def conv_dw(filter_in, filter_out, stride=1):
                          nn.ReLU6(inplace=True))  # ReLU6激活
 
 
-def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
-              epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir):
+def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val,
+              gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir):
     loss = 0
     val_loss = 0
     pbar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
@@ -225,14 +225,9 @@ class YOLO(object):
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        show_config({"anchors_path": self.anchors_path,
-                     "input_shape": self.input_shape,
-                     "anchors_mask": self.anchors_mask,
-                     "model_path": self.model_path,
-                     "cuda": self.cuda,
-                     "classes_path": self.classes_path,
-                     "confidence": self.confidence,
-                     "nms_iou": self.nms_iou})
+        show_config(anchors_path=self.anchors_path, input_shape=self.input_shape, anchors_mask=self.anchors_mask,
+                    model_path=self.model_path, cuda=self.cuda, classes_path=self.classes_path,
+                    confidence=self.confidence, nms_iou=self.nms_iou)
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes)
@@ -316,7 +311,8 @@ class YOLO(object):
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
-            self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape, self.confidence,
+            self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
+                                               self.confidence,
                                                self.nms_iou)
         t1 = time.time()
         for _ in range(test_interval):
@@ -356,7 +352,7 @@ class YOLO(object):
         plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
         print(heatmap_save_path + " saved.")
 
-    def convert_to_onnx(self, model_path):
+    def convert_to_onnx(self, simplify, model_path):
         self.generate(onnx=True)
         im = torch.zeros(1, 3, *self.input_shape).to("cpu")
         input_layer_names = ["images"]
@@ -366,9 +362,10 @@ class YOLO(object):
                           input_names=input_layer_names, output_names=output_layer_names, dynamic_axes=None)
         model_onnx = onnx.load(model_path)
         onnx.checker.check_model(model_onnx)
-        model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
-        assert check, "assert check failed"
-        onnx.save(model_onnx, model_path)
+        if simplify:
+            model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
+            assert check, "assert check failed"
+            onnx.save(model_onnx, model_path)
         print(model_path + " saved.")
 
     def get_map_txt(self, image_id, image, class_names, maps_out_path):
@@ -719,8 +716,7 @@ class YOLOLoss(nn.Module):
     def clip_by_tensor(self, t: torch.Tensor, t_min: float, t_max: float):
         t = t.float()
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
-        result = (result <= t_max).float() * result + (result > t_max).float() * t_max
-        return result
+        return (result <= t_max).float() * result + (result > t_max).float() * t_max
 
     def bce_loss(self, pred, target):
         epsilon = 1e-7
@@ -753,9 +749,9 @@ class YOLOLoss(nn.Module):
         enclose_wh = torch.max(enclose_maxes - enclose_mins, torch.zeros_like(intersect_maxes))
         enclose_diagonal = torch.sum(torch.pow(enclose_wh, 2), dim=-1)
         ciou = iou - 1.0 * center_distance / torch.clamp(enclose_diagonal, min=1e-6)
-        v = (4 / (math.pi ** 2)) * torch.pow((torch.atan(
-            b1_wh[..., 0] / torch.clamp(b1_wh[..., 1], min=1e-6)) - torch.atan(
-            b2_wh[..., 0] / torch.clamp(b2_wh[..., 1], min=1e-6))), 2)
+        v = (4 / (math.pi ** 2)) * torch.pow(
+            (torch.atan(b1_wh[..., 0] / torch.clamp(b1_wh[..., 1], min=1e-6)) - torch.atan(
+                b2_wh[..., 0] / torch.clamp(b2_wh[..., 1], min=1e-6))), 2)
         alpha = v / torch.clamp((1.0 - iou + v), min=1e-6)
         ciou = ciou - alpha * v
         return ciou
