@@ -51,7 +51,7 @@ def tmp(fpath):
 
 
 if __name__ == "__main__":
-    mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, summary, video], default app.: ")
+    mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video], default app.: ")
     # dir
     if mode == "dir":
         yolo = Yolo()
@@ -167,7 +167,7 @@ if __name__ == "__main__":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False, model_path="data/model.onnx")
     # summary
-    elif mode == "summary":
+    elif mode == "sum":
         input_shape = [416, 416]
         anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         num_classes = 80

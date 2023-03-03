@@ -38,7 +38,8 @@ class Backbone(nn.Module):
         return out3, out4, out5
 
 
-class ConvBNReLU(nn.Sequential):  # 3x3深度卷积 + 批量归一化 + ReLU激活
+# 3x3深度卷积 + 批量归一化 + ReLU激活
+class ConvBNReLU(nn.Sequential):
     def __init__(self, in_planes, out_planes, kernel_size=3, stride=1, groups=1):
         padding = (kernel_size - 1) // 2
         super(ConvBNReLU, self).__init__(
