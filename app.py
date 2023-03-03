@@ -40,7 +40,7 @@ def tmp(fpath):
 
 
 if __name__ == "__main__":
-    mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, video], default app.: ")
+    mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, summary, video], default app.: ")
     # dir
     if mode == "dir":
         yolo = Yolo()
