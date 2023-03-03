@@ -148,7 +148,7 @@ if __name__ == "__main__":
         shutil.rmtree("tmp/maps_out/.gt", ignore_errors=True)
     # onnx
     elif mode == "onnx":
-        yolo.convert_to_onnx(False, "data/model.onnx")
+        yolo.convert_to_onnx(simplify=False, model_path="data/model.onnx")
     # summary
     elif mode == "summary":
         input_shape = [416, 416]
