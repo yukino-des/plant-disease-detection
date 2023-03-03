@@ -233,7 +233,8 @@ class EvalCallback:
             shutil.rmtree(self.maps_out_path)
 
 
-class InvertedResidual(nn.Module):  # 倒残差
+# 倒残差
+class InvertedResidual(nn.Module):
     def __init__(self, inp, oup, stride, expand_ratio):
         super(InvertedResidual, self).__init__()
         self.stride = stride

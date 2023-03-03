@@ -42,7 +42,6 @@ if __name__ == "__main__":
     type_index = 0
     for image_set in ["train", "val"]:
         image_ids = open(f"VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
-        # todo
         list_file = open(f"data/{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
             list_file.write(f"VOC/JPEGImages/{image_id}.jpg")
@@ -110,8 +109,8 @@ if __name__ == "__main__":
     save_dir = "data"
     eval_period = 10
     num_workers = 2
-    train_annotation_path = "train.txt"
-    val_annotation_path = "val.txt"
+    train_annotation_path = "data/train.txt"
+    val_annotation_path = "data/val.txt"
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names, num_classes = get_classes("data/classes.txt")
