@@ -13,19 +13,14 @@ from torchvision.ops import nms
 from utils import *
 
 
-def mobilenet_v2(pretrained=False, progress=True):
-    model = MobileNetV2()
-    if pretrained:
-        state_dict = load_state_dict_from_url("https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-                                              model_dir="data", progress=progress)
-        model.load_state_dict(state_dict)
-    return model
-
-
 class Backbone(nn.Module):
     def __init__(self):
         super(Backbone, self).__init__()
-        self.model = mobilenet_v2(pretrained=True)
+        model = MobileNetV2()
+        state_dict = load_state_dict_from_url(url="https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
+                                              model_dir="data", progress=True)
+        model.load_state_dict(state_dict)
+        self.model = model
 
     def forward(self, x):
         out3 = self.model.features[:7](x)
