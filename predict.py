@@ -1,23 +1,11 @@
-import cv2
-import matplotlib
-import numpy as np
-import os
-import shutil
-import time
-import torch
 import uvicorn
 from datetime import datetime
-from matplotlib import pyplot as plt
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from PIL import Image
 from starlette.responses import FileResponse
 from thop import clever_format, profile
 from torchsummary import summary
-from tqdm import tqdm
-from util import avg_iou, get_classes, get_map, kmeans, load_data
-from xml.etree import ElementTree as ET
-from yolo import YOLO, YoloBody
+from net import *
 
 if os.name == "nt":
     matplotlib.use("Agg")
@@ -56,7 +44,7 @@ def tmp(fpath):
 
 
 if __name__ == "__main__":
-    yolo = YOLO()
+    yolo = Yolo()
     mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, video], default app.: ")
     crop = True
     fps_interval = 100  # mode = "fps"
@@ -134,7 +122,7 @@ if __name__ == "__main__":
         os.makedirs("tmp/maps_out/.gt", exist_ok=True)
         os.makedirs("tmp/maps_out/.dr", exist_ok=True)
         class_names, _ = get_classes("data/classes.txt")
-        yolo = YOLO(confidence=confidence, nms_iou=nms_iou)
+        yolo = Yolo(confidence=confidence, nms_iou=nms_iou)
         for image_id in tqdm(image_ids):
             image_path = f"VOC/JPEGImages/{image_id}.jpg"
             image = Image.open(image_path)

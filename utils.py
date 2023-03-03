@@ -7,12 +7,12 @@ import operator
 import os
 import shutil
 import torch
+from collections import OrderedDict
+from functools import partial
 from matplotlib import pyplot as plt
 from PIL import Image
-from torch.utils.tensorboard import SummaryWriter
-from torchvision.ops import nms
+from torch import nn
 from tqdm import tqdm
-from scipy import signal
 from xml.etree import ElementTree as ET
 
 if os.name == "nt":
@@ -42,6 +42,26 @@ def cas_iou(box, cluster):
     area1 = box[0] * box[1]
     area2 = cluster[:, 0] * cluster[:, 1]
     return intersection / (area1 + area2 - intersection)
+
+
+# 标准卷积
+def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
+    pad = (kernel_size - 1) // 2 if kernel_size else 0
+    return nn.Sequential(OrderedDict([("conv", nn.Conv2d(filter_in, filter_out, kernel_size=kernel_size, stride=stride,
+                                                         padding=pad, groups=groups, bias=False)),  # 3x3标准卷积
+                                      ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
+                                      ("relu", nn.ReLU6(inplace=True))]))  # ReLU6激活
+
+
+# 深度可分离卷积
+def conv_dw(filter_in, filter_out, stride=1):
+    return nn.Sequential(nn.Conv2d(filter_in, filter_in, kernel_size=3, stride=stride, padding=1, groups=filter_in,
+                                   bias=False),  # 3x3深度卷积
+                         nn.BatchNorm2d(filter_in),  # 批量归一化
+                         nn.ReLU6(inplace=True),  # ReLU6激活
+                         nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),  # 1x1点卷积
+                         nn.BatchNorm2d(filter_out),  # 批量归一化
+                         nn.ReLU6(inplace=True))  # ReLU6激活
 
 
 def cvt_color(image):
@@ -90,6 +110,67 @@ def file_lines_to_list(path):
     return content
 
 
+def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val,
+              gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir):
+    loss = 0
+    val_loss = 0
+    pbar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+    model_train.train()
+    for iteration, batch in enumerate(gen):
+        if iteration >= epoch_step:
+            break
+        images, targets = batch[0], batch[1]
+        with torch.no_grad():
+            if cuda:
+                images = images.cuda(0)
+                targets = [ann.cuda(0) for ann in targets]
+        optimizer.zero_grad()
+        outputs = model_train(images)
+        loss_sum = 0
+        for l in range(len(outputs)):
+            loss_item = yolo_loss(l, outputs[l], targets)
+            loss_sum += loss_item
+        loss_value = loss_sum
+        loss_value.backward()
+        optimizer.step()
+        loss += loss_value.item()
+        pbar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
+        pbar.update(1)
+    pbar.close()
+    pbar = tqdm(total=epoch_step_val, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+    model_train.eval()
+    for iteration, batch in enumerate(gen_val):
+        if iteration >= epoch_step_val:
+            break
+        images, targets = batch[0], batch[1]
+        with torch.no_grad():
+            if cuda:
+                images = images.cuda(0)
+                targets = [ann.cuda(0) for ann in targets]
+            optimizer.zero_grad()
+            outputs = model_train(images)
+            loss_value_all = 0
+            for l in range(len(outputs)):
+                loss_item = yolo_loss(l, outputs[l], targets)
+                loss_value_all += loss_item
+            loss_value = loss_value_all
+        val_loss += loss_value.item()
+        pbar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
+        pbar.update(1)
+    pbar.close()
+    loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
+    eval_callback.on_epoch_end(epoch + 1, model_train)
+    print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
+    print("total loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
+    if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
+        torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
+            epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
+    if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
+        print("data/best.pth saved.")
+        torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
+    torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
+
+
 def get_anchors(anchors_path):
     with open(anchors_path, encoding="utf-8") as f:
         anchors = f.readline()
@@ -108,6 +189,20 @@ def get_classes(classes_path):
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group["lr"]
+
+
+def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=0.05, warmup_lr_ratio=0.1,
+                     no_aug_iter_ratio=0.05, step_num=10):
+    if lr_decay_type == "cos":
+        warmup_total_iters = min(max(warmup_iters_ratio * total_iters, 1), 3)
+        warmup_lr_start = max(warmup_lr_ratio * lr, 1e-6)
+        no_aug_iter = min(max(no_aug_iter_ratio * total_iters, 1), 15)
+        func = partial(yolox_warm_cos_lr, lr, min_lr, total_iters, warmup_total_iters, warmup_lr_start, no_aug_iter)
+    else:
+        decay_rate = (min_lr / lr) ** (1 / (step_num - 1))
+        step_size = total_iters / step_num
+        func = partial(step_lr, lr, decay_rate, step_size)
+    return func
 
 
 def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
@@ -445,13 +540,6 @@ def load_data(path):
     return np.array(data)
 
 
-def logistic(x):
-    if np.all(x >= 0):
-        return 1.0 / (1 + np.exp(-x))
-    else:
-        return np.exp(x) / (1 + np.exp(x))
-
-
 def log_average_miss_rate(precision, fp_cumsum, num_images):
     if precision.size == 0:
         lamr = 0
@@ -470,6 +558,36 @@ def log_average_miss_rate(precision, fp_cumsum, num_images):
     return lamr, mr, fppi
 
 
+def logistic(x):
+    if np.all(x >= 0):
+        return 1.0 / (1 + np.exp(-x))
+    else:
+        return np.exp(x) / (1 + np.exp(x))
+
+
+def make_divisible(v, divisor, min_value=None):
+    if min_value is None:
+        min_value = divisor
+    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
+
+
+def make3conv(filters_list, in_filters):
+    return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
+                         conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1))
+
+
+def make5conv(filters_list, in_filters):
+    return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
+                         conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1),
+                         conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1))
+
+
 def print_table(l1, l2):
     for i in range(len(l1[0])):
         print("|", end=" ")
@@ -485,11 +603,24 @@ def resize_image(image, size):
     return new_image
 
 
+def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
+    lr = lr_scheduler_func(epoch)
+    for param_group in optimizer.param_groups:
+        param_group["lr"] = lr
+
+
 def show_config(**_map):
     print("-" * 60)
     for k, v in _map.items():
         print("|%20s | %35s|" % (k, str(v)))
     print("-" * 60)
+
+
+def step_lr(lr, decay_rate, step_size, iters):
+    if step_size < 1:
+        raise ValueError("step_size error.")
+    n = iters // step_size
+    return lr * decay_rate ** n
 
 
 def voc_ap(rec, prec):
@@ -511,245 +642,27 @@ def voc_ap(rec, prec):
     return ap, mrec, mpre
 
 
-class DecodeBox:
-    def __init__(self, anchors, num_classes, input_shape, anchors_mask=None):
-        super(DecodeBox, self).__init__()
-        if anchors_mask is None:
-            anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-        self.anchors = anchors
-        self.num_classes = num_classes
-        self.bbox_attrs = 5 + num_classes
-        self.input_shape = input_shape
-        self.anchors_mask = anchors_mask
-
-    def decode_box(self, inputs):
-        outputs = []
-        for i, _input in enumerate(inputs):
-            batch_size = _input.size(0)
-            input_height = _input.size(2)
-            input_width = _input.size(3)
-            stride_h = self.input_shape[0] / input_height
-            stride_w = self.input_shape[1] / input_width
-            scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
-                              self.anchors[self.anchors_mask[i]]]
-            prediction = _input.view(batch_size, len(self.anchors_mask[i]), self.bbox_attrs, input_height,
-                                     input_width).permute(0, 1, 3, 4, 2).contiguous()
-            x = torch.sigmoid(prediction[..., 0])
-            y = torch.sigmoid(prediction[..., 1])
-            w = prediction[..., 2]
-            h = prediction[..., 3]
-            conf = torch.sigmoid(prediction[..., 4])
-            pred_cls = torch.sigmoid(prediction[..., 5:])
-            float_tensor = torch.cuda.FloatTensor if x.is_cuda else torch.FloatTensor
-            long_tensor = torch.cuda.LongTensor if x.is_cuda else torch.LongTensor
-            grid_x = torch.linspace(0, input_width - 1, input_width).repeat(input_height, 1).repeat(
-                batch_size * len(self.anchors_mask[i]), 1, 1).view(x.shape).type(float_tensor)
-            grid_y = torch.linspace(0, input_height - 1, input_height).repeat(input_width, 1).t().repeat(
-                batch_size * len(self.anchors_mask[i]), 1, 1).view(y.shape).type(float_tensor)
-            anchor_w = float_tensor(scaled_anchors).index_select(1, long_tensor([0]))
-            anchor_h = float_tensor(scaled_anchors).index_select(1, long_tensor([1]))
-            anchor_w = anchor_w.repeat(batch_size, 1).repeat(1, 1, input_height * input_width).view(w.shape)
-            anchor_h = anchor_h.repeat(batch_size, 1).repeat(1, 1, input_height * input_width).view(h.shape)
-            pred_boxes = float_tensor(prediction[..., :4].shape)
-            pred_boxes[..., 0] = x.data + grid_x
-            pred_boxes[..., 1] = y.data + grid_y
-            pred_boxes[..., 2] = torch.exp(w.data) * anchor_w
-            pred_boxes[..., 3] = torch.exp(h.data) * anchor_h
-            _scale = torch.Tensor([input_width, input_height, input_width, input_height]).type(float_tensor)
-            output = torch.cat((pred_boxes.view(batch_size, -1, 4) / _scale, conf.view(batch_size, -1, 1),
-                                pred_cls.view(batch_size, -1, self.num_classes)), -1)
-            outputs.append(output.data)
-        return outputs
-
-    def yolo_correct_boxes(self, box_xy, box_wh, image_shape):
-        box_yx = box_xy[..., ::-1]
-        box_hw = box_wh[..., ::-1]
-        image_shape = np.array(image_shape)
-        box_mins = box_yx - (box_hw / 2.)
-        box_maxes = box_yx + (box_hw / 2.)
-        boxes = np.concatenate([box_mins[..., 0:1], box_mins[..., 1:2], box_maxes[..., 0:1], box_maxes[..., 1:2]],
-                               axis=-1)
-        boxes *= np.concatenate([image_shape, image_shape], axis=-1)
-        return boxes
-
-    def non_max_suppression(self, prediction, num_classes, image_shape, conf_thres=0.5, nms_thres=0.4):
-        box_corner = prediction.new(prediction.shape)
-        box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
-        box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
-        box_corner[:, :, 2] = prediction[:, :, 0] + prediction[:, :, 2] / 2
-        box_corner[:, :, 3] = prediction[:, :, 1] + prediction[:, :, 3] / 2
-        prediction[:, :, :4] = box_corner[:, :, :4]
-        output: list = [None]
-        for i, image_pred in enumerate(prediction):
-            class_conf, class_pred = torch.max(image_pred[:, 5:5 + num_classes], 1, keepdim=True)
-            conf_mask = (image_pred[:, 4] * class_conf[:, 0] >= conf_thres).squeeze()
-            image_pred = image_pred[conf_mask]
-            class_conf = class_conf[conf_mask]
-            class_pred = class_pred[conf_mask]
-            if not image_pred.size(0):
-                continue
-            detections = torch.cat((image_pred[:, :5], class_conf.float(), class_pred.float()), 1)
-            unique_labels = detections[:, -1].cpu().unique()
-            if prediction.is_cuda:
-                unique_labels = unique_labels.cuda()
-                detections = detections.cuda()
-            for c in unique_labels:
-                detections_class = detections[detections[:, -1] == c]
-                keep = nms(detections_class[:, :4], detections_class[:, 4] * detections_class[:, 5], nms_thres)
-                max_detections = detections_class[keep]
-                output[i] = max_detections if output[i] is None else torch.cat([output[i], max_detections])
-            if output[i] is not None:
-                output[i] = output[i].cpu().numpy()
-                box_xy, box_wh = (output[i][:, 0:2] + output[i][:, 2:4]) / 2, output[i][:, 2:4] - output[i][:, 0:2]
-                output[i][:, :4] = self.yolo_correct_boxes(box_xy, box_wh, image_shape)
-        return output
+def yolo_dataset_collate(batch):
+    images = []
+    bboxes = []
+    for img, box in batch:
+        images.append(img)
+        bboxes.append(box)
+    images = torch.from_numpy(np.array(images)).type(torch.FloatTensor)
+    bboxes = [torch.from_numpy(ann).type(torch.FloatTensor) for ann in bboxes]
+    return images, bboxes
 
 
-class EvalCallback:
-    def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_out_path="tmp/.maps_out", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
-                 eval_flag=True, period=1):
-        super(EvalCallback, self).__init__()
-        self.net = net
-        self.input_shape = input_shape
-        self.anchors = anchors
-        self.anchors_mask = anchors_mask
-        self.class_names = class_names
-        self.num_classes = num_classes
-        self.val_lines = val_lines
-        self.log_dir = log_dir
-        self.cuda = cuda
-        self.maps_out_path = maps_out_path
-        self.max_boxes = max_boxes
-        self.confidence = confidence
-        self.nms_iou = nms_iou
-        self.min_overlap = min_overlap
-        self.eval_flag = eval_flag
-        self.period = period
-        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
-                                   self.anchors_mask)
-        self.maps = [0.0]
-        self.epochs = [0]
-        if self.eval_flag:
-            with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
-                f.write(str(0))
-                f.write("\n")
-
-    def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, f".dr/{image_id}.txt"), "w", encoding="utf-8")
-        image_shape = np.array(np.shape(image)[0:2])
-        image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
-        with torch.no_grad():
-            images = torch.from_numpy(image_data)
-            if self.cuda:
-                images = images.cuda()
-            outputs = self.net(images)
-            outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
-                                                         self.confidence, self.nms_iou)
-            if results[0] is None:
-                return
-            top_label = np.array(results[0][:, 6], dtype="int32")
-            top_conf = results[0][:, 4] * results[0][:, 5]
-            top_boxes = results[0][:, :4]
-        top_100 = np.argsort(top_conf)[::-1][:self.max_boxes]
-        top_boxes = top_boxes[top_100]
-        top_conf = top_conf[top_100]
-        top_label = top_label[top_100]
-        for i, c in list(enumerate(top_label)):
-            predicted_class = self.class_names[int(c)]
-            box = top_boxes[i]
-            score = str(top_conf[i])
-            top, left, bottom, right = box
-            if predicted_class not in class_names:
-                continue
-            f.write(f"{predicted_class} {score[:6]} "
-                    f"{str(int(left))} {str(int(top))} {str(int(right))} {str(int(bottom))}\n")
-        f.close()
-        return
-
-    def on_epoch_end(self, epoch, model_eval):
-        if epoch % self.period == 0 and self.eval_flag:
-            self.net = model_eval
-            os.makedirs(self.maps_out_path, exist_ok=True)
-            os.makedirs(os.path.join(self.maps_out_path, ".gt"), exist_ok=True)
-            os.makedirs(os.path.join(self.maps_out_path, ".dr"), exist_ok=True)
-            for annotation_line in tqdm(self.val_lines):
-                line = annotation_line.split()
-                image_id = os.path.basename(line[0]).split(".")[0]
-                image = Image.open(line[0])
-                gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
-                self.get_map_txt(image_id, image, self.class_names, self.maps_out_path)
-                with open(os.path.join(self.maps_out_path, f".gt/{image_id}.txt"), "w") as new_f:
-                    for box in gt_boxes:
-                        left, top, right, bottom, obj = box
-                        obj_name = self.class_names[obj]
-                        new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-            temp_map = get_map(self.min_overlap, False, path=self.maps_out_path)
-            self.maps.append(temp_map)
-            self.epochs.append(epoch)
-            with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
-                f.write(str(temp_map))
-                f.write("\n")
-            plt.figure()
-            plt.plot(self.epochs, self.maps, "red", linewidth=2, label="train map")
-            plt.grid(True)
-            plt.xlabel("epoch")
-            plt.ylabel(f"map {str(self.min_overlap)}")
-            plt.title("a map curve")
-            plt.legend(loc="upper right")
-            plt.savefig(os.path.join(self.log_dir, "map.png"))
-            plt.cla()
-            plt.close("all")
-            shutil.rmtree(self.maps_out_path)
+def yolo_head(filters_list, in_filters):
+    return nn.Sequential(conv_dw(in_filters, filters_list[0]), nn.Conv2d(filters_list[0], filters_list[1], 1))
 
 
-class LossHistory:
-    def __init__(self, log_dir, model, input_shape):
-        self.log_dir = log_dir
-        self.losses = []
-        self.val_loss = []
-        os.makedirs(self.log_dir, exist_ok=True)
-        self.writer = SummaryWriter(self.log_dir)
-        try:
-            dummy_input = torch.randn(2, 3, input_shape[0], input_shape[1])
-            self.writer.add_graph(model, dummy_input)
-        except:
-            pass
-
-    def append_loss(self, epoch, loss, val_loss):
-        os.makedirs(self.log_dir, exist_ok=True)
-        self.losses.append(loss)
-        self.val_loss.append(val_loss)
-        with open(os.path.join(self.log_dir, "loss.txt"), "a") as f:
-            f.write(str(loss))
-            f.write("\n")
-        with open(os.path.join(self.log_dir, "val_loss.txt"), "a") as f:
-            f.write(str(val_loss))
-            f.write("\n")
-        self.writer.add_scalar("loss", loss, epoch)
-        self.writer.add_scalar("val_loss", val_loss, epoch)
-        self.loss_plot()
-
-    def loss_plot(self):
-        iters = range(len(self.losses))
-        plt.figure()
-        plt.plot(iters, self.losses, "red", linewidth=2, label="train loss")
-        plt.plot(iters, self.val_loss, "coral", linewidth=2, label="val loss")
-        try:
-            num = 5 if len(self.losses) < 25 else 15
-            plt.plot(iters, signal.savgol_filter(self.losses, num, 3), "green", linestyle="--", linewidth=2,
-                     label="train loss")
-            plt.plot(iters, signal.savgol_filter(self.val_loss, num, 3), "#8B4513", linestyle="--", linewidth=2,
-                     label="val loss")
-        except:
-            pass
-        plt.grid(True)
-        plt.xlabel("epoch")
-        plt.ylabel("loss")
-        plt.legend(loc="upper right")
-        plt.savefig(os.path.join(self.log_dir, "loss.png"))
-        plt.cla()
-        plt.close("all")
+def yolox_warm_cos_lr(lr, min_lr, total_iters, warmup_total_iters, warmup_lr_start, no_aug_iter, iters):
+    if iters <= warmup_total_iters:
+        lr = (lr - warmup_lr_start) * pow(iters / float(warmup_total_iters), 2) + warmup_lr_start
+    elif iters >= total_iters - no_aug_iter:
+        lr = min_lr
+    else:
+        lr = min_lr + 0.5 * (lr - min_lr) * (1.0 + math.cos(
+            math.pi * (iters - warmup_total_iters) / (total_iters - warmup_total_iters - no_aug_iter)))
+    return lr

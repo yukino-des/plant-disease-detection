@@ -1,14 +1,9 @@
-import numpy as np
-import os
 import random
-import torch
 from datetime import datetime
-from torch import nn, optim
+from torch import optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
-from util import get_anchors, get_classes, print_table, show_config, EvalCallback, LossHistory
-from yolo import fit1epoch, get_lr_scheduler, set_optimizer_lr, yolo_dataset_collate, YoloBody, YoloDataset, YOLOLoss
-from xml.etree import ElementTree as ET
+from net import *
 
 if __name__ == "__main__":
     random.seed(0)
@@ -131,7 +126,7 @@ if __name__ == "__main__":
         model_dict.update(temp_dict)
         model.load_state_dict(model_dict)
     cuda = torch.cuda.is_available()
-    yolo_loss = YOLOLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
+    yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
     log_dir = os.path.join(save_dir, "loss" + str(time_str))
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
