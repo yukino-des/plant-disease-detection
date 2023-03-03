@@ -1,6 +1,8 @@
 *.docx
 VOC/ImageSets/Main/*.txt
 
-.idea/
-tmp/
-VOC/.tmp.driveupload/
+__pycache__
+*/__pycache__
+.idea
+tmp
+VOC/.tmp.driveupload
