@@ -42,7 +42,8 @@ if __name__ == "__main__":
     type_index = 0
     for image_set in ["train", "val"]:
         image_ids = open(f"VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
-        list_file = open(f"{image_set}.txt", "w", encoding="utf-8")
+        # todo
+        list_file = open(f"data/{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
             list_file.write(f"VOC/JPEGImages/{image_id}.jpg")
             in_file = open(f"VOC/Annotations/{image_id}.xml", encoding="utf-8")

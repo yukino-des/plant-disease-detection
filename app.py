@@ -7,10 +7,6 @@ from thop import clever_format, profile
 from torchsummary import summary
 from net import *
 
-if os.name == "nt":
-    matplotlib.use("Agg")
-else:
-    matplotlib.use("TkAgg")
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["GET", "POST"],
                    allow_headers=["Content-Type", "X-Requested-With"])
