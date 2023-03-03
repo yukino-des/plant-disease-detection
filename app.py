@@ -37,7 +37,6 @@ def upload(file: UploadFile):
 
 @app.get("/tmp/{fpath:path}", response_class=FileResponse)
 def tmp(fpath):
-    print(fpath)
     return FileResponse(os.path.join("tmp", fpath), headers={"Content-Type": "image/png"})
 
 
