@@ -509,7 +509,6 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
     classes, _ = get_classes("data/classes.txt")
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
-    os.makedirs("VOC/ImageSets/Main", exist_ok=True)
     temp_xml = os.listdir("VOC/Annotations")
     total_xml = []
     for xml in temp_xml:
@@ -521,6 +520,7 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
+    os.makedirs("VOC/ImageSets/Main", exist_ok=True)
     ftrainval = open("VOC/ImageSets/Main/trainval.txt", "w")
     ftest = open("VOC/ImageSets/Main/test.txt", "w")
     ftrain = open("VOC/ImageSets/Main/train.txt", "w")
