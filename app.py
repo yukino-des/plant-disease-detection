@@ -40,12 +40,10 @@ def tmp(fpath):
 
 
 if __name__ == "__main__":
-    yolo = Yolo()
     mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, video], default app.: ")
-    crop = True
-    fps_interval = 100  # mode = "fps"
     # dir
     if mode == "dir":
+        yolo = Yolo()
         img_names = os.listdir("tmp/imgs")
         for img_name in tqdm(img_names):
             if img_name.lower().endswith(
@@ -57,12 +55,14 @@ if __name__ == "__main__":
                 r_image.save(os.path.join("tmp/imgs_out", img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
     # fps
     elif mode == "fps":
+        yolo = Yolo()
         fps_image_path = input("Input image path: ")
         img = Image.open(fps_image_path)
-        tact_time = yolo.get_fps(img, fps_interval)
+        tact_time = yolo.get_fps(img, test_interval=100)
         print(str(tact_time) + " seconds, " + str(1 / tact_time) + " fps, @batch_size 1")
     # heatmap
     elif mode == "heatmap":
+        yolo = Yolo()
         img = input("Input image path: ")
         try:
             image = Image.open(img)
@@ -72,13 +72,14 @@ if __name__ == "__main__":
             yolo.detect_heatmap(image, "tmp/heatmap.png")
     # img
     elif mode == "img":
+        yolo = Yolo()
         img = input("Input image path: ")
         try:
             image = Image.open(img)
         except:
             pass
         else:
-            r_image, _ = yolo.detect_image(image, crop=crop)
+            r_image, _ = yolo.detect_image(image, crop=True)
             r_image.show()
             r_image.save(os.path.join("tmp/imgs_out", img.split(".")[-2] + ".png"), quality=95, subsampling=0)
     # kmeans
@@ -148,6 +149,7 @@ if __name__ == "__main__":
         shutil.rmtree("tmp/maps_out/.gt", ignore_errors=True)
     # onnx
     elif mode == "onnx":
+        yolo = Yolo()
         yolo.convert_to_onnx(simplify=False, model_path="data/model.onnx")
     # summary
     elif mode == "summary":
@@ -165,6 +167,7 @@ if __name__ == "__main__":
         print(f"Total params: {params}")
     # video
     elif mode == "video":
+        yolo = Yolo()
         video_path = input("Input video path: ")
         capture = cv2.VideoCapture(0 if video_path == "" else video_path)
         os.makedirs("tmp/videos_out", exist_ok=True)
@@ -200,6 +203,7 @@ if __name__ == "__main__":
         print(video_save_path + " saved")
     # app
     else:
+        yolo = Yolo()
         shutil.rmtree("tmp", ignore_errors=True)
         for _dir in ["tmp/imgs", "tmp/imgs_out", "tmp/videos_out", "tmp/maps_out", "tmp/original", "tmp/detected"]:
             os.makedirs(_dir, exist_ok=True)
