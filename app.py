@@ -1,3 +1,5 @@
+import os
+
 import uvicorn
 from datetime import datetime
 from fastapi import FastAPI, UploadFile
@@ -17,19 +19,19 @@ def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.split(".")
-    original_path = os.path.join("tmp/original", file.filename)
-    detected_path = os.path.join("tmp/detected", f"{file_name}.png")
+    imgs_path = os.path.join("tmp/imgs", file.filename)
+    imgs_out_path = os.path.join("tmp/imgs_out", f"{file_name}.png")
     try:
-        with open(original_path, "wb+") as buffer:
+        with open(imgs_path, "wb+") as buffer:
             shutil.copyfileobj(file.file, buffer)
     finally:
         file.file.close()
     if extend_name.lower() in ("bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"):
-        r_image, image_info = yolo.detect_image(Image.open(original_path))
-        r_image.save(detected_path, quality=95, subsampling=0)
+        r_image, image_info = yolo.detect_image(Image.open(imgs_path))
+        r_image.save(imgs_out_path, quality=95, subsampling=0)
         return {"status": 1,
-                "image_url": "http://127.0.0.1:8081/" + original_path,
-                "draw_url": "http://127.0.0.1:8081/" + detected_path,
+                "image_url": "http://127.0.0.1:8081/" + imgs_path,
+                "draw_url": "http://127.0.0.1:8081/" + imgs_out_path,
                 "image_info": image_info}
 
 
@@ -44,7 +46,11 @@ if __name__ == "__main__":
     # dir
     if mode == "dir":
         yolo = Yolo()
-        img_names = os.listdir("tmp/imgs")
+        img_dir = input("Input directory path, default tmp/imgs.: ")
+        if img_dir == "":
+            img_names = os.listdir("tmp/imgs")
+        else:
+            img_names = os.listdir(img_dir)
         for img_name in tqdm(img_names):
             if img_name.lower().endswith(
                     (".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff")):
@@ -116,15 +122,15 @@ if __name__ == "__main__":
         nms_iou = 0.5
         score_threshold = 0.5
         image_ids = open("VOC/ImageSets/Main/test.txt").read().strip().split()
-        os.makedirs("tmp/maps_out/.gt", exist_ok=True)
-        os.makedirs("tmp/maps_out/.dr", exist_ok=True)
+        os.makedirs("tmp/maps/.gt", exist_ok=True)
+        os.makedirs("tmp/maps/.dr", exist_ok=True)
         class_names, _ = get_classes("data/classes.txt")
         yolo = Yolo(confidence=confidence, nms_iou=nms_iou)
         for image_id in tqdm(image_ids):
             image_path = f"VOC/JPEGImages/{image_id}.jpg"
             image = Image.open(image_path)
-            yolo.get_map_txt(image_id, image, class_names, "tmp/maps_out")
-            with open(f"tmp/maps_out/.gt/{image_id}.txt", "w") as new_f:
+            yolo.get_map_txt(image_id, image, class_names, "tmp/maps")
+            with open(f"tmp/maps/.gt/{image_id}.txt", "w") as new_f:
                 root = ET.parse(f"VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
@@ -144,9 +150,9 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom} difficult\n")
                     else:
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-        get_map(min_overlap, True, score_threshold=score_threshold, path="tmp/maps_out")
-        shutil.rmtree("tmp/maps_out/.dr", ignore_errors=True)
-        shutil.rmtree("tmp/maps_out/.gt", ignore_errors=True)
+        get_map(min_overlap, True, score_threshold=score_threshold, path="tmp/maps")
+        shutil.rmtree("tmp/maps/.dr", ignore_errors=True)
+        shutil.rmtree("tmp/maps/.gt", ignore_errors=True)
     # onnx
     elif mode == "onnx":
         yolo = Yolo()
@@ -168,10 +174,10 @@ if __name__ == "__main__":
     # video
     elif mode == "video":
         yolo = Yolo()
-        video_path = input("Input video path: ")
+        video_path = input("Input video path, default camera.: ")
         capture = cv2.VideoCapture(0 if video_path == "" else video_path)
-        os.makedirs("tmp/videos_out", exist_ok=True)
-        video_save_path = f"tmp/videos_out/{datetime.strftime(datetime.now(), '%H%M%S')}.avi"
+        os.makedirs("tmp/videos", exist_ok=True)
+        video_save_path = f"tmp/videos/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         out = cv2.VideoWriter(video_save_path, fourcc, 25.0, size)
@@ -190,21 +196,21 @@ if __name__ == "__main__":
             frame = np.array(image)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
             fps = (fps + (1. / (time.time() - t1))) / 2
-            frame = cv2.putText(frame, "fps= %.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            frame = cv2.putText(frame, "fps=%.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             if video_path == "":
                 cv2.imshow("video", frame)
             c = cv2.waitKey(1) & 0xff
             out.write(frame)
             if c == 27:
                 break
-        capture.release()
         out.release()
+        capture.release()
         cv2.destroyAllWindows()
         print(video_save_path + " saved")
     # app
     else:
         yolo = Yolo()
         shutil.rmtree("tmp", ignore_errors=True)
-        for _dir in ["tmp/imgs", "tmp/imgs_out", "tmp/videos_out", "tmp/maps_out", "tmp/original", "tmp/detected"]:
+        for _dir in ["tmp/imgs", "tmp/imgs_out", "tmp/videos", "tmp/maps"]:
             os.makedirs(_dir, exist_ok=True)
         uvicorn.run(app, host="0.0.0.0", port=8081)

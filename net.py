@@ -134,7 +134,7 @@ class DecodeBox:
 
 class EvalCallback:
     def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_out_path="tmp/.maps_out", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+                 maps_path="tmp/.maps", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
                  eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net
@@ -146,7 +146,7 @@ class EvalCallback:
         self.val_lines = val_lines
         self.log_dir = log_dir
         self.cuda = cuda
-        self.maps_out_path = maps_out_path
+        self.maps_path = maps_path
         self.max_boxes = max_boxes
         self.confidence = confidence
         self.nms_iou = nms_iou
@@ -162,8 +162,8 @@ class EvalCallback:
                 f.write(str(0))
                 f.write("\n")
 
-    def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, f".dr/{image_id}.txt"), "w", encoding="utf-8")
+    def get_map_txt(self, image_id, image, class_names, maps_path):
+        f = open(os.path.join(maps_path, f".dr/{image_id}.txt"), "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
@@ -200,21 +200,21 @@ class EvalCallback:
     def on_epoch_end(self, epoch, model_eval):
         if epoch % self.period == 0 and self.eval_flag:
             self.net = model_eval
-            os.makedirs(self.maps_out_path, exist_ok=True)
-            os.makedirs(os.path.join(self.maps_out_path, ".gt"), exist_ok=True)
-            os.makedirs(os.path.join(self.maps_out_path, ".dr"), exist_ok=True)
+            os.makedirs(self.maps_path, exist_ok=True)
+            os.makedirs(os.path.join(self.maps_path, ".gt"), exist_ok=True)
+            os.makedirs(os.path.join(self.maps_path, ".dr"), exist_ok=True)
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
                 image_id = os.path.basename(line[0]).split(".")[0]
                 image = Image.open(line[0])
                 gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
-                self.get_map_txt(image_id, image, self.class_names, self.maps_out_path)
-                with open(os.path.join(self.maps_out_path, f".gt/{image_id}.txt"), "w") as new_f:
+                self.get_map_txt(image_id, image, self.class_names, self.maps_path)
+                with open(os.path.join(self.maps_path, f".gt/{image_id}.txt"), "w") as new_f:
                     for box in gt_boxes:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-            temp_map = get_map(self.min_overlap, False, path=self.maps_out_path)
+            temp_map = get_map(self.min_overlap, False, path=self.maps_path)
             self.maps.append(temp_map)
             self.epochs.append(epoch)
             with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
@@ -230,7 +230,7 @@ class EvalCallback:
             plt.savefig(os.path.join(self.log_dir, "map.png"))
             plt.cla()
             plt.close("all")
-            shutil.rmtree(self.maps_out_path)
+            shutil.rmtree(self.maps_path)
 
 
 # 倒残差
@@ -529,8 +529,8 @@ class Yolo(object):
             onnx.save(model_onnx, model_path)
         print(model_path + " saved.")
 
-    def get_map_txt(self, image_id, image, class_names, maps_out_path):
-        f = open(os.path.join(maps_out_path, ".dr/" + image_id + ".txt"), "w")
+    def get_map_txt(self, image_id, image, class_names, maps_path):
+        f = open(os.path.join(maps_path, ".dr/" + image_id + ".txt"), "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))

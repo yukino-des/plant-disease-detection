@@ -205,7 +205,7 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=
     return func
 
 
-def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps_out"):
+def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps"):
     gt_path = os.path.join(path, ".gt")  # ground_truth
     dr_path = os.path.join(path, ".dr")  # detection_results
     temp_files_path = os.path.join(path, ".temp_files")
