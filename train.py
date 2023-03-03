@@ -10,23 +10,28 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
                    yolo_dataset_collate)
 
 if __name__ == "__main__":
+    # 如果训练中断，请修改：model_path = "data/best.pth"
+    model_path = ""
+    # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
+    init_epoch = 0
     get_txts(0, 0.9, 0.9)
     flag = input("Start training (y/n)? ")
     if flag != "y" and flag != "Y":
         exit(0)
-    # todo update `model_path = "data/best.pth"` if training is interrupted.
-    model_path = ""
-    # todo update `init_epoch` if training is interrupted.
-    init_epoch = 0
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
     # lr_decay_type = "step"
     lr_decay_type = "cos"
-    # optimizer_type, unfreeze_epoch, init_lr, weight_decay = "sgd", 300, 1e-2, 5e-4
-    optimizer_type, unfreeze_epoch, init_lr, weight_decay = "adam", 100, 1e-3, 0
+    # ---------------------------------------------------------------------
+    # |optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay|
+    # |        "adam",         True,            100,    1e-3,            0|
+    # |        "adam",        False,            100,    1e-3,            0|
+    # |         "sgd",         True,            300,    1e-2,         5e-4|
+    # |         "sgd",        False,            300,    1e-2,         5e-4|
+    # ---------------------------------------------------------------------
+    optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay = "adam", True, 100, 1e-3, 0
     input_shape = [416, 416]
     mosaic = True  # 是否使用马赛克数据增强
     mixup = True  # 是否使用mixup数据增强
-    freeze_train = True  # 是否进行冻结训练，默认先冻结主干训练后解冻训练
     focal_loss = False  # 是否使用focal loss平衡正负样本
     eval_flag = True  # 是否在训练时对验证集进行评估
     mosaic_prob = 0.5
@@ -42,8 +47,6 @@ if __name__ == "__main__":
     save_period = 10
     eval_period = 10
     num_workers = 2
-    train_annotation_path = "data/train.txt"
-    val_annotation_path = "data/val.txt"
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names, num_classes = get_classes("data/classes.txt")
@@ -61,20 +64,20 @@ if __name__ == "__main__":
     cuda = torch.cuda.is_available()
     yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
-    log_dir = os.path.join("data", "loss" + str(time_str))
+    log_dir = os.path.join("data", f"loss{time_str}")
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     model_train = model.train()
     if cuda:
         model_train = torch.nn.DataParallel(model)
         cudnn.benchmark = True
         model_train = model_train.cuda()
-    with open(train_annotation_path, encoding="utf-8") as f:
+    with open("data/train.txt", encoding="utf-8") as f:
         train_lines = f.readlines()
-    with open(val_annotation_path, encoding="utf-8") as f:
+    with open("data/val.txt", encoding="utf-8") as f:
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    show_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt", anchors_mask="anchors_mask",
+    show_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt", anchors_mask=anchors_mask,
                 model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
                 unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
                 unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,

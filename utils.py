@@ -685,10 +685,10 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
 
 
 def show_config(**_map):
-    print("-" * 60)
+    print("-" * 55)
     for k, v in _map.items():
-        print("|%20s | %35s|" % (k, str(v)))
-    print("-" * 60)
+        print("|%19s|%33s|" % (k, str(v)))
+    print("-" * 55)
 
 
 def step_lr(lr, decay_rate, step_size, iters):
