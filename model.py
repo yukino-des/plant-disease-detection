@@ -272,11 +272,8 @@ class LossHistory:
         self.val_loss = []
         os.makedirs(self.log_dir, exist_ok=True)
         self.writer = SummaryWriter(self.log_dir)
-        try:
-            dummy_input = torch.randn(2, 3, input_shape[0], input_shape[1])
-            self.writer.add_graph(model, dummy_input)
-        except:
-            pass
+        dummy_input = torch.randn(2, 3, input_shape[0], input_shape[1])
+        self.writer.add_graph(model, dummy_input)
 
     def append_loss(self, epoch, loss, val_loss):
         os.makedirs(self.log_dir, exist_ok=True)
@@ -296,15 +293,12 @@ class LossHistory:
         iters = range(len(self.losses))
         plt.figure()
         plt.plot(iters, self.losses, "red", linewidth=2, label="train loss")
-        plt.plot(iters, self.val_loss, "coral", linewidth=2, label="val loss")
-        try:
-            num = 5 if len(self.losses) < 25 else 15
-            plt.plot(iters, signal.savgol_filter(self.losses, num, 3), "green", linestyle="--", linewidth=2,
-                     label="train loss")
-            plt.plot(iters, signal.savgol_filter(self.val_loss, num, 3), "#8B4513", linestyle="--", linewidth=2,
-                     label="val loss")
-        except:
-            pass
+        plt.plot(iters, self.val_loss, "green", linewidth=2, label="val loss")
+        num = 5 if len(self.losses) < 25 else 15
+        plt.plot(iters, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
+                 label="train loss")
+        plt.plot(iters, signal.savgol_filter(self.val_loss, num, 3), "#21b3b9", linestyle="--", linewidth=2,
+                 label="val loss")
         plt.grid(True)
         plt.xlabel("epoch")
         plt.ylabel("loss")
@@ -470,8 +464,7 @@ class Yolo(object):
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
             self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
-                                               self.confidence,
-                                               self.nms_iou)
+                                               self.confidence, self.nms_iou)
         t1 = time.time()
         for _ in range(test_interval):
             with torch.no_grad():

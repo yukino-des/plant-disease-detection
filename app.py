@@ -53,14 +53,11 @@ def data(fpath):
 
 if __name__ == "__main__":
     mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]: ")
-    # app
     if mode == "app":
         yolo = Yolo()
-        # shutil.rmtree("data/cache", ignore_errors=True)
-        for _dir in ["data/cache/img/out", "data/cache/video", "data/cache/map"]:
-            os.makedirs(_dir, exist_ok=True)
+        shutil.rmtree("data/cache", ignore_errors=True)
+        os.makedirs("data/cache/img/out", exist_ok=True)
         uvicorn.run(app, host="0.0.0.0", port=8081)
-    # dir
     elif mode == "dir":
         yolo = Yolo()
         img_dir = input("Input directory path: ")
@@ -74,39 +71,27 @@ if __name__ == "__main__":
             image, _ = yolo.detect_image(image)
             os.makedirs("data/cache/img/out", exist_ok=True)
             image.save(os.path.join("data/cache/img/out", img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
-    # fps
     elif mode == "fps":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
         img = Image.open(fps_image_path)
         tact_time = yolo.get_fps(img, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
-    # heatmap
     elif mode == "heatmap":
         yolo = Yolo()
         img = input("Input image path: ")
-        try:
-            image = Image.open(img)
-        except:
-            pass
-        else:
-            yolo.detect_heatmap(image, "data/cache/heatmap.png")
-    # img
+        image = Image.open(img)
+        yolo.detect_heatmap(image, "data/cache/heatmap.png")
     elif mode == "img":
         yolo = Yolo()
         img = input("Input image path: ")
         img_name = img.rsplit("/", 1)[1].split(".")[0]
-        try:
-            image = Image.open(img)
-        except:
-            pass
-        else:
-            image, _ = yolo.detect_image(image)
-            # image.show()
-            image_save_path = os.path.join("data/cache/img/out", img_name + ".png")
-            image.save(image_save_path, quality=95, subsampling=0)
-            print(f"{image_save_path} saved.")
-    # kmeans
+        image = Image.open(img)
+        image, _ = yolo.detect_image(image)
+        # image.show()
+        image_save_path = os.path.join("data/cache/img/out", img_name + ".png")
+        image.save(image_save_path, quality=95, subsampling=0)
+        print(f"{image_save_path} saved.")
     elif mode == "kmeans":
         np.random.seed(0)
         input_shape = [416, 416]
@@ -133,7 +118,6 @@ if __name__ == "__main__":
                 xy = ", %d,%d" % (cluster[i][0], cluster[i][1])
             f.write(xy)
         f.close()
-    # map
     elif mode == "map":
         min_overlap = 0.5
         confidence = 0.001
@@ -169,11 +153,9 @@ if __name__ == "__main__":
                     else:
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(min_overlap, True, score_threshold=score_threshold)
-    # onnx
     elif mode == "onnx":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False, model_path="data/model.onnx")
-    # sum
     elif mode == "sum":
         input_shape = [416, 416]
         anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
@@ -187,7 +169,6 @@ if __name__ == "__main__":
         flops, params = clever_format([flops, params], "%.3f")
         print(f"Total flops: {flops}")
         print(f"Total params: {params}")
-    # video
     elif mode == "video":
         yolo = Yolo()
         video_path = input("Input video path, default camera.: ")
