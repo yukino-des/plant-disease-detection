@@ -19,6 +19,7 @@
 │   ├── mobilenet_v2-b0353104.pth
 │   ├── model.pth
 │   ├── train.txt
+│   ├── あ.txt
 │   └── val.txt
 ├── model.py
 ├── requirements.txt

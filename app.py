@@ -39,8 +39,8 @@ def upload(file: UploadFile):
         image, image_info = yolo.detect_image(Image.open(img_path))
         image.save(img_out_path, quality=95, subsampling=0)
         return {"status": 1,
-                "image_url": "http://127.0.0.1:8081/" + img_path,
-                "draw_url": "http://127.0.0.1:8081/" + img_out_path,
+                "image_url": "http://0.0.0.0:8081/" + img_path,
+                "draw_url": "http://0.0.0.0:8081/" + img_out_path,
                 "image_info": image_info}
     else:
         return {"status": 0}
