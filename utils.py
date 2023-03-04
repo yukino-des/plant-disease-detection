@@ -663,6 +663,16 @@ def make5conv(filters_list, in_filters):
                          conv2d(filters_list[1], filters_list[0], 1))
 
 
+def print_config(**_map):
+    width_k = max(len(k) for k in _map.keys())
+    width_v = max(len(str(v)) for v in _map.values())
+    width = width_k + width_v + 7
+    print("-" * width)
+    for k, v in _map.items():
+        print(f"| {k.rjust(width_k)} | {str(v).rjust(width_v)} |")
+    print("-" * width)
+
+
 def print_table(table_data, col_widths):
     print("-" * (sum(col_widths) + 7))
     for i in range(len(table_data[0])):
@@ -680,16 +690,6 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
     lr = lr_scheduler_func(epoch)
     for param_group in optimizer.param_groups:
         param_group["lr"] = lr
-
-
-def show_config(**_map):
-    width_k = max(len(k) for k in _map.keys())
-    width_v = max(len(str(v)) for v in _map.values())
-    width = width_k + width_v + 7
-    print("-" * width)
-    for k, v in _map.items():
-        print(f"| {k.rjust(width_k)} | {str(v).rjust(width_v)} |")
-    print("-" * width)
 
 
 def step_lr(lr, decay_rate, step_size, iters):

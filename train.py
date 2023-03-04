@@ -6,7 +6,7 @@ from model import EvalCallback, LossHistory, YoloBody, YoloDataset, YoloLoss
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
-from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_txts, set_optimizer_lr, show_config,
+from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_txts, set_optimizer_lr, print_config,
                    yolo_dataset_collate)
 
 if __name__ == "__main__":
@@ -77,13 +77,13 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    show_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt", anchors_mask=anchors_mask,
-                model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
-                unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
-                unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,
-                optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type, save_period=save_period,
-                save_dir="data", num_workers=num_workers, num_train=num_train, num_val=num_val,
-                cuda=torch.cuda.is_available())
+    print_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt", anchors_mask=anchors_mask,
+                 model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
+                 unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
+                 unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,
+                 optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type, save_period=save_period,
+                 save_dir="data", num_workers=num_workers, num_train=num_train, num_val=num_val,
+                 cuda=torch.cuda.is_available())
     wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
     total_step = num_train // unfreeze_batch_size * unfreeze_epoch
     if total_step <= wanted_step and num_train // unfreeze_batch_size == 0:

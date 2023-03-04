@@ -19,7 +19,7 @@ from torch.utils.tensorboard import SummaryWriter
 from torchvision.ops import nms
 from tqdm import tqdm
 from utils import (conv2d, conv_dw, cvt_color, get_anchors, get_classes, get_map, logistic, make3conv, make5conv,
-                   make_divisible, resize_image, show_config, yolo_head)
+                   make_divisible, resize_image, print_config, yolo_head)
 
 
 class Backbone(nn.Module):
@@ -395,9 +395,9 @@ class Yolo(object):
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        show_config(anchors_path=self.anchors_path, input_shape=self.input_shape, anchors_mask=self.anchors_mask,
-                    model_path=self.model_path, cuda=self.cuda, classes_path=self.classes_path,
-                    confidence=self.confidence, nms_iou=self.nms_iou)
+        print_config(anchors_path=self.anchors_path, input_shape=self.input_shape, anchors_mask=self.anchors_mask,
+                     model_path=self.model_path, cuda=self.cuda, classes_path=self.classes_path,
+                     confidence=self.confidence, nms_iou=self.nms_iou)
 
     def generate(self, onnx=False):
         self.net = YoloBody(self.anchors_mask, self.num_classes)
