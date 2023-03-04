@@ -167,9 +167,9 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
         torch.save(model.state_dict(), os.path.join(save_dir, "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
-        print("data/best.pth saved.")
-        torch.save(model.state_dict(), os.path.join(save_dir, "best.pth"))
-    torch.save(model.state_dict(), os.path.join(save_dir, "last.pth"))
+        print("data/model.pth saved.")
+        torch.save(model.state_dict(), os.path.join(save_dir, "model.pth"))
+    torch.save(model.state_dict(), os.path.join(save_dir, "current.pth"))
 
 
 def get_anchors(anchors_path):

@@ -382,7 +382,7 @@ class Yolo(object):
         self.anchors_path = "data/anchors.txt"
         self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-        self.model_path = "data/best.pth"
+        self.model_path = "data/model.pth"
         self.cuda = torch.cuda.is_available()
         self.classes_path = "data/classes.txt"
         self.confidence = confidence

@@ -10,7 +10,7 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
                    yolo_dataset_collate)
 
 if __name__ == "__main__":
-    # 如果训练中断，请修改：model_path = "data/best.pth"
+    # 如果训练中断，请修改：model_path = "data/current.pth"
     model_path = ""
     # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
     init_epoch = 0
