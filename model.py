@@ -143,7 +143,7 @@ class DecodeBox:
 
 class EvalCallback:
     def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_path="tmp/.maps", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+                 maps_path="data/cache/.maps", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
                  eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net
@@ -409,7 +409,7 @@ class Yolo(object):
                 self.net = nn.DataParallel(self.net)
                 self.net = self.net.cuda()
 
-    def detect_image(self, image, crop=False):
+    def detect_image(self, image):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
@@ -429,18 +429,6 @@ class Yolo(object):
             top_boxes = results[0][:, :4]
         font = ImageFont.truetype(font="Arial", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
-        if crop:
-            for i, c in list(enumerate(top_label)):
-                top, left, bottom, right = top_boxes[i]
-                top = max(0, np.floor(top).astype("int32"))
-                left = max(0, np.floor(left).astype("int32"))
-                bottom = min(image.size[1], np.floor(bottom).astype("int32"))
-                right = min(image.size[0], np.floor(right).astype("int32"))
-                dir_save_path = "tmp/imgs_out"
-                os.makedirs(dir_save_path, exist_ok=True)
-                crop_image = image.crop([left, top, right, bottom])
-                crop_image.save(os.path.join(dir_save_path, "crop_" + str(i) + ".png"), quality=95, subsampling=0)
-                print(dir_save_path + "/crop_" + str(i) + ".png saved.")
         image_info = {}
         count = 0
         for i, c in list(enumerate(top_label)):

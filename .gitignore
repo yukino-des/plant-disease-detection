@@ -1,9 +1,9 @@
 *.docx
-VOC/ImageSets/Main/*.txt
+data/VOC/ImageSets/Main/*.txt
 
 __pycache__
 */__pycache__
 .idea
 data
 tmp
-VOC
+data/VOC

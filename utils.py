@@ -206,7 +206,7 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=
     return func
 
 
-def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps"):
+def get_map(min_overlap, draw_plot, score_threshold=0.5, path="data/cache/maps"):
     gt_path = os.path.join(path, ".gt")  # ground_truth
     dr_path = os.path.join(path, ".dr")  # detection_results
     temp_files_path = os.path.join(path, ".temp_files")
@@ -509,7 +509,7 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
     classes, _ = get_classes("data/classes.txt")
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
-    temp_xml = os.listdir("VOC/Annotations")
+    temp_xml = os.listdir("data/VOC/Annotations")
     total_xml = []
     for xml in temp_xml:
         if xml.endswith(".xml"):
@@ -520,11 +520,11 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
-    os.makedirs("VOC/ImageSets/Main", exist_ok=True)
-    ftrainval = open("VOC/ImageSets/Main/trainval.txt", "w")
-    ftest = open("VOC/ImageSets/Main/test.txt", "w")
-    ftrain = open("VOC/ImageSets/Main/train.txt", "w")
-    fval = open("VOC/ImageSets/Main/val.txt", "w")
+    os.makedirs("data/VOC/ImageSets/Main", exist_ok=True)
+    ftrainval = open("data/VOC/ImageSets/Main/trainval.txt", "w")
+    ftest = open("data/VOC/ImageSets/Main/test.txt", "w")
+    ftrain = open("data/VOC/ImageSets/Main/train.txt", "w")
+    fval = open("data/VOC/ImageSets/Main/val.txt", "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
@@ -538,11 +538,11 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
     ftest.close()
     type_index = 0
     for image_set in ["train", "val"]:
-        image_ids = open(f"VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
+        image_ids = open(f"data/VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
         list_file = open(f"data/{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
-            list_file.write(f"VOC/JPEGImages/{image_id}.jpg")
-            in_file = open(f"VOC/Annotations/{image_id}.xml", encoding="utf-8")
+            list_file.write(f"data/VOC/JPEGImages/{image_id}.jpg")
+            in_file = open(f"data/VOC/Annotations/{image_id}.xml", encoding="utf-8")
             tree = ET.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
