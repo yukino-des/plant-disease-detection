@@ -68,7 +68,7 @@ Tomato mold leaf
 grape leaf
 grape leaf black rot
 ```
-データ/VOC データ セットについては、作成者に連絡してください: 3181137349go@gmail.com
+データ/VOC データ セットについては、作成者に連絡してください：3181137349go@gmail.com
 
 4. トレーニング モデル
 ```shell
