@@ -18,12 +18,14 @@
 ```
 
 ### はじめましょう
+
 1. インストールパッケージ
 ```shell
 cd plant-disease-detection
 pip install -r requirements.txt
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 ```
+
 2. data/anchors.txtファイルを作成
 ```shell
 touch data/anchors.txt # 以下を書いてください
@@ -31,6 +33,7 @@ touch data/anchors.txt # 以下を書いてください
 ```text
 12, 16,  19, 36,  40, 28,  36, 75,  76, 55,  72, 146,  142, 110,  192, 243,  459, 401
 ```
+
 3. data/classes.txtファイルを作成
 ```shell
 touch data/classes.txt # 以下を書いてください
@@ -65,10 +68,12 @@ grape leaf
 grape leaf black rot
 ```
 data/VOC datasetについては、作成者に連絡してください。
-4. train model
+
+4. トレーニングモデル
 ```shell
 python train.py
 ```
+
 5. 農作物の病気と害虫の検出を開始し、27 種類の病気と害虫をサポートし、複数の検出モードをサポートします。
 ```shell
 python app.py
