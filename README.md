@@ -3,7 +3,6 @@ YOLOv4 でバックボーン特徴抽出ネットワーク DarkNet の代わり�
 
 ### プロジェクト構造
 ```text
-.
 ├── LICENSE
 ├── README.md
 ├── app.py
