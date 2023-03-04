@@ -67,7 +67,7 @@ Tomato mold leaf
 grape leaf
 grape leaf black rot
 ```
-data/VOC datasetついては、作成者に連絡してください。
+data/VOCデータセットついては、作成者に連絡してください。
 
 4. トレーニングモデル
 ```shell
