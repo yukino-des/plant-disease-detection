@@ -143,7 +143,7 @@ class DecodeBox:
 
 class EvalCallback:
     def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_path="data/cache/.maps", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+                 maps_path="data/cache/.map", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
                  eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net

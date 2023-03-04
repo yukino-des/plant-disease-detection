@@ -64,7 +64,7 @@ if __name__ == "__main__":
     cuda = torch.cuda.is_available()
     yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
-    log_dir = os.path.join("data", f"loss{time_str}")
+    log_dir = os.path.join("data/cache/loss", time_str)
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     model_train = model.train()
     if cuda:
@@ -108,8 +108,7 @@ if __name__ == "__main__":
             pg1.append(v.weight)
     optimizer = {"adam": optim.Adam(pg0, init_lr_fit, betas=(momentum, 0.999)),
                  "adamw": optim.AdamW(pg0, init_lr_fit, betas=(momentum, 0.999)),
-                 "sgd": optim.SGD(pg0, init_lr_fit, momentum=momentum, nesterov=True)
-                 }[optimizer_type]
+                 "sgd": optim.SGD(pg0, init_lr_fit, momentum=momentum, nesterov=True)}[optimizer_type]
     optimizer.add_param_group({"params": pg1, "weight_decay": weight_decay})
     optimizer.add_param_group({"params": pg2})
     lr_scheduler_func = get_lr_scheduler(lr_decay_type, init_lr_fit, min_lr_fit, unfreeze_epoch)
@@ -121,8 +120,7 @@ if __name__ == "__main__":
                                 mixup=mixup, mosaic_prob=mosaic_prob, mixup_prob=mixup_prob, train=True,
                                 special_aug_ratio=special_aug_ratio)
     val_dataset = YoloDataset(val_lines, input_shape, num_classes, epoch_length=unfreeze_epoch, mosaic=False,
-                              mixup=False, mosaic_prob=0, mixup_prob=0, train=False,
-                              special_aug_ratio=0)
+                              mixup=False, mosaic_prob=0, mixup_prob=0, train=False, special_aug_ratio=0)
     train_sampler = None
     val_sampler = None
     shuffle = True
@@ -156,5 +154,5 @@ if __name__ == "__main__":
         gen_val.dataset.epoch_now = epoch
         set_optimizer_lr(optimizer, lr_scheduler_func, epoch)
         fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step,
-                  epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period, save_dir="data")
+                  epoch_step_val, gen, gen_val, unfreeze_epoch, cuda, save_period)
     loss_history.writer.close()

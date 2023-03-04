@@ -28,19 +28,19 @@ def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.split(".")
-    imgs_path = os.path.join("data/cache/imgs", file.filename)
-    imgs_out_path = os.path.join("data/cache/imgs/out", f"{file_name}.png")
+    img_path = os.path.join("data/cache/img", file.filename)
+    img_out_path = os.path.join("data/cache/img/out", f"{file_name}.png")
     try:
-        with open(imgs_path, "wb+") as buffer:
+        with open(img_path, "wb+") as buffer:
             shutil.copyfileobj(file.file, buffer)
     finally:
         file.file.close()
     if extend_name.lower() in ("bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"):
-        image, image_info = yolo.detect_image(Image.open(imgs_path))
-        image.save(imgs_out_path, quality=95, subsampling=0)
+        image, image_info = yolo.detect_image(Image.open(img_path))
+        image.save(img_out_path, quality=95, subsampling=0)
         return {"status": 1,
-                "image_url": "http://127.0.0.1:8081/" + imgs_path,
-                "draw_url": "http://127.0.0.1:8081/" + imgs_out_path,
+                "image_url": "http://127.0.0.1:8081/" + img_path,
+                "draw_url": "http://127.0.0.1:8081/" + img_out_path,
                 "image_info": image_info}
     else:
         return {"status": 0}
@@ -56,8 +56,8 @@ if __name__ == "__main__":
     # app
     if mode == "app":
         yolo = Yolo()
-        shutil.rmtree("data/cache", ignore_errors=True)
-        for _dir in ["data/cache/imgs/out", "data/cache/videos", "data/cache/maps"]:
+        # shutil.rmtree("data/cache", ignore_errors=True)
+        for _dir in ["data/cache/img/out", "data/cache/video", "data/cache/map"]:
             os.makedirs(_dir, exist_ok=True)
         uvicorn.run(app, host="0.0.0.0", port=8081)
     # dir
@@ -72,8 +72,8 @@ if __name__ == "__main__":
             image_path = os.path.join(img_dir, img_name)
             image = Image.open(image_path)
             image, _ = yolo.detect_image(image)
-            os.makedirs("data/cache/imgs/out", exist_ok=True)
-            image.save(os.path.join("data/cache/imgs/out", img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
+            os.makedirs("data/cache/img/out", exist_ok=True)
+            image.save(os.path.join("data/cache/img/out", img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
     # fps
     elif mode == "fps":
         yolo = Yolo()
@@ -103,7 +103,7 @@ if __name__ == "__main__":
         else:
             image, _ = yolo.detect_image(image)
             # image.show()
-            image_save_path = os.path.join("data/cache/imgs/out", img_name + ".png")
+            image_save_path = os.path.join("data/cache/img/out", img_name + ".png")
             image.save(image_save_path, quality=95, subsampling=0)
             print(f"{image_save_path} saved.")
     # kmeans
@@ -140,15 +140,15 @@ if __name__ == "__main__":
         nms_iou = 0.5
         score_threshold = 0.5
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
-        os.makedirs("data/cache/maps/.gt", exist_ok=True)
-        os.makedirs("data/cache/maps/.dr", exist_ok=True)
+        os.makedirs("data/cache/map/.gt", exist_ok=True)
+        os.makedirs("data/cache/map/.dr", exist_ok=True)
         class_names, _ = get_classes("data/classes.txt")
         yolo = Yolo(confidence=confidence, nms_iou=nms_iou)
         for image_id in tqdm(image_ids):
             image_path = f"data/VOC/JPEGImages/{image_id}.jpg"
             image = Image.open(image_path)
-            yolo.get_map_txt(image_id, image, class_names, "data/cache/maps")
-            with open(f"data/cache/maps/.gt/{image_id}.txt", "w") as new_f:
+            yolo.get_map_txt(image_id, image, class_names, "data/cache/map")
+            with open(f"data/cache/map/.gt/{image_id}.txt", "w") as new_f:
                 root = ET.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
@@ -168,9 +168,7 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom} difficult\n")
                     else:
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-        get_map(min_overlap, True, score_threshold=score_threshold, path="data/cache/maps")
-        shutil.rmtree("data/cache/maps/.dr", ignore_errors=True)
-        shutil.rmtree("data/cache/maps/.gt", ignore_errors=True)
+        get_map(min_overlap, True, score_threshold=score_threshold)
     # onnx
     elif mode == "onnx":
         yolo = Yolo()
@@ -194,8 +192,8 @@ if __name__ == "__main__":
         yolo = Yolo()
         video_path = input("Input video path, default camera.: ")
         capture = cv2.VideoCapture(0 if video_path == "" else video_path)
-        os.makedirs("data/cache/videos", exist_ok=True)
-        video_save_path = f"data/cache/videos/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
+        os.makedirs("data/cache/video", exist_ok=True)
+        video_save_path = f"data/cache/video/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
         fourcc = cv2.VideoWriter_fourcc(*"XVID")
         size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         out = cv2.VideoWriter(video_save_path, fourcc, 25.0, size)
