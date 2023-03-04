@@ -10,7 +10,7 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
                    yolo_dataset_collate)
 
 if __name__ == "__main__":
-    # 如果训练中断，请修改：model_path = "data/current.pth"
+    # 如果训练中断，请修改：model_path = "data/cache/current.pth"
     model_path = ""
     # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
     init_epoch = 0
@@ -23,10 +23,10 @@ if __name__ == "__main__":
     lr_decay_type = "cos"
     # -----------------------------------------------------------------------
     # | optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay |
-    # |         "adam",         True,            100,    1e-3,            0 |
-    # |         "adam",        False,            100,    1e-3,            0 |
-    # |          "sgd",         True,            300,    1e-2,         5e-4 |
-    # |          "sgd",        False,            300,    1e-2,         5e-4 |
+    # |         "adam",         True,            300,    1e-3,            0 |
+    # |         "adam",        False,            300,    1e-3,            0 |
+    # |          "sgd",         True,            500,    1e-2,         5e-4 |
+    # |          "sgd",        False,            500,    1e-2,         5e-4 |
     # -----------------------------------------------------------------------
     optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay = "adam", True, 100, 1e-3, 0
     input_shape = [416, 416]
