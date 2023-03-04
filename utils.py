@@ -563,13 +563,13 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
         type_index += 1
         list_file.close()
     str_nums = [str(int(x)) for x in nums]
-    tableData = [classes, str_nums]
-    colWidths = [0] * len(tableData)
-    for i in range(len(tableData)):
-        for j in range(len(tableData[i])):
-            if len(tableData[i][j]) > colWidths[i]:
-                colWidths[i] = len(tableData[i][j])
-    print_table(tableData, colWidths)
+    table_data = [classes, str_nums]
+    col_widths = [0] * len(table_data)
+    for i in range(len(table_data)):
+        for j in range(len(table_data[i])):
+            if len(table_data[i][j]) > col_widths[i]:
+                col_widths[i] = len(table_data[i][j])
+    print_table(table_data, col_widths)
     if photo_nums[0] <= 500:
         raise ValueError("Dataset not qualified.")
     if np.sum(nums) == 0:
@@ -663,13 +663,11 @@ def make5conv(filters_list, in_filters):
                          conv2d(filters_list[1], filters_list[0], 1))
 
 
-def print_table(l1, l2):
-    for i in range(len(l1[0])):
-        print("|", end=" ")
-        for j in range(len(l1)):
-            print(l1[j][i].rjust(int(l2[j])), end=" ")
-            print("|", end=" ")
-        print()
+def print_table(table_data, col_widths):
+    print("-" * (sum(col_widths) + 7))
+    for i in range(len(table_data[0])):
+        print(f"| {table_data[0][i].rjust(col_widths[0])} | {table_data[1][i].rjust(col_widths[1])} |")
+    print("-" * (sum(col_widths) + 7))
 
 
 def resize_image(image, size):
@@ -685,10 +683,10 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
 
 
 def show_config(**_map):
-    print("-" * 55)
+    print("-" * 59)
     for k, v in _map.items():
-        print("|%19s|%33s|" % (k, str(v)))
-    print("-" * 55)
+        print("| %19s | %33s |" % (k, str(v)))
+    print("-" * 59)
 
 
 def step_lr(lr, decay_rate, step_size, iters):
