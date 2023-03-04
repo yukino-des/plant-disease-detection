@@ -1,5 +1,4 @@
 # 作物害虫検出
-YOLOv4 でバックボーン特徴抽出ネットワーク DarkNet の代わりに MobileNetV2 を使用
 
 ### プロジェクト構造
 ```text
@@ -26,7 +25,7 @@ pip install -r requirements.txt
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
-2. data/anchors.txt ファイルを作成
+2. data/anchors.txt を作成
 ```shell
 touch data/anchors.txt # 以下のテキストを書きます
 ```
@@ -34,7 +33,7 @@ touch data/anchors.txt # 以下のテキストを書きます
 12, 16,  19, 36,  40, 28,  36, 75,  76, 55,  72, 146,  142, 110,  192, 243,  459, 401
 ```
 
-3. data/classes.txt ファイルを作成
+3. data/classes.txt を作成
 ```shell
 touch data/classes.txt # 以下のテキストを書きます
 ```
@@ -67,7 +66,7 @@ Tomato mold leaf
 grape leaf
 grape leaf black rot
 ```
-data/VOC データセットについては、作成者に連絡してください：3181137349go@gmail.com ^_^
+data/VOC 作成者に連絡してください：3181137349go@gmail.com ^_^
 
 4. トレーニング モデル
 ```shell
