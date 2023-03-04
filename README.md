@@ -1,4 +1,4 @@
-# 農作物の病気と害虫の検出
+# 作物病虫害の検出
 
 ### プロジェクト構造
 ```text
@@ -17,16 +17,16 @@
 ├── utils.py
 ```
 
-### はじめましょう
+### はじめましょう！
 
-1. インストールパッケージ
+1. インストールパッケージ。
 ```shell
 cd plant-disease-detection
 pip install -r requirements.txt
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
-2. data/anchors.txtファイルを作成
+2. data/anchors.txtを作成。
 ```shell
 touch data/anchors.txt # 以下を書いてください
 ```
@@ -34,7 +34,7 @@ touch data/anchors.txt # 以下を書いてください
 12, 16,  19, 36,  40, 28,  36, 75,  76, 55,  72, 146,  142, 110,  192, 243,  459, 401
 ```
 
-3. data/classes.txtファイルを作成
+3. data/classes.txtを作成。
 ```shell
 touch data/classes.txt # 以下を書いてください
 ```
@@ -67,14 +67,14 @@ Tomato mold leaf
 grape leaf
 grape leaf black rot
 ```
-data/VOC datasetについては、作成者に連絡してください。
+data/VOC datasetついては、作成者に連絡してください。
 
 4. トレーニングモデル
 ```shell
 python train.py
 ```
 
-5. 農作物の病気と害虫の検出を開始し、27 種類の病気と害虫をサポートし、複数の検出モードをサポートします。
+5. 检测が始まり、27種類の作物病虫害と多重检测モードをサポートします。
 ```shell
 python app.py
 ```
