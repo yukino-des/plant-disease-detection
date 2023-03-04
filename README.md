@@ -1,7 +1,7 @@
-# 农作物病虫害检测
-使用MobileNet V2代替YOLOv4中主干特征提取网络DarkNet
+# 作物害虫検出
+YOLOv4 でバックボーン特徴抽出ネットワーク DarkNet の代わりに MobileNet V2 を使用する
 
-### 结构
+### プロジェクト構造
 ```text
 .
 ├── LICENSE
@@ -19,25 +19,25 @@
 ├── utils.py
 ```
 
-### 开始
-1. 下载依赖
+### 始める
+1. 依存関係をダウンロードする
 ```shell
 cd plant-disease-detection
 pip install -r requirements.txt
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
-2. 制作data/anchors.txt文件
+2. data/anchors.txt ファイルを作成
 ```shell
-touch data/anchors.txt # 写入下方文本
+touch data/anchors.txt # 以下のテキストを書きます
 ```
 ```text
 12, 16,  19, 36,  40, 28,  36, 75,  76, 55,  72, 146,  142, 110,  192, 243,  459, 401
 ```
 
-3. 制作data/classes.txt文件
+3. data/classes.txt ファイルを作成する
 ```shell
-touch data/classes.txt # 写入下方文本
+touch data/classes.txt # 以下のテキストを書きます
 ```
 ```text
 Apple Scab Leaf
@@ -68,14 +68,14 @@ Tomato mold leaf
 grape leaf
 grape leaf black rot
 ```
-data/VOC数据集请邮件作者：3181137349@qq.com
+データ/VOC データ セットについては、作成者に連絡してください: 3181137349go@gmail.com
 
-4. 训练
+4. トレーニング モデル
 ```shell
 python train.py
 ```
 
-5. 农作物病虫害检测，支持 `[app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]` 10种模式
+5. 作物害虫検出を開始し、`[app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]` 10 モードをサポート
 ```shell
 python app.py
 ```
