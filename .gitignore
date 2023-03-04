@@ -1,9 +1,0 @@
-*.docx
-data/VOC/ImageSets/Main/*.txt
-
-__pycache__
-*/__pycache__
-.idea
-data
-tmp
-data/VOC
