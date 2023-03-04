@@ -1,5 +1,5 @@
 # 作物害虫検出
-YOLOv4 でバックボーン特徴抽出ネットワーク DarkNet の代わりに MobileNet V2 を使用する
+YOLOv4 でバックボーン特徴抽出ネットワーク DarkNet の代わりに MobileNetV2 を使用
 
 ### プロジェクト構造
 ```text
@@ -19,7 +19,7 @@ YOLOv4 でバックボーン特徴抽出ネットワーク DarkNet の代わり�
 ```
 
 ### 始める
-1. 依存関係をダウンロードする
+1. 依存関係をダウンロード
 ```shell
 cd plant-disease-detection
 pip install -r requirements.txt
@@ -34,7 +34,7 @@ touch data/anchors.txt # 以下のテキストを書きます
 12, 16,  19, 36,  40, 28,  36, 75,  76, 55,  72, 146,  142, 110,  192, 243,  459, 401
 ```
 
-3. data/classes.txt ファイルを作成する
+3. data/classes.txt ファイルを作成
 ```shell
 touch data/classes.txt # 以下のテキストを書きます
 ```
