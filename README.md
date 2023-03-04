@@ -75,7 +75,7 @@ data/VOC数据集请邮件作者：3181137349@qq.com
 python train.py
 ```
 
-5. 农作物病虫害检测，支持 app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video 10种模式
+5. 农作物病虫害检测，支持 `[app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]` 10种模式
 ```shell
 python app.py
 ```
