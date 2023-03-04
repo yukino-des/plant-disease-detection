@@ -683,10 +683,13 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
 
 
 def show_config(**_map):
-    print("-" * 59)
+    width_k = max(len(k) for k in _map.keys())
+    width_v = max(len(str(v)) for v in _map.values())
+    width = width_k + width_v + 7
+    print("-" * width)
     for k, v in _map.items():
-        print("| %19s | %33s |" % (k, str(v)))
-    print("-" * 59)
+        print(f"| {k.rjust(width_k)} | {str(v).rjust(width_v)} |")
+    print("-" * width)
 
 
 def step_lr(lr, decay_rate, step_size, iters):

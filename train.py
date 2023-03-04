@@ -21,13 +21,13 @@ if __name__ == "__main__":
     anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
     # lr_decay_type = "step"
     lr_decay_type = "cos"
-    # ---------------------------------------------------------------------
-    # |optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay|
-    # |        "adam",         True,            100,    1e-3,            0|
-    # |        "adam",        False,            100,    1e-3,            0|
-    # |         "sgd",         True,            300,    1e-2,         5e-4|
-    # |         "sgd",        False,            300,    1e-2,         5e-4|
-    # ---------------------------------------------------------------------
+    # -----------------------------------------------------------------------
+    # | optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay |
+    # |         "adam",         True,            100,    1e-3,            0 |
+    # |         "adam",        False,            100,    1e-3,            0 |
+    # |          "sgd",         True,            300,    1e-2,         5e-4 |
+    # |          "sgd",        False,            300,    1e-2,         5e-4 |
+    # -----------------------------------------------------------------------
     optimizer_type, freeze_train, unfreeze_epoch, init_lr, weight_decay = "adam", True, 100, 1e-3, 0
     input_shape = [416, 416]
     mosaic = True  # 是否使用马赛克数据增强
