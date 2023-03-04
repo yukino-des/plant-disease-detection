@@ -75,7 +75,8 @@ grape leaf black rot
 python train.py
 ```
 
-5. 作物害虫検出を開始し、`[app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]` 10 モードをサポート
+5. 作物害虫検出を開始し
+`[app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]` 10 モードをサポート
 ```shell
 python app.py
 ```
