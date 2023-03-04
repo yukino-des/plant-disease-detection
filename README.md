@@ -27,7 +27,7 @@ pip install torch torchvision torchaudio --extra-index-url https://download.pyto
 
 2. data/anchors.txt を作成
 ```shell
-touch data/anchors.txt # 以下のテキストを書きます
+touch data/anchors.txt # 以下を書きます
 ```
 ```text
 12, 16,  19, 36,  40, 28,  36, 75,  76, 55,  72, 146,  142, 110,  192, 243,  459, 401
@@ -35,7 +35,7 @@ touch data/anchors.txt # 以下のテキストを書きます
 
 3. data/classes.txt を作成
 ```shell
-touch data/classes.txt # 以下のテキストを書きます
+touch data/classes.txt # 以下を書きます
 ```
 ```text
 Apple Scab Leaf
