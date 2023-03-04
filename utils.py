@@ -467,7 +467,7 @@ def get_map(min_overlap, draw_plot, score_threshold=0.5, path="tmp/maps"):
     with open(results_files_path + "/results.txt", "a") as results_file:
         results_file.write("\nnumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
-            results_file.write(f"{class_name}: str(gt_counter_per_class[class_name])\n")
+            results_file.write(f"class_name: {str(gt_counter_per_class[class_name])}\n")
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
