@@ -1,5 +1,5 @@
 *.docx
-data/VOC/ImageSets/Main/*.txt
+*.ipynb
 
 __pycache__
 */__pycache__
