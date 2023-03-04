@@ -27,7 +27,7 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
 def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
-    file_name, extend_name = file.filename.split(".")
+    file_name, extend_name = file.filename.rsplit(".", 1)
     img_path = os.path.join("data/cache/img", file.filename)
     img_out_path = os.path.join("data/cache/img/out", f"{file_name}.png")
     try:
