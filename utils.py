@@ -14,7 +14,7 @@ from matplotlib import pyplot as plt
 from PIL import Image
 from torch import nn
 from tqdm import tqdm
-from xml.etree import ElementTree as ET
+from xml.etree import ElementTree
 
 if os.name == "nt":
     matplotlib.use("Agg")
@@ -122,7 +122,8 @@ def fit1epoch(model_train,
               epoch_step_val,
               gen,
               gen_val,
-              unfreeze_epoch):
+              unfreeze_epoch,
+              period):
     loss = 0
     val_loss = 0
     bar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
@@ -141,13 +142,7 @@ def fit1epoch(model_train,
         # 计算损失
         for i in range(len(outputs)):
             loss_item = yolo_loss(i, outputs[i], targets)
-            # todo
-            print(loss_item, type(loss_item))
             loss_sum += loss_item
-        # loss_value = loss_sum
-        # loss_value.backward()
-        # optimizer.step()
-        # loss += loss_value.item()
         loss_sum.backward()  # 反向传播
         optimizer.step()
         loss += loss_sum.item()
@@ -171,17 +166,16 @@ def fit1epoch(model_train,
             for i in range(len(outputs)):
                 val_loss_item = yolo_loss(i, outputs[i], targets)
                 val_loss_sum += val_loss_item
-            # val_loss_value = val_loss_sum
         val_loss += val_loss_sum.item()
         bar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
         bar.update(1)
     bar.close()
     loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
     eval_callback.on_epoch_end(epoch + 1, model_train)
-    print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
-    print("loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
+    print(f"epoch: {str(epoch + 1)}/{str(unfreeze_epoch)}")
+    print("loss=%.3f; val_loss=%.3f" % (loss / epoch_step, val_loss / epoch_step_val))
     # 保存权值
-    if (epoch + 1) % 10 == 0 or epoch + 1 == unfreeze_epoch:
+    if (epoch + 1) % period == 0 or epoch + 1 == unfreeze_epoch:
         torch.save(model.state_dict(), "data/cache/loss/epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
@@ -557,7 +551,7 @@ def get_txt(seed=0, train_val_percent=0.9, train_percent=0.9):
         for image_id in image_ids:
             list_file.write(f"data/VOC/JPEGImages/{image_id}.jpg")
             in_file = open(f"data/VOC/Annotations/{image_id}.xml", encoding="utf-8")
-            tree = ET.parse(in_file)
+            tree = ElementTree.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
                 difficult = 0
@@ -615,7 +609,7 @@ def k_means(box, k):
 def load_data():
     data = []
     for xml_file in tqdm(glob.glob("data/VOC/Annotations/*xml")):
-        tree = ET.parse(xml_file)
+        tree = ElementTree.parse(xml_file)
         height = int(tree.findtext("./size/height"))
         width = int(tree.findtext("./size/width"))
         if height <= 0 or width <= 0:

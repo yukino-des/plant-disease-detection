@@ -16,7 +16,7 @@ from thop import clever_format, profile
 from torchsummary import summary
 from tqdm import tqdm
 from utils import avg_iou, get_classes, get_map, k_means, load_data
-from xml.etree import ElementTree as ET
+from xml.etree import ElementTree
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["GET", "POST"],
@@ -130,7 +130,7 @@ if __name__ == "__main__":
             image = Image.open(image_path)
             yolo.get_map_txt(image_id, image, class_names)
             with open(f"data/cache/map/.gt/{image_id}.txt", "w") as new_f:
-                root = ET.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
+                root = ElementTree.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
                     if obj.find("difficult") is not None:

@@ -221,5 +221,6 @@ if __name__ == "__main__":
                   epoch_step_val=epoch_step_val,
                   gen=gen,
                   gen_val=gen_val,
-                  unfreeze_epoch=unfreeze_epoch)
+                  unfreeze_epoch=unfreeze_epoch,
+                  period=period)
     loss_history.writer.close()
