@@ -164,8 +164,8 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
     print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
     print("loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
     if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
-        torch.save(model.state_dict(), os.path.join("data/cache/loss", "epoch%03d-loss%.3f-val_loss%.3f.pth" % (
-            epoch + 1, loss / epoch_step, val_loss / epoch_step_val)))
+        torch.save(model.state_dict(), "data/cache/loss/epoch%03d-loss%.3f-val_loss%.3f.pth" % (
+            epoch + 1, loss / epoch_step, val_loss / epoch_step_val))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
         torch.save(model.state_dict(), "data/model.pth")
         print("data/model.pth saved.")
@@ -225,7 +225,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
     for txt_file in ground_truth_files:
         file_id = txt_file.split(".txt", 1)[0]
         file_id = os.path.basename(os.path.normpath(file_id))
-        temp_path = os.path.join(dr_path, (file_id + ".txt"))
+        temp_path = f"{dr_path}/{file_id}.txt"
         if not os.path.exists(temp_path):
             raise FileNotFoundError(f"{temp_path} not found.")
         lines_list = lines_to_list(txt_file)
@@ -279,7 +279,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                     else:
                         counter_images_per_class[class_name] = 1
                     already_seen_classes.append(class_name)
-        with open(os.path.join(tf_path, f"{file_id}_ground_truth.json"), "w") as outfile:
+        with open(f"{tf_path}/{file_id}_ground_truth.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     gt_classes = list(gt_counter_per_class.keys())
     gt_classes = sorted(gt_classes)
@@ -291,7 +291,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
         for txt_file in dr_files_list:
             file_id = txt_file.split(".txt", 1)[0]
             file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = os.path.join(gt_path, file_id + ".txt")
+            temp_path = f"{gt_path}/{file_id}.txt"
             if class_index == 0:
                 if not os.path.exists(temp_path):
                     raise FileNotFoundError(f"{temp_path} not found.")
@@ -314,7 +314,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                     bbox = f"{left} {top} {right} {bottom}"
                     bounding_boxes.append({"confidence": confidence, "file_id": file_id, "bbox": bbox})
         bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
-        with open(os.path.join(tf_path, f"{class_name}_dr.json"), "w") as outfile:
+        with open(f"{tf_path}/{class_name}_dr.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     sum_ap = 0.0
     ap_dictionary = {}
@@ -324,7 +324,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0
-            dr_file = os.path.join(tf_path, f"{class_name}_dr.json")
+            dr_file = f"{tf_path}/{class_name}_dr.json"
             dr_data = json.load(open(dr_file))
             nd = len(dr_data)
             tp = [0] * nd
@@ -336,7 +336,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threshold:
                     score_threshold_idx = idx
-                gt_file = os.path.join(tf_path, f"{file_id}_ground_truth.json")
+                gt_file = f"{tf_path}/{file_id}_ground_truth.json"
                 ground_truth_data = json.load(open(gt_file))
                 ovmax = -1
                 gt_match = -1

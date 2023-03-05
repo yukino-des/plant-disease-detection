@@ -28,13 +28,10 @@ def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.rsplit(".", 1)
-    img_path = os.path.join("data/cache/img", file.filename)
-    img_out_path = os.path.join("data/cache/img/out", f"{file_name}.png")
-    try:
-        with open(img_path, "wb+") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-    finally:
-        file.file.close()
+    img_path = f"data/cache/img/{file_name}"
+    img_out_path = f"data/cache/img/out/{file_name}.png"
+    with open(img_path, "wb+") as buffer:
+        shutil.copyfileobj(file.file, buffer)
     if extend_name.lower() in ("bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"):
         image, image_info = yolo.detect_image(Image.open(img_path))
         image.save(img_out_path, quality=95, subsampling=0)
@@ -46,9 +43,9 @@ def upload(file: UploadFile):
         return {"status": 0}
 
 
-@app.get("/data/{fpath:path}", response_class=FileResponse)
-def data(fpath):
-    return FileResponse(os.path.join("data", fpath), headers={"Content-Type": "image/png"})
+@app.get("/data/{file_path:path}", response_class=FileResponse)
+def data(file_path):
+    return FileResponse(f"data{file_path}", headers={"Content-Type": "image/png"})
 
 
 if __name__ == "__main__":
@@ -70,7 +67,7 @@ if __name__ == "__main__":
             image = Image.open(image_path)
             image, _ = yolo.detect_image(image)
             os.makedirs("data/cache/img/out", exist_ok=True)
-            image.save(os.path.join("data/cache/img/out", img_name.replace(".jpg", ".png")), quality=95, subsampling=0)
+            image.save(f"data/cache/img/out/{img_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
     elif mode == "fps":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
@@ -89,7 +86,7 @@ if __name__ == "__main__":
         image = Image.open(img)
         image, _ = yolo.detect_image(image)
         # image.show()
-        image_save_path = os.path.join("data/cache/img/out", img_name + ".png")
+        image_save_path = f"data/cache/img/out/{img_name}.png"
         image.save(image_save_path, quality=95, subsampling=0)
         print(f"{image_save_path} saved.")
     elif mode == "kmeans":

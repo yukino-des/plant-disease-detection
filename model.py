@@ -141,7 +141,7 @@ class DecodeBox:
 
 class EvalCallback:
     def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 maps_path="data/cache/map", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+                 map_path="data/cache/map", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
                  eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net
@@ -153,7 +153,7 @@ class EvalCallback:
         self.val_lines = val_lines
         self.log_dir = log_dir
         self.cuda = cuda
-        self.maps_path = maps_path
+        self.map_path = map_path
         self.max_boxes = max_boxes
         self.confidence = confidence
         self.nms_iou = nms_iou
@@ -165,12 +165,12 @@ class EvalCallback:
         self.maps = [0.0]
         self.epochs = [0]
         if self.eval_flag:
-            with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
+            with open(f"{self.log_dir}/map.txt", "a") as f:
                 f.write(str(0))
                 f.write("\n")
 
-    def get_map_txt(self, image_id, image, class_names, maps_path):
-        f = open(os.path.join(maps_path, f".dr/{image_id}.txt"), "w", encoding="utf-8")
+    def get_map_txt(self, image_id, image, class_names, map_path):
+        f = open(f"{map_path}/.dr/{image_id}.txt", "w", encoding="utf-8")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
@@ -207,16 +207,16 @@ class EvalCallback:
     def on_epoch_end(self, epoch, model_eval):
         if epoch % self.period == 0 and self.eval_flag:
             self.net = model_eval
-            os.makedirs(self.maps_path, exist_ok=True)
-            os.makedirs(os.path.join(self.maps_path, ".gt"), exist_ok=True)
-            os.makedirs(os.path.join(self.maps_path, ".dr"), exist_ok=True)
+            os.makedirs(self.map_path, exist_ok=True)
+            os.makedirs(f"{self.map_path}/.gt", exist_ok=True)
+            os.makedirs(f"{self.map_path}/.dr", exist_ok=True)
             for annotation_line in tqdm(self.val_lines):
                 line = annotation_line.split()
                 image_id = os.path.basename(line[0]).split(".")[0]
                 image = Image.open(line[0])
                 gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
-                self.get_map_txt(image_id, image, self.class_names, self.maps_path)
-                with open(os.path.join(self.maps_path, f".gt/{image_id}.txt"), "w") as new_f:
+                self.get_map_txt(image_id, image, self.class_names, self.map_path)
+                with open(f"{self.map_path}/.gt/{image_id}.txt", "w") as new_f:
                     for box in gt_boxes:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]
@@ -224,7 +224,7 @@ class EvalCallback:
             temp_map = get_map(self.min_overlap, False)
             self.maps.append(temp_map)
             self.epochs.append(epoch)
-            with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
+            with open(f"{self.log_dir}/map.txt", "a") as f:
                 f.write(str(temp_map))
                 f.write("\n")
             plt.figure()
@@ -234,10 +234,10 @@ class EvalCallback:
             plt.ylabel(f"map {str(self.min_overlap)}")
             plt.title("a map curve")
             plt.legend(loc="upper right")
-            plt.savefig(os.path.join(self.log_dir, "map.png"))
+            plt.savefig(f"{self.log_dir}/map.png")
             plt.cla()
             plt.close("all")
-            shutil.rmtree(self.maps_path)
+            shutil.rmtree(self.map_path)
 
 
 # 倒残差
@@ -277,10 +277,10 @@ class LossHistory:
         os.makedirs(self.log_dir, exist_ok=True)
         self.losses.append(loss)
         self.val_loss.append(val_loss)
-        with open(os.path.join(self.log_dir, "loss.txt"), "a") as f:
+        with open(f"{self.log_dir}/loss.txt", "a") as f:
             f.write(str(loss))
             f.write("\n")
-        with open(os.path.join(self.log_dir, "val_loss.txt"), "a") as f:
+        with open(f"{self.log_dir}/val_loss.txt", "a") as f:
             f.write(str(val_loss))
             f.write("\n")
         self.writer.add_scalar("loss", loss, epoch)
@@ -301,7 +301,7 @@ class LossHistory:
         plt.xlabel("epoch")
         plt.ylabel("loss")
         plt.legend(loc="upper right")
-        plt.savefig(os.path.join(self.log_dir, "loss.png"))
+        plt.savefig(f"{self.log_dir}/loss.png")
         plt.cla()
         plt.close("all")
 

@@ -64,7 +64,7 @@ if __name__ == "__main__":
     cuda = torch.cuda.is_available()
     yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
-    log_dir = os.path.join("data/cache/loss", time_str)
+    log_dir = f"data/cache/loss{time_str}"
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     model_train = model.train()
     if cuda:
@@ -129,7 +129,7 @@ if __name__ == "__main__":
                      pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=train_sampler)
     gen_val = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
                          pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=val_sampler)
-    eval_callback = EvalCallback(model, input_shape, anchors, class_names, num_classes, val_lines,
+    eval_callback = EvalCallback(model, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines,
                                  log_dir, cuda, eval_flag=eval_flag, period=eval_period)
     for epoch in range(init_epoch, unfreeze_epoch):
         if epoch >= freeze_epoch and not unfreeze_flag and freeze_train:
