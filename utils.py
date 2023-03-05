@@ -135,18 +135,22 @@ def fit1epoch(model_train,
             if torch.cuda.is_available():
                 images = images.cuda(0)
                 targets = [ann.cuda(0) for ann in targets]
-        optimizer.zero_grad()
-        outputs = model_train(images)
+        optimizer.zero_grad()  # 清零梯度
+        outputs = model_train(images)  # 前向传播
         loss_sum = 0
+        # 计算损失
         for i in range(len(outputs)):
             loss_item = yolo_loss(i, outputs[i], targets)
+            # todo
+            print(loss_item, type(loss_item))
             loss_sum += loss_item
-        loss_value = loss_sum
-        # todo
-        print(type(loss_value))
-        loss_value.backward()
+        # loss_value = loss_sum
+        # loss_value.backward()
+        # optimizer.step()
+        # loss += loss_value.item()
+        loss_sum.backward()  # 反向传播
         optimizer.step()
-        loss += loss_value.item()
+        loss += loss_sum.item()
         bar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
         bar.update(1)
     bar.close()
@@ -160,14 +164,15 @@ def fit1epoch(model_train,
             if torch.cuda.is_available():
                 images = images.cuda(0)
                 targets = [ann.cuda(0) for ann in targets]
-            optimizer.zero_grad()
-            outputs = model_train(images)
-            loss_value_all = 0
+            optimizer.zero_grad()  # 清零梯度
+            outputs = model_train(images)  # 前向传播
+            val_loss_sum = 0
+            # 计算损失
             for i in range(len(outputs)):
-                loss_item = yolo_loss(i, outputs[i], targets)
-                loss_value_all += loss_item
-            loss_value = loss_value_all
-        val_loss += loss_value.item()
+                val_loss_item = yolo_loss(i, outputs[i], targets)
+                val_loss_sum += val_loss_item
+            # val_loss_value = val_loss_sum
+        val_loss += val_loss_sum.item()
         bar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
         bar.update(1)
     bar.close()
@@ -175,6 +180,7 @@ def fit1epoch(model_train,
     eval_callback.on_epoch_end(epoch + 1, model_train)
     print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
     print("loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
+    # 保存权值
     if (epoch + 1) % 10 == 0 or epoch + 1 == unfreeze_epoch:
         torch.save(model.state_dict(), "data/cache/loss/epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val))
