@@ -23,6 +23,11 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
                    allow_headers=["Content-Type", "X-Requested-With"])
 
 
+@app.get("/data/{file_path:path}", response_class=FileResponse)
+def data(file_path):
+    return FileResponse(f"data/{file_path}", headers={"Content-Type": "image/png"})
+
+
 @app.post("/upload", response_model=dict)
 def upload(file: UploadFile):
     if file is None:
@@ -41,11 +46,6 @@ def upload(file: UploadFile):
                 "image_info": image_info}
     else:
         return {"status": 0}
-
-
-@app.get("/data/{file_path:path}", response_class=FileResponse)
-def data(file_path):
-    return FileResponse(f"data{file_path}", headers={"Content-Type": "image/png"})
 
 
 if __name__ == "__main__":

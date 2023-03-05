@@ -633,13 +633,6 @@ def logistic(x):
         return np.exp(x) / (1 + np.exp(x))
 
 
-def make_divisible(v, divisor):
-    new_v = max(divisor, int(v + divisor / 2) // divisor * divisor)
-    if new_v < 0.9 * v:
-        new_v += divisor
-    return new_v
-
-
 def make3conv(filters_list, in_filters):
     return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
                          conv_dw(filters_list[0], filters_list[1]),
@@ -652,6 +645,13 @@ def make5conv(filters_list, in_filters):
                          conv2d(filters_list[1], filters_list[0], 1),
                          conv_dw(filters_list[0], filters_list[1]),
                          conv2d(filters_list[1], filters_list[0], 1))
+
+
+def make_divisible(v, divisor):
+    new_v = max(divisor, int(v + divisor / 2) // divisor * divisor)
+    if new_v < 0.9 * v:
+        new_v += divisor
+    return new_v
 
 
 def print_config(**_map):
