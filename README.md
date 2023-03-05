@@ -48,9 +48,5 @@ python app.py
 
 4. 次の単語のスペルを無視
 ```text
-bndbox
-trainval
-upsample
-xmax, xmin, ymax, ymin
-xvid
+[bndbox, trainval, upsample, xmax, xmin, ymax, ymin, xvid]
 ```
