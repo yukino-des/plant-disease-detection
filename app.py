@@ -33,7 +33,7 @@ def upload(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.rsplit(".", 1)
-    img_path = f"data/cache/img/{file_name}"
+    img_path = f"data/cache/img/{file.filename}"
     img_out_path = f"data/cache/img/out/{file_name}.png"
     with open(img_path, "wb+") as buffer:
         shutil.copyfileobj(file.file, buffer)
@@ -95,8 +95,8 @@ if __name__ == "__main__":
         anchors_num = 9
         data = load_data()
         cluster, near = k_means(data, anchors_num)
-        data = data * np.array([input_shape[1], input_shape[0]])
-        cluster = cluster * np.array([input_shape[1], input_shape[0]])
+        data = data * np.array([416, 416])
+        cluster = cluster * np.array([416, 416])
         for j in range(anchors_num):
             plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
             plt.scatter(cluster[j][0], cluster[j][1], marker="x", c="black")
@@ -116,15 +116,11 @@ if __name__ == "__main__":
             f.write(xy)
         f.close()
     elif mode == "map":
-        min_overlap = 0.5
-        confidence = 0.001
-        nms_iou = 0.5
-        score_threshold = 0.5
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/.gt", exist_ok=True)
         os.makedirs("data/cache/map/.dr", exist_ok=True)
         class_names, _ = get_classes()
-        yolo = Yolo(confidence=confidence, nms_iou=nms_iou)
+        yolo = Yolo(confidence=0.001, nms_iou=0.5)
         for image_id in tqdm(image_ids):
             image_path = f"data/VOC/JPEGImages/{image_id}.jpg"
             image = Image.open(image_path)
@@ -149,18 +145,16 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom} difficult\n")
                     else:
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-        get_map(min_overlap, True, score_threshold=score_threshold)
+        get_map(0.5, 0.5)
     elif mode == "onnx":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
     elif mode == "sum":
         input_shape = [416, 416]
-        anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-        num_classes = 80
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        m = YoloBody(num_classes).to(device)
-        summary(m, (3, input_shape[0], input_shape[1]))
-        dummy_input = torch.randn(1, 3, input_shape[0], input_shape[1]).to(device)
+        m = YoloBody(80).to(device)
+        summary(m, (3, 416, 416))
+        dummy_input = torch.randn(1, 3, 416, 416).to(device)
         flops, params = profile(m.to(device), (dummy_input,), verbose=False)
         flops = flops * 2
         flops, params = clever_format([flops, params], "%.3f")

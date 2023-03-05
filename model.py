@@ -5,7 +5,6 @@ import numpy as np
 import onnx
 import onnxsim
 import os
-import shutil
 import time
 import torch
 from matplotlib import pyplot as plt
@@ -17,9 +16,8 @@ from torch.hub import load_state_dict_from_url
 from torch.utils.data.dataset import Dataset
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.ops import nms
-from tqdm import tqdm
-from utils import (conv2d, conv_dw, cvt_color, get_anchors, get_classes, get_map, logistic, make3conv, make5conv,
-                   make_divisible, resize_image, print_config, yolo_head)
+from utils import (conv2d, conv_dw, cvt_color, get_anchors, get_classes, logistic, make3conv, make5conv, make_divisible,
+                   resize_image, print_config, yolo_head)
 
 
 class Backbone(nn.Module):
@@ -48,12 +46,12 @@ class ConvBNReLU(nn.Sequential):
 
 
 class DecodeBox:
-    def __init__(self, anchors, num_classes, input_shape):
+    def __init__(self, anchors, num_classes):
         super(DecodeBox, self).__init__()
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
-        self.input_shape = input_shape
+        self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 
     @staticmethod
@@ -61,10 +59,9 @@ class DecodeBox:
         box_yx = box_xy[..., ::-1]
         box_hw = box_wh[..., ::-1]
         image_shape = np.array(image_shape)
-        box_min = box_yx - (box_hw / 2.)
-        box_max = box_yx + (box_hw / 2.)
-        boxes = np.concatenate([box_min[..., 0:1], box_min[..., 1:2], box_max[..., 0:1], box_max[..., 1:2]],
-                               axis=-1)
+        box_min = box_yx - (box_hw / 2.0)
+        box_max = box_yx + (box_hw / 2.0)
+        boxes = np.concatenate([box_min[..., 0:1], box_min[..., 1:2], box_max[..., 0:1], box_max[..., 1:2]], axis=-1)
         boxes *= np.concatenate([image_shape, image_shape], axis=-1)
         return boxes
 
@@ -74,8 +71,8 @@ class DecodeBox:
             batch_size = _input.size(0)
             input_height = _input.size(2)
             input_width = _input.size(3)
-            stride_h = self.input_shape[0] / input_height
-            stride_w = self.input_shape[1] / input_width
+            stride_h = 416 / input_height
+            stride_w = 416 / input_width
             scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
                               self.anchors[self.anchors_mask[i]]]
             prediction = _input.view(batch_size, len(self.anchors_mask[i]), self.bbox_attrs, input_height,
@@ -140,116 +137,6 @@ class DecodeBox:
         return output
 
 
-class EvalCallback:
-    def __init__(self,
-                 net,
-                 input_shape,
-                 anchors,
-                 class_names,
-                 num_classes,
-                 val_lines,
-                 log_dir,
-                 max_boxes=100,
-                 confidence=0.05,
-                 nms_iou=0.5,
-                 min_overlap=0.5,
-                 eval_flag=True,
-                 period=1):
-        super(EvalCallback, self).__init__()
-        self.net = net
-        self.input_shape = input_shape
-        self.anchors = anchors
-        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-        self.class_names = class_names
-        self.num_classes = num_classes
-        self.val_lines = val_lines
-        self.log_dir = log_dir
-        self.cuda = torch.cuda.is_available()
-        self.map_path = "data/cache/map"
-        self.max_boxes = max_boxes
-        self.confidence = confidence
-        self.nms_iou = nms_iou
-        self.min_overlap = min_overlap
-        self.eval_flag = eval_flag
-        self.period = period
-        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]))
-        self.maps = [0.0]
-        self.epochs = [0]
-        if self.eval_flag:
-            with open(f"{self.log_dir}/map.txt", "a") as f:
-                f.write(str(0) + "\n")
-
-    def get_map_txt(self, image_id, image, class_names, map_path):
-        f = open(f"{map_path}/.dr/{image_id}.txt", "w", encoding="utf-8")
-        image_shape = np.array(np.shape(image)[0:2])
-        image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
-        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
-        with torch.no_grad():
-            images = torch.from_numpy(image_data)
-            if self.cuda:
-                images = images.cuda()
-            outputs = self.net(images)
-            outputs = self.bbox_util.decode_box(outputs)
-            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
-                                                         self.confidence, self.nms_iou)
-            if results[0] is None:
-                return
-            top_label = np.array(results[0][:, 6], dtype="int32")
-            top_conf = results[0][:, 4] * results[0][:, 5]
-            top_boxes = results[0][:, :4]
-        top_100 = np.argsort(top_conf)[::-1][:self.max_boxes]
-        top_boxes = top_boxes[top_100]
-        top_conf = top_conf[top_100]
-        top_label = top_label[top_100]
-        for i, c in list(enumerate(top_label)):
-            predicted_class = self.class_names[int(c)]
-            box = top_boxes[i]
-            score = str(top_conf[i])
-            top, left, bottom, right = box
-            if predicted_class not in class_names:
-                continue
-            f.write(f"{predicted_class} {score[:6]} "
-                    f"{str(int(left))} {str(int(top))} {str(int(right))} {str(int(bottom))}\n")
-        f.close()
-        return
-
-    def on_epoch_end(self, epoch, model_eval):
-        if epoch % self.period == 0 and self.eval_flag:
-            self.net = model_eval
-            os.makedirs(self.map_path, exist_ok=True)
-            os.makedirs(f"{self.map_path}/.gt", exist_ok=True)
-            os.makedirs(f"{self.map_path}/.dr", exist_ok=True)
-            for annotation_line in tqdm(self.val_lines):
-                line = annotation_line.split()
-                image_id = os.path.basename(line[0]).split(".")[0]
-                image = Image.open(line[0])
-                gt_boxes = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
-                self.get_map_txt(image_id, image, self.class_names, self.map_path)
-                with open(f"{self.map_path}/.gt/{image_id}.txt", "w") as new_f:
-                    for box in gt_boxes:
-                        left, top, right, bottom, obj = box
-                        obj_name = self.class_names[obj]
-                        new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-            temp_map = get_map(self.min_overlap, False)
-            self.maps.append(temp_map)
-            self.epochs.append(epoch)
-            with open(f"{self.log_dir}/map.txt", "a") as f:
-                f.write(str(temp_map))
-                f.write("\n")
-            plt.figure()
-            plt.plot(self.epochs, self.maps, "red", linewidth=2, label="train map")
-            plt.grid(True)
-            plt.xlabel("epoch")
-            plt.ylabel(f"map {str(self.min_overlap)}")
-            plt.title("a map curve")
-            plt.legend(loc="upper right")
-            plt.savefig(f"{self.log_dir}/map.png")
-            plt.cla()
-            plt.close("all")
-            shutil.rmtree(self.map_path)
-
-
 # 倒残差
 class InvertedResidual(nn.Module):
     def __init__(self, inp, oup, stride, expand_ratio):
@@ -274,13 +161,13 @@ class InvertedResidual(nn.Module):
 
 
 class LossHistory:
-    def __init__(self, log_dir, model, input_shape):
+    def __init__(self, log_dir, model):
         self.log_dir = log_dir
         self.losses = []
         self.val_loss = []
         os.makedirs(self.log_dir, exist_ok=True)
         self.writer = SummaryWriter(self.log_dir)
-        dummy_input = torch.randn(2, 3, input_shape[0], input_shape[1])
+        dummy_input = torch.randn(2, 3, 416, 416)
         self.writer.add_graph(model, dummy_input)
 
     def append_loss(self, epoch, loss, val_loss):
@@ -288,11 +175,9 @@ class LossHistory:
         self.losses.append(loss)
         self.val_loss.append(val_loss)
         with open(f"{self.log_dir}/loss.txt", "a") as f:
-            f.write(str(loss))
-            f.write("\n")
+            f.write(f"{str(loss)}\n")
         with open(f"{self.log_dir}/val_loss.txt", "a") as f:
-            f.write(str(val_loss))
-            f.write("\n")
+            f.write(f"{str(val_loss)}\n")
         self.writer.add_scalar("loss", loss, epoch)
         self.writer.add_scalar("val_loss", val_loss, epoch)
         self.loss_plot()
@@ -384,41 +269,37 @@ class Upsample(nn.Module):
 
 class Yolo(object):
     def __init__(self, confidence=0.5, nms_iou=0.3):
-        self.anchors_path = "data/anchors.txt"
         self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
-        self.model_path = "data/model.pth"
-        self.cuda = torch.cuda.is_available()
-        self.classes_path = "data/classes.txt"
         self.confidence = confidence
         self.nms_iou = nms_iou
         self.class_names, self.num_classes = get_classes()
         self.anchors, self.num_anchors = get_anchors()
-        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]))
+        self.bbox_util = DecodeBox(self.anchors, self.num_classes)
         hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.net = YoloBody(self.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.net.load_state_dict(torch.load(self.model_path, map_location=device))
+        self.net.load_state_dict(torch.load("data/model.pth", map_location=device))
         self.net = self.net.eval()
-        if self.cuda:
+        if torch.cuda.is_available():
             self.net = nn.DataParallel(self.net).cuda()
-        print_config(anchors_path=self.anchors_path,
-                     input_shape=self.input_shape,
+        print_config(anchors_path="data/anchors.txt",
+                     input_shape=[416, 416],
                      anchors_mask=self.anchors_mask,
-                     model_path=self.model_path,
-                     cuda=self.cuda,
-                     classes_path=self.classes_path,
+                     model_path="data/model.pth",
+                     cuda=torch.cuda.is_available(),
+                     classes_path="data/classes.txt",
                      confidence=self.confidence,
                      nms_iou=self.nms_iou)
 
     def convert_to_onnx(self, simplify):
         self.net = YoloBody(self.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.net.load_state_dict(torch.load(self.model_path, map_location=device))
+        self.net.load_state_dict(torch.load("data/model.pth", map_location=device))
         self.net = self.net.eval()
-        im = torch.zeros(1, 3, *self.input_shape).to("cpu")
+        im = torch.zeros(1, 3, 416, 416).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
         torch.onnx.export(self.net, im, f="data/cache/model.onnx", verbose=False, opset_version=12,
@@ -434,11 +315,11 @@ class Yolo(object):
 
     def detect_heatmap(self, image):
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
+        image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
-            if self.cuda:
+            if torch.cuda.is_available():
                 images = images.cuda()
             outputs = self.net(images)
         plt.imshow(image, alpha=1)
@@ -462,11 +343,11 @@ class Yolo(object):
     def detect_image(self, image):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
+        image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
-            if self.cuda:
+            if torch.cuda.is_available():
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
@@ -478,7 +359,7 @@ class Yolo(object):
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
         font = ImageFont.truetype(font="data/あ.ttc", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
-        thickness = int(max((image.size[0] + image.size[1]) // np.mean(self.input_shape), 1))
+        thickness = int(max((image.size[0] + image.size[1]) // np.mean([416, 416]), 1))
         image_info = {}
         count = 0
         for i, c in list(enumerate(top_label)):
@@ -511,11 +392,11 @@ class Yolo(object):
     def get_fps(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
+        image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
-            if self.cuda:
+            if torch.cuda.is_available():
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
@@ -536,11 +417,11 @@ class Yolo(object):
         f = open(f"data/cache/map/.dr/{image_id}.txt", "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
-        image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
+        image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
         with torch.no_grad():
             images = torch.from_numpy(image_data)
-            if self.cuda:
+            if torch.cuda.is_available():
                 images = images.cuda()
             outputs = self.net(images)
             outputs = self.bbox_util.decode_box(outputs)
@@ -613,11 +494,11 @@ class YoloBody(nn.Module):
 
 
 class YoloDataset(Dataset):
-    def __init__(self, annotation_lines, input_shape, num_classes, epoch_length, mosaic, mix_up, mosaic_prob,
+    def __init__(self, annotation_lines, num_classes, epoch_length, mosaic, mix_up, mosaic_prob,
                  mix_up_prob, train, special_aug_ratio=0.7):
         super(YoloDataset, self).__init__()
         self.annotation_lines = annotation_lines
-        self.input_shape = input_shape
+        self.input_shape = [416, 416]
         self.num_classes = num_classes
         self.epoch_length = epoch_length
         self.mosaic = mosaic
@@ -639,18 +520,18 @@ class YoloDataset(Dataset):
             lines = sample(self.annotation_lines, 3)
             lines.append(self.annotation_lines[index])
             shuffle(lines)
-            image, box = self.get_random_data_with_mosaic(lines, self.input_shape)
+            image, box = self.get_random_data_with_mosaic(lines)
             if self.mix_up and self.rand() < self.mix_up_prob:
                 lines = sample(self.annotation_lines, 1)
-                image_2, box_2 = self.get_random_data(lines[0], self.input_shape, random=self.train)
+                image_2, box_2 = self.get_random_data(lines[0], random=self.train)
                 image, box = self.get_random_data_with_mix_up(image, box, image_2, box_2)
         else:
-            image, box = self.get_random_data(self.annotation_lines[index], self.input_shape, random=self.train)
+            image, box = self.get_random_data(self.annotation_lines[index], random=self.train)
         image = np.transpose(np.array(image, dtype=np.float32) / 255.0, (2, 0, 1))
         box = np.array(box, dtype=np.float32)
         if len(box) != 0:
-            box[:, [0, 2]] = box[:, [0, 2]] / self.input_shape[1]
-            box[:, [1, 3]] = box[:, [1, 3]] / self.input_shape[0]
+            box[:, [0, 2]] = box[:, [0, 2]] / 416
+            box[:, [1, 3]] = box[:, [1, 3]] / 416
             box[:, 2:4] = box[:, 2:4] - box[:, 0:2]
             box[:, 0:2] = box[:, 0:2] + box[:, 2:4] / 2
         return image, box
@@ -713,12 +594,12 @@ class YoloDataset(Dataset):
     def rand(a=0.0, b=1.0):
         return np.random.rand() * (b - a) + a
 
-    def get_random_data(self, annotation_line, input_shape, jitter=0.3, hue=0.1, sat=0.7, val=0.4, random=True):
+    def get_random_data(self, annotation_line, jitter=0.3, hue=0.1, sat=0.7, val=0.4, random=True):
         line = annotation_line.split()
         image = Image.open(line[0])
         image = cvt_color(image)
         iw, ih = image.size
-        h, w = input_shape
+        h, w = 416, 416
         box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
         if not random:
             scale = min(w / iw, h / ih)
@@ -782,8 +663,8 @@ class YoloDataset(Dataset):
             box = box[np.logical_and(box_w > 1, box_h > 1)]
         return image_data, box
 
-    def get_random_data_with_mosaic(self, annotation_line, input_shape, jitter=0.3, hue=0.1, sat=0.7, val=0.4):
-        h, w = input_shape
+    def get_random_data_with_mosaic(self, annotation_line, jitter=0.3, hue=0.1, sat=0.7, val=0.4):
+        h, w = 416, 416
         min_offset_x = self.rand(0.3, 0.7)
         min_offset_y = self.rand(0.3, 0.7)
         image_list = []
@@ -863,23 +744,22 @@ class YoloDataset(Dataset):
 
 
 class YoloLoss(nn.Module):
-    def __init__(self, anchors, num_classes, input_shape, focal_loss=False, alpha=0.25, gamma=2):
+    def __init__(self, anchors, num_classes, focal_loss=False, alpha=0.25, gamma=2):
         super(YoloLoss, self).__init__()
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
-        self.input_shape = input_shape
+        self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.balance = [0.4, 1.0, 4]
         self.box_ratio = 0.05
-        self.obj_ratio = 5 * (input_shape[0] * input_shape[1]) / (416 ** 2)
+        self.obj_ratio = 5
         self.cls_ratio = 1 * (num_classes / 80)
         self.focal_loss = focal_loss
         self.focal_loss_ratio = 10
         self.alpha = alpha
         self.gamma = gamma
         self.ignore_threshold = 0.5
-        self.cuda = torch.cuda.is_available()
 
     @staticmethod
     def box_c_iou(b1, b2):
@@ -951,8 +831,8 @@ class YoloLoss(nn.Module):
         bs = _input.size(0)
         in_h = _input.size(2)
         in_w = _input.size(3)
-        stride_h = self.input_shape[0] / in_h
-        stride_w = self.input_shape[1] / in_w
+        stride_h = 416 / in_h
+        stride_w = 416 / in_w
         scaled_anchors = [(a_w / stride_w, a_h / stride_h) for a_w, a_h in self.anchors]
         prediction = _input.view(bs, len(self.anchors_mask[idx]), self.bbox_attrs, in_h, in_w).permute(
             0, 1, 3, 4, 2).contiguous()
@@ -964,7 +844,7 @@ class YoloLoss(nn.Module):
         pred_cls = torch.sigmoid(prediction[..., 5:])
         y_true, no_obj_mask, _ = self.get_target(idx, targets, scaled_anchors, in_h, in_w)
         no_obj_mask, pred_boxes = self.get_ignore(idx, x, y, h, w, targets, scaled_anchors, in_h, in_w, no_obj_mask)
-        if self.cuda:
+        if torch.cuda.is_available():
             y_true = y_true.type_as(x)
             no_obj_mask = no_obj_mask.type_as(x)
         loss = 0

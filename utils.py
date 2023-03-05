@@ -16,9 +16,9 @@ from torch import nn
 from tqdm import tqdm
 from xml.etree import ElementTree
 
-if os.name == "nt":
+if os.name == "nt":  # windows
     matplotlib.use("Agg")
-else:
+else:  # mac, linux
     matplotlib.use("TkAgg")
 
 
@@ -107,26 +107,14 @@ def draw_plot(dictionary, n_classes, window_title, plot_title, x_label, output_p
 def lines_to_list(path):
     with open(path) as f:
         content = f.readlines()
-    content = [x.strip() for x in content]
-    return content
+    return [x.strip() for x in content]
 
 
-def fit1epoch(model_train,
-              model,
-              yolo_loss,
-              loss_history,
-              eval_callback,
-              optimizer,
-              epoch,
-              epoch_step,
-              epoch_step_val,
-              gen,
-              gen_val,
-              unfreeze_epoch,
-              period):
+def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_step, epoch_step_val, gen, gen_val,
+              epoch, period):
     loss = 0
     val_loss = 0
-    bar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+    bar = tqdm(total=epoch_step, desc=f"epoch {e + 1}/{epoch}", postfix=dict, mininterval=0.3)
     model_train.train()
     for iteration, batch in enumerate(gen):
         if iteration >= epoch_step:
@@ -149,7 +137,7 @@ def fit1epoch(model_train,
         bar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
         bar.update(1)
     bar.close()
-    bar = tqdm(total=epoch_step_val, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+    bar = tqdm(total=epoch_step_val, desc=f"epoch {e + 1}/{epoch}", postfix=dict, mininterval=0.3)
     model_train.eval()
     for iteration, batch in enumerate(gen_val):
         if iteration >= epoch_step_val:
@@ -170,14 +158,13 @@ def fit1epoch(model_train,
         bar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
         bar.update(1)
     bar.close()
-    loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
-    eval_callback.on_epoch_end(epoch + 1, model_train)
-    print(f"epoch: {str(epoch + 1)}/{str(unfreeze_epoch)}")
+    loss_history.append_loss(e + 1, loss / epoch_step, val_loss / epoch_step_val)
+    print(f"epoch: {str(e + 1)}/{str(epoch)}")
     print("loss=%.3f; val_loss=%.3f" % (loss / epoch_step, val_loss / epoch_step_val))
     # 保存权值
-    if (epoch + 1) % period == 0 or epoch + 1 == unfreeze_epoch:
+    if (e + 1) % period == 0 or e + 1 == epoch:
         torch.save(model.state_dict(), "data/cache/loss/epoch%03d-loss%.3f-val_loss%.3f.pth" % (
-            epoch + 1, loss / epoch_step, val_loss / epoch_step_val))
+            e + 1, loss / epoch_step, val_loss / epoch_step_val))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
         torch.save(model.state_dict(), "data/model.pth")
         print("data/model.pth saved.")
@@ -204,11 +191,8 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter,
-                     warmup_iter_ratio=0.05,
-                     warmup_lr_ratio=0.1,
-                     no_aug_iter_ratio=0.05,
-                     step_num=10):
+def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter, warmup_iter_ratio=0.05, warmup_lr_ratio=0.1,
+                     no_aug_iter_ratio=0.05, step_num=10):
     if lr_decay_type == "cos":
         warmup_total_iter = min(max(warmup_iter_ratio * total_iter, 1), 3)
         warmup_lr_start = max(warmup_lr_ratio * lr, 1e-6)
@@ -221,17 +205,13 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter,
     return func
 
 
-def get_map(min_overlap, draw, score_threshold=0.5):
-    gt_path = "data/cache/map/.gt"
-    dr_path = "data/cache/map/.dr"
-    tf_path = "data/cache/map/.tf"
+def get_map(min_overlap, score_threshold):
     os.makedirs("data/cache/map/.tf", exist_ok=True)
-    if draw:
-        os.makedirs("data/cache/map/AP", exist_ok=True)
-        os.makedirs("data/cache/map/F1", exist_ok=True)
-        os.makedirs("data/cache/map/recall", exist_ok=True)
-        os.makedirs("data/cache/map/precision", exist_ok=True)
-    ground_truth_files = glob.glob(gt_path + "/*.txt")
+    os.makedirs("data/cache/map/AP", exist_ok=True)
+    os.makedirs("data/cache/map/F1", exist_ok=True)
+    os.makedirs("data/cache/map/recall", exist_ok=True)
+    os.makedirs("data/cache/map/precision", exist_ok=True)
+    ground_truth_files = glob.glob("data/cache/map/.gt/*.txt")
     if len(ground_truth_files) == 0:
         raise FileNotFoundError("Ground-truth files not found.")
     ground_truth_files.sort()
@@ -240,7 +220,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
     for txt_file in ground_truth_files:
         file_id = txt_file.split(".txt", 1)[0]
         file_id = os.path.basename(os.path.normpath(file_id))
-        temp_path = f"{dr_path}/{file_id}.txt"
+        temp_path = f"data/cache/map/.dr/{file_id}.txt"
         if not os.path.exists(temp_path):
             raise FileNotFoundError(f"{temp_path} not found.")
         lines_list = lines_to_list(txt_file)
@@ -293,19 +273,19 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                     else:
                         counter_images_per_class[class_name] = 1
                     already_seen_classes.append(class_name)
-        with open(f"{tf_path}/{file_id}_ground_truth.json", "w") as outfile:
+        with open(f"data/cache/map/.tf/{file_id}_ground_truth.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     gt_classes = list(gt_counter_per_class.keys())
     gt_classes = sorted(gt_classes)
     n_classes = len(gt_classes)
-    dr_files_list = glob.glob(dr_path + "/*.txt")
+    dr_files_list = glob.glob("data/cache/map/.dr/*.txt")
     dr_files_list.sort()
     for class_index, class_name in enumerate(gt_classes):
         bounding_boxes = []
         for txt_file in dr_files_list:
             file_id = txt_file.split(".txt", 1)[0]
             file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = f"{gt_path}/{file_id}.txt"
+            temp_path = f"data/cache/map/.gt/{file_id}.txt"
             if class_index == 0:
                 if not os.path.exists(temp_path):
                     raise FileNotFoundError(f"{temp_path} not found.")
@@ -328,7 +308,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                     bbox = f"{left} {top} {right} {bottom}"
                     bounding_boxes.append({"confidence": confidence, "file_id": file_id, "bbox": bbox})
         bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
-        with open(f"{tf_path}/{class_name}_dr.json", "w") as outfile:
+        with open(f"data/cache/map/.tf/{class_name}_dr.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     sum_ap = 0.0
     ap_dict = {}
@@ -338,7 +318,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0
-            dr_file = f"{tf_path}/{class_name}_dr.json"
+            dr_file = f"data/cache/map/.tf/{class_name}_dr.json"
             dr_data = json.load(open(dr_file))
             nd = len(dr_data)
             tp = [0] * nd
@@ -350,7 +330,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threshold:
                     score_threshold_idx = idx
-                gt_file = f"{tf_path}/{file_id}_ground_truth.json"
+                gt_file = f"data/cache/map/.tf/{file_id}_ground_truth.json"
                 ground_truth_data = json.load(open(gt_file))
                 ov_max = -1
                 gt_match = -1
@@ -414,55 +394,54 @@ def get_map(min_overlap, draw, score_threshold=0.5):
             n_images = counter_images_per_class[class_name]
             loss_avg_miss_rate, mr, false_pos_per_img = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
             loss_avg_miss_rate_dict[class_name] = loss_avg_miss_rate
-            if draw:
-                plt.plot(rec, precision, "-o")
-                area_under_curve_x = m_recall[:-1] + [m_recall[-2]] + [m_recall[-1]]
-                area_under_curve_y = m_precision[:-1] + [0.0] + [m_precision[-1]]
-                plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor="r")
-                fig = plt.gcf()
-                fig.canvas.manager.set_window_title("AP " + class_name)
-                plt.title("class: " + text)
-                plt.xlabel("recall")
-                plt.ylabel("precision")
-                axes = plt.gca()
-                axes.set_xlim([0.0, 1.0])
-                axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"data/cache/map/AP/{class_name}.png")
-                plt.cla()
-                plt.plot(score, f1, "-", color="orangered")
-                plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("score threshold")
-                plt.ylabel("F1")
-                axes = plt.gca()
-                axes.set_xlim([0.0, 1.0])
-                axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"data/cache/map/F1/{class_name}.png")
-                plt.cla()
-                plt.plot(score, rec, "-H", color="gold")
-                plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("score threshold")
-                plt.ylabel("recall")
-                axes = plt.gca()
-                axes.set_xlim([0.0, 1.0])
-                axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"data/cache/map/recall/{class_name}.png")
-                plt.cla()
-                plt.plot(score, precision, "-s", color="palevioletred")
-                plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
-                plt.xlabel("score threshold")
-                plt.ylabel("precision")
-                axes = plt.gca()
-                axes.set_xlim([0.0, 1.0])
-                axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"data/cache/map/precision/{class_name}.png")
-                plt.cla()
+            plt.plot(rec, precision, "-o")
+            area_under_curve_x = m_recall[:-1] + [m_recall[-2]] + [m_recall[-1]]
+            area_under_curve_y = m_precision[:-1] + [0.0] + [m_precision[-1]]
+            plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor="r")
+            fig = plt.gcf()
+            fig.canvas.manager.set_window_title("AP " + class_name)
+            plt.title("class: " + text)
+            plt.xlabel("recall")
+            plt.ylabel("precision")
+            axes = plt.gca()
+            axes.set_xlim([0.0, 1.0])
+            axes.set_ylim([0.0, 1.05])
+            fig.savefig(f"data/cache/map/AP/{class_name}.png")
+            plt.cla()
+            plt.plot(score, f1, "-", color="orangered")
+            plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
+            plt.xlabel("score threshold")
+            plt.ylabel("F1")
+            axes = plt.gca()
+            axes.set_xlim([0.0, 1.0])
+            axes.set_ylim([0.0, 1.05])
+            fig.savefig(f"data/cache/map/F1/{class_name}.png")
+            plt.cla()
+            plt.plot(score, rec, "-H", color="gold")
+            plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
+            plt.xlabel("score threshold")
+            plt.ylabel("recall")
+            axes = plt.gca()
+            axes.set_xlim([0.0, 1.0])
+            axes.set_ylim([0.0, 1.05])
+            fig.savefig(f"data/cache/map/recall/{class_name}.png")
+            plt.cla()
+            plt.plot(score, precision, "-s", color="palevioletred")
+            plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
+            plt.xlabel("score threshold")
+            plt.ylabel("precision")
+            axes = plt.gca()
+            axes.set_xlim([0.0, 1.0])
+            axes.set_ylim([0.0, 1.05])
+            fig.savefig(f"data/cache/map/precision/{class_name}.png")
+            plt.cla()
         if n_classes == 0:
             raise ValueError("data/classes.txt error.")
         m_ap = sum_ap / n_classes
         text = "mAP={:.2f}%".format(m_ap * 100)
         results_file.write(text + "\n")
         print(text)
-    shutil.rmtree(tf_path)
+    shutil.rmtree("data/cache/map/.tf")
     det_counter_per_class = {}
     for txt_file in dr_files_list:
         lines_list = lines_to_list(txt_file)
@@ -487,33 +466,30 @@ def get_map(min_overlap, draw, score_threshold=0.5):
             text += f" (tp: {str(count_true_positives[class_name])}"
             text += f", fp: {str(n_det - count_true_positives[class_name])})\n"
             results_file.write(text)
-    if draw:
-        window_title = "ground-truth"
-        plot_title = f"{window_title}\n"
-        plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
-        x_label = "number of objects per class"
-        output_path = "data/cache/map/gt.png"
-        plot_color = "forestgreen"
-        draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-        window_title = "log-average miss rate"
-        plot_title = window_title
-        x_label = "log-average miss rate"
-        output_path = "data/cache/map/loss_avg_miss_rate.png"
-        plot_color = "royalblue"
-        draw_plot(loss_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-        window_title = "mAP={:.2f}%".format(m_ap * 100)
-        plot_title = window_title
-        x_label = "average precision"
-        output_path = "data/cache/map/mAP.png"
-        plot_color = "royalblue"
-        draw_plot(ap_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
+    window_title = "ground-truth"
+    plot_title = f"{window_title}\n"
+    plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
+    x_label = "number of objects per class"
+    output_path = "data/cache/map/gt.png"
+    plot_color = "forestgreen"
+    draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
+    window_title = "log-average miss rate"
+    plot_title = window_title
+    x_label = "log-average miss rate"
+    output_path = "data/cache/map/loss_avg_miss_rate.png"
+    plot_color = "forestgreen"
+    draw_plot(loss_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
+    window_title = "mAP={:.2f}%".format(m_ap * 100)
+    plot_title = window_title
+    x_label = "average precision"
+    output_path = "data/cache/map/mAP.png"
+    plot_color = "forestgreen"
+    draw_plot(ap_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     return m_ap
 
 
-def get_txt(seed=0, train_val_percent=0.9, train_percent=0.9):
+def get_txt(seed, train_val_percent, train_percent):
     random.seed(seed)
-    train_val_percent = train_val_percent
-    train_percent = train_percent
     classes, _ = get_classes()
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
@@ -623,13 +599,13 @@ def load_data():
     return np.array(data)
 
 
-def log_average_miss_rate(precision, fp_cum_sum, num_images):
+def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     if precision.size == 0:
         loss_avg_miss_rate = 0
         mr = 1
         false_pos_per_img = 0
         return loss_avg_miss_rate, mr, false_pos_per_img
-    false_pos_per_img = fp_cum_sum / float(num_images)
+    false_pos_per_img = false_pos_cum_sum / float(num_images)
     mr = (1 - precision)
     fp_per_img_tmp = np.insert(false_pos_per_img, 0, -1.0)
     mr_tmp = np.insert(mr, 0, 1.0)
@@ -705,10 +681,10 @@ def step_lr(lr, decay_rate, step_size, _iter):
     return lr * decay_rate ** n
 
 
-def voc_ap(rec, precision):
-    rec.insert(0, 0.0)
-    rec.append(1.0)
-    m_recall = rec[:]
+def voc_ap(recall, precision):
+    recall.insert(0, 0.0)
+    recall.append(1.0)
+    m_recall = recall[:]
     precision.insert(0, 0.0)
     precision.append(0.0)
     m_precision = precision[:]
