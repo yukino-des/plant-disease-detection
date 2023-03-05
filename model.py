@@ -933,7 +933,7 @@ class YoloLoss(nn.Module):
         return inter / union
 
     @staticmethod
-    def clip_by_tensor(t, t_min, t_max):
+    def clip_by_tensor(t: torch.Tensor, t_min: float, t_max: float):
         t = t.float()
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         return (result <= t_max).float() * result + (result > t_max).float() * t_max

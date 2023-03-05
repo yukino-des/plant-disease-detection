@@ -142,6 +142,8 @@ def fit1epoch(model_train,
             loss_item = yolo_loss(i, outputs[i], targets)
             loss_sum += loss_item
         loss_value = loss_sum
+        # todo
+        print(type(loss_value))
         loss_value.backward()
         optimizer.step()
         loss += loss_value.item()
@@ -202,10 +204,7 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def get_lr_scheduler(lr_decay_type,
-                     lr,
-                     min_lr,
-                     total_iter,
+def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter,
                      warmup_iter_ratio=0.05,
                      warmup_lr_ratio=0.1,
                      no_aug_iter_ratio=0.05,
