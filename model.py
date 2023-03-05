@@ -941,10 +941,10 @@ class YoloLoss(nn.Module):
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         return (result <= t_max).float() * result + (result > t_max).float() * t_max
 
-    def bce_loss(self, predict, target):
+    def bce_loss(self, pred, target):
         epsilon = 1e-7
-        predict = self.clip_by_tensor(predict, epsilon, 1.0 - epsilon)
-        output = - target * torch.log(predict) - (1.0 - target) * torch.log(1.0 - predict)
+        pred = self.clip_by_tensor(pred, epsilon, 1.0 - epsilon)
+        output = - target * torch.log(pred) - (1.0 - target) * torch.log(1.0 - pred)
         return output
 
     def forward(self, idx, _input, targets=None):
