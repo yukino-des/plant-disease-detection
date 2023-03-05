@@ -23,13 +23,13 @@ else:
 
 
 def adjust_axes(r, t, fig, axes):
-    bb = t.get_window_extent(renderer=r)
-    text_width_inches = bb.width / fig.dpi
+    b0 = t.get_window_extent(renderer=r)
+    text_width_inches = b0.width / fig.dpi
     current_fig_width = fig.get_figwidth()
     new_fig_width = current_fig_width + text_width_inches
-    propotion = new_fig_width / current_fig_width
+    proportion = new_fig_width / current_fig_width
     x_lim = axes.get_xlim()
-    axes.set_xlim([x_lim[0], x_lim[1] * propotion])
+    axes.set_xlim([x_lim[0], x_lim[1] * proportion])
 
 
 def avg_iou(box, cluster):
@@ -112,17 +112,17 @@ def lines_to_list(path):
 
 
 def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val,
-              gen, gen_val, unfreeze_epoch, cuda, save_period):
+              gen, gen_val, unfreeze_epoch):
     loss = 0
     val_loss = 0
-    pbar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+    bar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
     model_train.train()
     for iteration, batch in enumerate(gen):
         if iteration >= epoch_step:
             break
         images, targets = batch[0], batch[1]
         with torch.no_grad():
-            if cuda:
+            if torch.cuda.is_available():
                 images = images.cuda(0)
                 targets = [ann.cuda(0) for ann in targets]
         optimizer.zero_grad()
@@ -135,17 +135,17 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
         loss_value.backward()
         optimizer.step()
         loss += loss_value.item()
-        pbar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
-        pbar.update(1)
-    pbar.close()
-    pbar = tqdm(total=epoch_step_val, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
+        bar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
+        bar.update(1)
+    bar.close()
+    bar = tqdm(total=epoch_step_val, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
     model_train.eval()
     for iteration, batch in enumerate(gen_val):
         if iteration >= epoch_step_val:
             break
         images, targets = batch[0], batch[1]
         with torch.no_grad():
-            if cuda:
+            if torch.cuda.is_available():
                 images = images.cuda(0)
                 targets = [ann.cuda(0) for ann in targets]
             optimizer.zero_grad()
@@ -156,14 +156,14 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
                 loss_value_all += loss_item
             loss_value = loss_value_all
         val_loss += loss_value.item()
-        pbar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
-        pbar.update(1)
-    pbar.close()
+        bar.set_postfix(**{"val_loss": val_loss / (iteration + 1)})
+        bar.update(1)
+    bar.close()
     loss_history.append_loss(epoch + 1, loss / epoch_step, val_loss / epoch_step_val)
     eval_callback.on_epoch_end(epoch + 1, model_train)
     print("epoch: " + str(epoch + 1) + "/" + str(unfreeze_epoch))
     print("loss: %.3f; val loss: %.3f" % (loss / epoch_step, val_loss / epoch_step_val))
-    if (epoch + 1) % save_period == 0 or epoch + 1 == unfreeze_epoch:
+    if (epoch + 1) % 10 == 0 or epoch + 1 == unfreeze_epoch:
         torch.save(model.state_dict(), "data/cache/loss/epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             epoch + 1, loss / epoch_step, val_loss / epoch_step_val))
     if len(loss_history.val_loss) <= 1 or (val_loss / epoch_step_val) <= min(loss_history.val_loss):
@@ -192,16 +192,16 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=0.05, warmup_lr_ratio=0.1,
+def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter, warmup_iter_ratio=0.05, warmup_lr_ratio=0.1,
                      no_aug_iter_ratio=0.05, step_num=10):
     if lr_decay_type == "cos":
-        warmup_total_iters = min(max(warmup_iters_ratio * total_iters, 1), 3)
+        warmup_total_iter = min(max(warmup_iter_ratio * total_iter, 1), 3)
         warmup_lr_start = max(warmup_lr_ratio * lr, 1e-6)
-        no_aug_iter = min(max(no_aug_iter_ratio * total_iters, 1), 15)
-        func = partial(yolox_warm_cos_lr, lr, min_lr, total_iters, warmup_total_iters, warmup_lr_start, no_aug_iter)
+        no_aug_iter = min(max(no_aug_iter_ratio * total_iter, 1), 15)
+        func = partial(yolo_x_warm_cos_lr, lr, min_lr, total_iter, warmup_total_iter, warmup_lr_start, no_aug_iter)
     else:
         decay_rate = (min_lr / lr) ** (1 / (step_num - 1))
-        step_size = total_iters / step_num
+        step_size = total_iter / step_num
         func = partial(step_lr, lr, decay_rate, step_size)
     return func
 
@@ -239,8 +239,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                     is_difficult = True
                 else:
                     class_name, left, top, right, bottom = line.split()
-            except ValueError as e:
-                # print(repr(e))
+            except ValueError:
                 if "difficult" in line:
                     line_split = line.split()
                     _difficult = line_split[-1]
@@ -317,8 +316,8 @@ def get_map(min_overlap, draw, score_threshold=0.5):
         with open(f"{tf_path}/{class_name}_dr.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     sum_ap = 0.0
-    ap_dictionary = {}
-    lamr_dictionary = {}
+    ap_dict = {}
+    loss_avg_miss_rate_dict = {}
     with open("data/cache/map/results.txt", "w") as results_file:
         results_file.write("AP, precision, recall per class\n")
         count_true_positives = {}
@@ -338,23 +337,23 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                     score_threshold_idx = idx
                 gt_file = f"{tf_path}/{file_id}_ground_truth.json"
                 ground_truth_data = json.load(open(gt_file))
-                ovmax = -1
+                ov_max = -1
                 gt_match = -1
-                bb = [float(x) for x in detection["bbox"].split()]
+                b0 = [float(x) for x in detection["bbox"].split()]
                 for obj in ground_truth_data:
                     if obj["class_name"] == class_name:
-                        bbgt = [float(x) for x in obj["bbox"].split()]
-                        bi = [max(bb[0], bbgt[0]), max(bb[1], bbgt[1]), min(bb[2], bbgt[2]), min(bb[3], bbgt[3])]
+                        b1 = [float(x) for x in obj["bbox"].split()]
+                        bi = [max(b0[0], b1[0]), max(b0[1], b1[1]), min(b0[2], b1[2]), min(b0[3], b1[3])]
                         iw = bi[2] - bi[0] + 1
                         ih = bi[3] - bi[1] + 1
                         if iw > 0 and ih > 0:
-                            ua = (bb[2] - bb[0] + 1) * (bb[3] - bb[1] + 1) + (
-                                    bbgt[2] - bbgt[0] + 1) * (bbgt[3] - bbgt[1] + 1) - iw * ih
+                            ua = (b0[2] - b0[0] + 1) * (b0[3] - b0[1] + 1) + (b1[2] - b1[0] + 1) * (
+                                    b1[3] - b1[1] + 1) - iw * ih
                             ov = iw * ih / ua
-                            if ov > ovmax:
-                                ovmax = ov
+                            if ov > ov_max:
+                                ov_max = ov
                                 gt_match = obj
-                if ovmax >= min_overlap:
+                if ov_max >= min_overlap:
                     if "difficult" not in gt_match:
                         if not bool(gt_match["used"]):
                             tp[idx] = 1
@@ -366,44 +365,44 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                             fp[idx] = 1
                 else:
                     fp[idx] = 1
-            cumsum = 0
+            cum_sum = 0
             for idx, val in enumerate(fp):
-                fp[idx] += cumsum
-                cumsum += val
-            cumsum = 0
+                fp[idx] += cum_sum
+                cum_sum += val
+            cum_sum = 0
             for idx, val in enumerate(tp):
-                tp[idx] += cumsum
-                cumsum += val
+                tp[idx] += cum_sum
+                cum_sum += val
             rec = tp[:]
             for idx, val in enumerate(tp):
                 rec[idx] = float(tp[idx]) / np.maximum(gt_counter_per_class[class_name], 1)
-            prec = tp[:]
+            precision = tp[:]
             for idx, val in enumerate(tp):
-                prec[idx] = float(tp[idx]) / np.maximum((fp[idx] + tp[idx]), 1)
-            ap, mrec, mprec = voc_ap(rec[:], prec[:])
-            f1 = np.array(rec) * np.array(prec) * 2 / np.where((np.array(prec) + np.array(rec)) == 0, 1,
-                                                               (np.array(prec) + np.array(rec)))
+                precision[idx] = float(tp[idx]) / np.maximum((fp[idx] + tp[idx]), 1)
+            ap, m_recall, m_precision = voc_ap(rec[:], precision[:])
+            f1 = np.array(rec) * np.array(precision) * 2 / np.where((np.array(precision) + np.array(rec)) == 0, 1,
+                                                                    (np.array(precision) + np.array(rec)))
             sum_ap += ap
             text = class_name + "\nAP={:.2f}%".format(ap * 100)
-            if len(prec) > 0:
+            if len(precision) > 0:
                 f1_text = class_name + "; F1={:.2f}".format(f1[score_threshold_idx])
                 recall_text = class_name + "; recall=" + "{:.2f}%".format(rec[score_threshold_idx] * 100)
-                precision_text = class_name + "; precision=" + "{:.2f}%".format(prec[score_threshold_idx] * 100)
+                precision_text = class_name + "; precision=" + "{:.2f}%".format(precision[score_threshold_idx] * 100)
             else:
                 f1_text = class_name + "; F1=0.00"
                 recall_text = class_name + "; recall=0.00%"
                 precision_text = class_name + "; precision=0.00%"
-            rounded_prec = ["%.2f" % elem for elem in prec]
+            rounded_precision = ["%.2f" % elem for elem in precision]
             rounded_rec = ["%.2f" % elem for elem in rec]
-            results_file.write(text + "\nprecision: " + str(rounded_prec) + "\nrecall: " + str(rounded_rec) + "\n\n")
-            ap_dictionary[class_name] = ap
+            results_file.write(f"{text}\nprecision: {str(rounded_precision)}\nrecall: {str(rounded_rec)}\n\n")
+            ap_dict[class_name] = ap
             n_images = counter_images_per_class[class_name]
-            lamr, mr, fppi = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
-            lamr_dictionary[class_name] = lamr
+            loss_avg_miss_rate, mr, false_pos_per_img = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
+            loss_avg_miss_rate_dict[class_name] = loss_avg_miss_rate
             if draw:
-                plt.plot(rec, prec, "-o")
-                area_under_curve_x = mrec[:-1] + [mrec[-2]] + [mrec[-1]]
-                area_under_curve_y = mprec[:-1] + [0.0] + [mprec[-1]]
+                plt.plot(rec, precision, "-o")
+                area_under_curve_x = m_recall[:-1] + [m_recall[-2]] + [m_recall[-1]]
+                area_under_curve_y = m_precision[:-1] + [0.0] + [m_precision[-1]]
                 plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor="r")
                 fig = plt.gcf()
                 fig.canvas.manager.set_window_title("AP " + class_name)
@@ -433,7 +432,7 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                 axes.set_ylim([0.0, 1.05])
                 fig.savefig(f"data/cache/map/recall/{class_name}.png")
                 plt.cla()
-                plt.plot(score, prec, "-s", color="palevioletred")
+                plt.plot(score, precision, "-s", color="palevioletred")
                 plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
                 plt.xlabel("score threshold")
                 plt.ylabel("precision")
@@ -444,8 +443,8 @@ def get_map(min_overlap, draw, score_threshold=0.5):
                 plt.cla()
         if n_classes == 0:
             raise ValueError("data/classes.txt error.")
-        mAP = sum_ap / n_classes
-        text = "mAP={:.2f}%".format(mAP * 100)
+        m_ap = sum_ap / n_classes
+        text = "mAP={:.2f}%".format(m_ap * 100)
         results_file.write(text + "\n")
         print(text)
     shutil.rmtree(tf_path)
@@ -484,21 +483,21 @@ def get_map(min_overlap, draw, score_threshold=0.5):
         window_title = "log-average miss rate"
         plot_title = window_title
         x_label = "log-average miss rate"
-        output_path = "data/cache/map/lamr.png"
+        output_path = "data/cache/map/loss_avg_miss_rate.png"
         plot_color = "royalblue"
-        draw_plot(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-        window_title = "mAP={:.2f}%".format(mAP * 100)
+        draw_plot(loss_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
+        window_title = "mAP={:.2f}%".format(m_ap * 100)
         plot_title = window_title
         x_label = "average precision"
         output_path = "data/cache/map/mAP.png"
         plot_color = "royalblue"
-        draw_plot(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-    return mAP
+        draw_plot(ap_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
+    return m_ap
 
 
-def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
+def get_txt(seed=0, train_val_percent=0.9, train_percent=0.9):
     random.seed(seed)
-    trainval_percent = trainval_percent
+    train_val_percent = train_val_percent
     train_percent = train_percent
     classes, _ = get_classes()
     photo_nums = np.zeros(2)
@@ -510,26 +509,26 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
             total_xml.append(xml)
     num = len(total_xml)
     num_list = range(num)
-    tv = int(num * trainval_percent)
+    tv = int(num * train_val_percent)
     tr = int(tv * train_percent)
     trainval = random.sample(num_list, tv)
     train = random.sample(trainval, tr)
     os.makedirs("data/VOC/ImageSets/Main", exist_ok=True)
-    ftrainval = open("data/VOC/ImageSets/Main/trainval.txt", "w")
-    ftest = open("data/VOC/ImageSets/Main/test.txt", "w")
-    ftrain = open("data/VOC/ImageSets/Main/train.txt", "w")
-    fval = open("data/VOC/ImageSets/Main/val.txt", "w")
+    trainval_txt = open("data/VOC/ImageSets/Main/trainval.txt", "w")
+    test_txt = open("data/VOC/ImageSets/Main/test.txt", "w")
+    train_txt = open("data/VOC/ImageSets/Main/train.txt", "w")
+    val_txt = open("data/VOC/ImageSets/Main/val.txt", "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in trainval:
-            ftrainval.write(name)
-            ftrain.write(name) if i in train else fval.write(name)
+            trainval_txt.write(name)
+            train_txt.write(name) if i in train else val_txt.write(name)
         else:
-            ftest.write(name)
-    ftrainval.close()
-    ftrain.close()
-    fval.close()
-    ftest.close()
+            test_txt.write(name)
+    trainval_txt.close()
+    train_txt.close()
+    val_txt.close()
+    test_txt.close()
     type_index = 0
     for image_set in ["train", "val"]:
         image_ids = open(f"data/VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
@@ -547,9 +546,9 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
                 if cls not in classes or int(difficult) == 1:
                     continue
                 cls_id = classes.index(cls)
-                xmlbox = obj.find("bndbox")
-                b = (int(float(xmlbox.find("xmin").text)), int(float(xmlbox.find("ymin").text)),
-                     int(float(xmlbox.find("xmax").text)), int(float(xmlbox.find("ymax").text)))
+                xml_box = obj.find("bndbox")
+                b = (int(float(xml_box.find("xmin").text)), int(float(xml_box.find("ymin").text)),
+                     int(float(xml_box.find("xmax").text)), int(float(xml_box.find("ymax").text)))
                 list_file.write(" " + ",".join([str(a) for a in b]) + "," + str(cls_id))
                 nums[classes.index(cls)] = nums[classes.index(cls)] + 1
             list_file.write("\n")
@@ -570,13 +569,13 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
         raise ValueError("data/classes.txt error.")
 
 
-def kmeans(box, k):
+def k_means(box, k):
     row = box.shape[0]
     distance = np.empty((row, k))
     last_clu = np.zeros((row,))
     np.random.seed()
     cluster = box[np.random.choice(row, k, replace=False)]
-    iternum = 0
+    iter_num = 0
     while True:
         for i in range(row):
             distance[i] = 1 - cas_iou(box[i], cluster)
@@ -586,9 +585,9 @@ def kmeans(box, k):
         for j in range(k):
             cluster[j] = np.median(box[near == j], axis=0)
         last_clu = near
-        if iternum % 5 == 0:
-            print("iter: {:d}; avg_iou: {:.2f}".format(iternum, avg_iou(box, cluster)))
-        iternum += 1
+        if iter_num % 5 == 0:
+            print("iter: {:d}; avg_iou: {:.2f}".format(iter_num, avg_iou(box, cluster)))
+        iter_num += 1
     return cluster, near
 
 
@@ -609,22 +608,22 @@ def load_data():
     return np.array(data)
 
 
-def log_average_miss_rate(precision, fp_cumsum, num_images):
+def log_average_miss_rate(precision, fp_cum_sum, num_images):
     if precision.size == 0:
-        lamr = 0
+        loss_avg_miss_rate = 0
         mr = 1
-        fppi = 0
-        return lamr, mr, fppi
-    fppi = fp_cumsum / float(num_images)
+        false_pos_per_img = 0
+        return loss_avg_miss_rate, mr, false_pos_per_img
+    false_pos_per_img = fp_cum_sum / float(num_images)
     mr = (1 - precision)
-    fppi_tmp = np.insert(fppi, 0, -1.0)
+    fp_per_img_tmp = np.insert(false_pos_per_img, 0, -1.0)
     mr_tmp = np.insert(mr, 0, 1.0)
     ref = np.logspace(-2.0, 0.0, num=9)
     for i, ref_i in enumerate(ref):
-        j = np.where(fppi_tmp <= ref_i)[-1][-1]
+        j = np.where(fp_per_img_tmp <= ref_i)[-1][-1]
         ref[i] = mr_tmp[j]
-    lamr = math.exp(np.mean(np.log(np.maximum(1e-10, ref))))
-    return lamr, mr, fppi
+    loss_avg_miss_rate = math.exp(np.mean(np.log(np.maximum(1e-10, ref))))
+    return loss_avg_miss_rate, mr, false_pos_per_img
 
 
 def logistic(x):
@@ -684,53 +683,53 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
         param_group["lr"] = lr
 
 
-def step_lr(lr, decay_rate, step_size, iters):
+def step_lr(lr, decay_rate, step_size, _iter):
     if step_size < 1:
         raise ValueError("step_size error.")
-    n = iters // step_size
+    n = _iter // step_size
     return lr * decay_rate ** n
 
 
-def voc_ap(rec, prec):
+def voc_ap(rec, precision):
     rec.insert(0, 0.0)
     rec.append(1.0)
-    mrec = rec[:]
-    prec.insert(0, 0.0)
-    prec.append(0.0)
-    mprec = prec[:]
-    for i in range(len(mprec) - 2, -1, -1):
-        mprec[i] = max(mprec[i], mprec[i + 1])
+    m_recall = rec[:]
+    precision.insert(0, 0.0)
+    precision.append(0.0)
+    m_precision = precision[:]
+    for i in range(len(m_precision) - 2, -1, -1):
+        m_precision[i] = max(m_precision[i], m_precision[i + 1])
     i_list = []
-    for i in range(1, len(mrec)):
-        if mrec[i] != mrec[i - 1]:
+    for i in range(1, len(m_recall)):
+        if m_recall[i] != m_recall[i - 1]:
             i_list.append(i)
     ap = 0.0
     for i in i_list:
-        ap += ((mrec[i] - mrec[i - 1]) * mprec[i])
-    return ap, mrec, mprec
+        ap += ((m_recall[i] - m_recall[i - 1]) * m_precision[i])
+    return ap, m_recall, m_precision
 
 
 def yolo_dataset_collate(batch):
-    images = []
-    bboxes = []
+    image_list = []
+    bbox_list = []
     for img, box in batch:
-        images.append(img)
-        bboxes.append(box)
-    images = torch.from_numpy(np.array(images)).type(torch.FloatTensor)
-    bboxes = [torch.from_numpy(ann).type(torch.FloatTensor) for ann in bboxes]
-    return images, bboxes
+        image_list.append(img)
+        bbox_list.append(box)
+    images = torch.from_numpy(np.array(image_list)).type(torch.FloatTensor)
+    bbox_list = [torch.from_numpy(ann).type(torch.FloatTensor) for ann in bbox_list]
+    return images, bbox_list
 
 
 def yolo_head(filters_list, in_filters):
     return nn.Sequential(conv_dw(in_filters, filters_list[0]), nn.Conv2d(filters_list[0], filters_list[1], 1))
 
 
-def yolox_warm_cos_lr(lr, min_lr, total_iters, warmup_total_iters, warmup_lr_start, no_aug_iter, iters):
-    if iters <= warmup_total_iters:
-        lr = (lr - warmup_lr_start) * pow(iters / float(warmup_total_iters), 2) + warmup_lr_start
-    elif iters >= total_iters - no_aug_iter:
+def yolo_x_warm_cos_lr(lr, min_lr, total_iter, warmup_total_iter, warmup_lr_start, no_aug_iter, _iter):
+    if _iter <= warmup_total_iter:
+        lr = (lr - warmup_lr_start) * pow(_iter / float(warmup_total_iter), 2) + warmup_lr_start
+    elif _iter >= total_iter - no_aug_iter:
         lr = min_lr
     else:
         lr = min_lr + 0.5 * (lr - min_lr) * (1.0 + math.cos(
-            math.pi * (iters - warmup_total_iters) / (total_iters - warmup_total_iters - no_aug_iter)))
+            math.pi * (_iter - warmup_total_iter) / (total_iter - warmup_total_iter - no_aug_iter)))
     return lr

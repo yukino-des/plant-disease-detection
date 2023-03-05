@@ -48,13 +48,13 @@ class ConvBNReLU(nn.Sequential):
 
 
 class DecodeBox:
-    def __init__(self, anchors, num_classes, input_shape, anchors_mask=None):
+    def __init__(self, anchors, num_classes, input_shape):
         super(DecodeBox, self).__init__()
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
         self.input_shape = input_shape
-        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]] if anchors_mask is None else anchors_mask
+        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 
     def decode_box(self, inputs):
         outputs = []
@@ -99,14 +99,14 @@ class DecodeBox:
         box_yx = box_xy[..., ::-1]
         box_hw = box_wh[..., ::-1]
         image_shape = np.array(image_shape)
-        box_mins = box_yx - (box_hw / 2.)
-        box_maxes = box_yx + (box_hw / 2.)
-        boxes = np.concatenate([box_mins[..., 0:1], box_mins[..., 1:2], box_maxes[..., 0:1], box_maxes[..., 1:2]],
+        box_min = box_yx - (box_hw / 2.)
+        box_max = box_yx + (box_hw / 2.)
+        boxes = np.concatenate([box_min[..., 0:1], box_min[..., 1:2], box_max[..., 0:1], box_max[..., 1:2]],
                                axis=-1)
         boxes *= np.concatenate([image_shape, image_shape], axis=-1)
         return boxes
 
-    def non_max_suppression(self, prediction, num_classes, image_shape, conf_thres=0.5, nms_thres=0.4):
+    def non_max_suppression(self, prediction, num_classes, image_shape, conf_threshold=0.5, nms_threshold=0.4):
         box_corner = prediction.new(prediction.shape)
         box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
         box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
@@ -116,7 +116,7 @@ class DecodeBox:
         output: list = [None]
         for i, image_pred in enumerate(prediction):
             class_conf, class_pred = torch.max(image_pred[:, 5:5 + num_classes], 1, keepdim=True)
-            conf_mask = (image_pred[:, 4] * class_conf[:, 0] >= conf_thres).squeeze()
+            conf_mask = (image_pred[:, 4] * class_conf[:, 0] >= conf_threshold).squeeze()
             image_pred = image_pred[conf_mask]
             class_conf = class_conf[conf_mask]
             class_pred = class_pred[conf_mask]
@@ -129,7 +129,7 @@ class DecodeBox:
                 detections = detections.cuda()
             for c in unique_labels:
                 detections_class = detections[detections[:, -1] == c]
-                keep = nms(detections_class[:, :4], detections_class[:, 4] * detections_class[:, 5], nms_thres)
+                keep = nms(detections_class[:, :4], detections_class[:, 4] * detections_class[:, 5], nms_threshold)
                 max_detections = detections_class[keep]
                 output[i] = max_detections if output[i] is None else torch.cat([output[i], max_detections])
             if output[i] is not None:
@@ -140,28 +140,27 @@ class DecodeBox:
 
 
 class EvalCallback:
-    def __init__(self, net, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines, log_dir, cuda,
-                 map_path="data/cache/map", max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
+    def __init__(self, net, input_shape, anchors, class_names, num_classes, val_lines, log_dir,
+                 max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
                  eval_flag=True, period=1):
         super(EvalCallback, self).__init__()
         self.net = net
         self.input_shape = input_shape
         self.anchors = anchors
-        self.anchors_mask = anchors_mask
+        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.class_names = class_names
         self.num_classes = num_classes
         self.val_lines = val_lines
         self.log_dir = log_dir
-        self.cuda = cuda
-        self.map_path = map_path
+        self.cuda = torch.cuda.is_available()
+        self.map_path = "data/cache/map"
         self.max_boxes = max_boxes
         self.confidence = confidence
         self.nms_iou = nms_iou
         self.min_overlap = min_overlap
         self.eval_flag = eval_flag
         self.period = period
-        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
-                                   self.anchors_mask)
+        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]))
         self.maps = [0.0]
         self.epochs = [0]
         if self.eval_flag:
@@ -288,14 +287,14 @@ class LossHistory:
         self.loss_plot()
 
     def loss_plot(self):
-        iters = range(len(self.losses))
+        _iter = range(len(self.losses))
         plt.figure()
-        plt.plot(iters, self.losses, "red", linewidth=2, label="train loss")
-        plt.plot(iters, self.val_loss, "green", linewidth=2, label="val loss")
+        plt.plot(_iter, self.losses, "red", linewidth=2, label="train loss")
+        plt.plot(_iter, self.val_loss, "green", linewidth=2, label="val loss")
         num = 5 if len(self.losses) < 25 else 15
-        plt.plot(iters, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
+        plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
                  label="train loss")
-        plt.plot(iters, signal.savgol_filter(self.val_loss, num, 3), "#21b3b9", linestyle="--", linewidth=2,
+        plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "#21b3b9", linestyle="--", linewidth=2,
                  label="val loss")
         plt.grid(True)
         plt.xlabel("epoch")
@@ -307,7 +306,7 @@ class LossHistory:
 
 
 class MobileNetV2(nn.Module):
-    def __init__(self, num_classes=1000, width_mult=1.0, inverted_residual_setting=None, round_nearest=8):
+    def __init__(self, num_classes=1000, width_multi=1.0, inverted_residual_setting=None, round_nearest=8):
         super(MobileNetV2, self).__init__()
         block = InvertedResidual
         input_channel = 32
@@ -317,11 +316,11 @@ class MobileNetV2(nn.Module):
                                          [6, 160, 3, 2], [6, 320, 1, 1]]
         if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
             raise ValueError("inverted_residual_setting error.")
-        input_channel = make_divisible(input_channel * width_mult, round_nearest)
-        self.last_channel = make_divisible(last_channel * max(1.0, width_mult), round_nearest)
+        input_channel = make_divisible(input_channel * width_multi, round_nearest)
+        self.last_channel = make_divisible(last_channel * max(1.0, width_multi), round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]
         for t, c, n, s in inverted_residual_setting:
-            output_channel = make_divisible(c * width_mult, round_nearest)
+            output_channel = make_divisible(c * width_multi, round_nearest)
             for i in range(n):
                 stride = s if i == 0 else 1
                 features.append(block(input_channel, output_channel, stride, expand_ratio=t))
@@ -352,10 +351,10 @@ class SpatialPyramidPooling(nn.Module):
         super(SpatialPyramidPooling, self).__init__()
         if pool_sizes is None:
             pool_sizes = [5, 9, 13]
-        self.maxpools = nn.ModuleList([nn.MaxPool2d(pool_size, 1, pool_size // 2) for pool_size in pool_sizes])
+        self.max_pools = nn.ModuleList([nn.MaxPool2d(pool_size, 1, pool_size // 2) for pool_size in pool_sizes])
 
     def forward(self, x):
-        features = [maxpool(x) for maxpool in self.maxpools[::-1]]
+        features = [max_pool(x) for max_pool in self.max_pools[::-1]]
         return torch.cat(features + [x], dim=1)
 
 
@@ -363,7 +362,7 @@ class Upsample(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(Upsample, self).__init__()
         self.upsample = nn.Sequential(conv2d(in_channels, out_channels, 1),
-                                      nn.Upsample(scale_factor=2, mode="nearest"))
+                                       nn.Upsample(scale_factor=2, mode="nearest"))
 
     def forward(self, x):
         return self.upsample(x)
@@ -381,25 +380,28 @@ class Yolo(object):
         self.nms_iou = nms_iou
         self.class_names, self.num_classes = get_classes()
         self.anchors, self.num_anchors = get_anchors()
-        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
-                                   self.anchors_mask)
+        self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]))
         hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
         self.colors = list(map(lambda x: (int(x[0] * 255), int(x[1] * 255), int(x[2] * 255)), self.colors))
         self.generate()
-        print_config(anchors_path=self.anchors_path, input_shape=self.input_shape, anchors_mask=self.anchors_mask,
-                     model_path=self.model_path, cuda=self.cuda, classes_path=self.classes_path,
-                     confidence=self.confidence, nms_iou=self.nms_iou)
+        print_config(anchors_path=self.anchors_path, 
+                     input_shape=self.input_shape, 
+                     anchors_mask=self.anchors_mask,
+                     model_path=self.model_path, 
+                     cuda=self.cuda, 
+                     classes_path=self.classes_path,
+                     confidence=self.confidence, 
+                     nms_iou=self.nms_iou)
 
     def generate(self, onnx=False):
-        self.net = YoloBody(self.anchors_mask, self.num_classes)
+        self.net = YoloBody(self.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.net.load_state_dict(torch.load(self.model_path, map_location=device))
         self.net = self.net.eval()
         if not onnx:
             if self.cuda:
-                self.net = nn.DataParallel(self.net)
-                self.net = self.net.cuda()
+                self.net = nn.DataParallel(self.net).cuda()
 
     def detect_image(self, image):
         image_shape = np.array(np.shape(image)[0:2])
@@ -550,7 +552,8 @@ class Yolo(object):
 
 
 class YoloBody(nn.Module):
-    def __init__(self, anchors_mask, num_classes):
+    def __init__(self, num_classes):
+        anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         super(YoloBody, self).__init__()
         self.backbone = Backbone()
         in_filters = [32, 96, 320]
@@ -584,11 +587,11 @@ class YoloBody(nn.Module):
         p3 = self.conv_for_P3(x2)
         p3 = torch.cat([p3, p4_upsample], dim=1)
         p3 = self.make_five_conv2(p3)
-        p3_downsample = self.down_sample1(p3)
-        p4 = torch.cat([p3_downsample, p4], dim=1)
+        p3_down_sample = self.down_sample1(p3)
+        p4 = torch.cat([p3_down_sample, p4], dim=1)
         p4 = self.make_five_conv3(p4)
-        p4_downsample = self.down_sample2(p4)
-        p5 = torch.cat([p4_downsample, p5], dim=1)
+        p4_down_sample = self.down_sample2(p4)
+        p5 = torch.cat([p4_down_sample, p5], dim=1)
         p5 = self.make_five_conv4(p5)
         out2 = self.yolo_head3(p3)
         out1 = self.yolo_head2(p4)
@@ -597,8 +600,8 @@ class YoloBody(nn.Module):
 
 
 class YoloDataset(Dataset):
-    def __init__(self, annotation_lines, input_shape, num_classes, epoch_length, mosaic, mixup, mosaic_prob, mixup_prob,
-                 train, special_aug_ratio=0.7):
+    def __init__(self, annotation_lines, input_shape, num_classes, epoch_length, mosaic, mix_up, mosaic_prob,
+                 mix_up_prob, train, special_aug_ratio=0.7):
         super(YoloDataset, self).__init__()
         self.annotation_lines = annotation_lines
         self.input_shape = input_shape
@@ -606,8 +609,8 @@ class YoloDataset(Dataset):
         self.epoch_length = epoch_length
         self.mosaic = mosaic
         self.mosaic_prob = mosaic_prob
-        self.mixup = mixup
-        self.mixup_prob = mixup_prob
+        self.mix_up = mix_up
+        self.mix_up_prob = mix_up_prob
         self.train = train
         self.special_aug_ratio = special_aug_ratio
         self.epoch_now = -1
@@ -624,10 +627,10 @@ class YoloDataset(Dataset):
             lines.append(self.annotation_lines[index])
             shuffle(lines)
             image, box = self.get_random_data_with_mosaic(lines, self.input_shape)
-            if self.mixup and self.rand() < self.mixup_prob:
+            if self.mix_up and self.rand() < self.mix_up_prob:
                 lines = sample(self.annotation_lines, 1)
                 image_2, box_2 = self.get_random_data(lines[0], self.input_shape, random=self.train)
-                image, box = self.get_random_data_with_mixup(image, box, image_2, box_2)
+                image, box = self.get_random_data_with_mix_up(image, box, image_2, box_2)
         else:
             image, box = self.get_random_data(self.annotation_lines[index], self.input_shape, random=self.train)
         image = np.transpose(np.array(image, dtype=np.float32) / 255.0, (2, 0, 1))
@@ -642,7 +645,7 @@ class YoloDataset(Dataset):
     def rand(self, a=0, b=1):
         return np.random.rand() * (b - a) + a
 
-    def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=.7, val=.4, random=True):
+    def get_random_data(self, annotation_line, input_shape, jitter=0.3, hue=0.1, sat=0.7, val=0.4, random=True):
         line = annotation_line.split()
         image = Image.open(line[0])
         image = cvt_color(image)
@@ -671,7 +674,7 @@ class YoloDataset(Dataset):
                 box = box[np.logical_and(box_w > 1, box_h > 1)]
             return image_data, box
         new_ar = iw / ih * self.rand(1 - jitter, 1 + jitter) / self.rand(1 - jitter, 1 + jitter)
-        scale = self.rand(.25, 2)
+        scale = self.rand(0.25, 2)
         if new_ar < 1:
             nh = int(scale * h)
             nw = int(nh * new_ar)
@@ -684,17 +687,17 @@ class YoloDataset(Dataset):
         new_image = Image.new("RGB", (w, h), (128, 128, 128))
         new_image.paste(image, (dx, dy))
         image = new_image
-        flip = self.rand() < .5
+        flip = self.rand() < 0.5
         if flip:
             image = image.transpose(Image.FLIP_LEFT_RIGHT)
         image_data = np.array(image, np.uint8)
         r = np.random.uniform(-1, 1, 3) * [hue, sat, val] + 1
         hue, sat, val = cv2.split(cv2.cvtColor(image_data, cv2.COLOR_RGB2HSV))
-        dtype = image_data.dtype
+        d_type = image_data.dtype
         x = np.arange(0, 256, dtype=r.dtype)
-        lut_hue = ((x * r[0]) % 180).astype(dtype)
-        lut_sat = np.clip(x * r[1], 0, 255).astype(dtype)
-        lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
+        lut_hue = ((x * r[0]) % 180).astype(d_type)
+        lut_sat = np.clip(x * r[1], 0, 255).astype(d_type)
+        lut_val = np.clip(x * r[2], 0, 255).astype(d_type)
         image_data = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val)))
         image_data = cv2.cvtColor(image_data, cv2.COLOR_HSV2RGB)
         if len(box) > 0:
@@ -711,40 +714,40 @@ class YoloDataset(Dataset):
             box = box[np.logical_and(box_w > 1, box_h > 1)]
         return image_data, box
 
-    def merge_bboxes(self, bboxes, cutx, cuty):
+    def merge_bbox(self, bbox_list, cut_x, cut_y):
         merge_bbox = []
-        for i in range(len(bboxes)):
-            for box in bboxes[i]:
+        for i in range(len(bbox_list)):
+            for box in bbox_list[i]:
                 tmp_box = []
                 x1, y1, x2, y2 = box[0], box[1], box[2], box[3]
                 if i == 0:
-                    if x1 > cutx or y1 > cuty:
+                    if x1 > cut_x or y1 > cut_y:
                         continue
-                    if y1 <= cuty <= y2:
-                        y2 = cuty
-                    if x1 <= cutx <= x2:
-                        x2 = cutx
+                    if y1 <= cut_y <= y2:
+                        y2 = cut_y
+                    if x1 <= cut_x <= x2:
+                        x2 = cut_x
                 if i == 1:
-                    if x1 > cutx or y2 < cuty:
+                    if x1 > cut_x or y2 < cut_y:
                         continue
-                    if y1 <= cuty <= y2:
-                        y1 = cuty
-                    if x1 <= cutx <= x2:
-                        x2 = cutx
+                    if y1 <= cut_y <= y2:
+                        y1 = cut_y
+                    if x1 <= cut_x <= x2:
+                        x2 = cut_x
                 if i == 2:
-                    if x2 < cutx or y2 < cuty:
+                    if x2 < cut_x or y2 < cut_y:
                         continue
-                    if y1 <= cuty <= y2:
-                        y1 = cuty
-                    if x1 <= cutx <= x2:
-                        x1 = cutx
+                    if y1 <= cut_y <= y2:
+                        y1 = cut_y
+                    if x1 <= cut_x <= x2:
+                        x1 = cut_x
                 if i == 3:
-                    if x2 < cutx or y1 > cuty:
+                    if x2 < cut_x or y1 > cut_y:
                         continue
-                    if y1 <= cuty <= y2:
-                        y2 = cuty
-                    if x1 <= cutx <= x2:
-                        x1 = cutx
+                    if y1 <= cut_y <= y2:
+                        y2 = cut_y
+                    if x1 <= cut_x <= x2:
+                        x1 = cut_x
                 tmp_box.append(x1)
                 tmp_box.append(y1)
                 tmp_box.append(x2)
@@ -753,12 +756,12 @@ class YoloDataset(Dataset):
                 merge_bbox.append(tmp_box)
         return merge_bbox
 
-    def get_random_data_with_mosaic(self, annotation_line, input_shape, jitter=0.3, hue=.1, sat=0.7, val=0.4):
+    def get_random_data_with_mosaic(self, annotation_line, input_shape, jitter=0.3, hue=0.1, sat=0.7, val=0.4):
         h, w = input_shape
         min_offset_x = self.rand(0.3, 0.7)
         min_offset_y = self.rand(0.3, 0.7)
-        image_datas = []
-        box_datas = []
+        image_list = []
+        box_list = []
         index = 0
         for line in annotation_line:
             line_content = line.split()
@@ -766,12 +769,12 @@ class YoloDataset(Dataset):
             image = cvt_color(image)
             iw, ih = image.size
             box = np.array([np.array(list(map(int, box.split(",")))) for box in line_content[1:]])
-            flip = self.rand() < .5
+            flip = self.rand() < 0.5
             if flip and len(box) > 0:
                 image = image.transpose(Image.FLIP_LEFT_RIGHT)
                 box[:, [0, 2]] = iw - box[:, [2, 0]]
             new_ar = iw / ih * self.rand(1 - jitter, 1 + jitter) / self.rand(1 - jitter, 1 + jitter)
-            scale = self.rand(.4, 1)
+            scale = self.rand(0.4, 1)
             if new_ar < 1:
                 nh = int(scale * h)
                 nw = int(nh * new_ar)
@@ -810,29 +813,29 @@ class YoloDataset(Dataset):
                 box = box[np.logical_and(box_w > 1, box_h > 1)]
                 box_data = np.zeros((len(box), 5))
                 box_data[:len(box)] = box
-            image_datas.append(image_data)
-            box_datas.append(box_data)
-        cutx = int(w * min_offset_x)
-        cuty = int(h * min_offset_y)
+            image_list.append(image_data)
+            box_list.append(box_data)
+        cut_x = int(w * min_offset_x)
+        cut_y = int(h * min_offset_y)
         new_image = np.zeros([h, w, 3])
-        new_image[:cuty, :cutx, :] = image_datas[0][:cuty, :cutx, :]
-        new_image[cuty:, :cutx, :] = image_datas[1][cuty:, :cutx, :]
-        new_image[cuty:, cutx:, :] = image_datas[2][cuty:, cutx:, :]
-        new_image[:cuty, cutx:, :] = image_datas[3][:cuty, cutx:, :]
+        new_image[:cut_y, :cut_x, :] = image_list[0][:cut_y, :cut_x, :]
+        new_image[cut_y:, :cut_x, :] = image_list[1][cut_y:, :cut_x, :]
+        new_image[cut_y:, cut_x:, :] = image_list[2][cut_y:, cut_x:, :]
+        new_image[:cut_y, cut_x:, :] = image_list[3][:cut_y, cut_x:, :]
         new_image = np.array(new_image, np.uint8)
         r = np.random.uniform(-1, 1, 3) * [hue, sat, val] + 1
         hue, sat, val = cv2.split(cv2.cvtColor(new_image, cv2.COLOR_RGB2HSV))
-        dtype = new_image.dtype
+        d_type = new_image.dtype
         x = np.arange(0, 256, dtype=r.dtype)
-        lut_hue = ((x * r[0]) % 180).astype(dtype)
-        lut_sat = np.clip(x * r[1], 0, 255).astype(dtype)
-        lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
+        lut_hue = ((x * r[0]) % 180).astype(d_type)
+        lut_sat = np.clip(x * r[1], 0, 255).astype(d_type)
+        lut_val = np.clip(x * r[2], 0, 255).astype(d_type)
         new_image = cv2.merge((cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val)))
         new_image = cv2.cvtColor(new_image, cv2.COLOR_HSV2RGB)
-        new_boxes = self.merge_bboxes(box_datas, cutx, cuty)
+        new_boxes = self.merge_bbox(box_list, cut_x, cut_y)
         return new_image, new_boxes
 
-    def get_random_data_with_mixup(self, image_1, box_1, image_2, box_2):
+    def get_random_data_with_mix_up(self, image_1, box_1, image_2, box_2):
         new_image = np.array(image_1, np.float32) * 0.5 + np.array(image_2, np.float32) * 0.5
         if len(box_1) == 0:
             new_boxes = box_2
@@ -843,6 +846,7 @@ class YoloDataset(Dataset):
         return new_image, new_boxes
 
 
+# anchor_mask
 class YoloLoss(nn.Module):
     def __init__(self, anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss=False, alpha=0.25, gamma=2):
         super(YoloLoss, self).__init__()
@@ -850,7 +854,7 @@ class YoloLoss(nn.Module):
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
         self.input_shape = input_shape
-        self.anchors_mask = anchors_mask
+        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.balance = [0.4, 1.0, 4]
         self.box_ratio = 0.05
         self.obj_ratio = 5 * (input_shape[0] * input_shape[1]) / (416 ** 2)
@@ -873,37 +877,37 @@ class YoloLoss(nn.Module):
         output = - target * torch.log(pred) - (1.0 - target) * torch.log(1.0 - pred)
         return output
 
-    def box_ciou(self, b1, b2):
+    def box_c_iou(self, b1, b2):
         b1_xy = b1[..., :2]
         b1_wh = b1[..., 2:4]
         b1_wh_half = b1_wh / 2.
-        b1_mins = b1_xy - b1_wh_half
+        b1_min = b1_xy - b1_wh_half
         b1_maxes = b1_xy + b1_wh_half
         b2_xy = b2[..., :2]
         b2_wh = b2[..., 2:4]
         b2_wh_half = b2_wh / 2.
-        b2_mins = b2_xy - b2_wh_half
+        b2_min = b2_xy - b2_wh_half
         b2_maxes = b2_xy + b2_wh_half
-        intersect_mins = torch.max(b1_mins, b2_mins)
-        intersect_maxes = torch.min(b1_maxes, b2_maxes)
-        intersect_wh = torch.max(intersect_maxes - intersect_mins, torch.zeros_like(intersect_maxes))
+        intersect_min = torch.max(b1_min, b2_min)
+        intersect_max = torch.min(b1_maxes, b2_maxes)
+        intersect_wh = torch.max(intersect_max - intersect_min, torch.zeros_like(intersect_max))
         intersect_area = intersect_wh[..., 0] * intersect_wh[..., 1]
         b1_area = b1_wh[..., 0] * b1_wh[..., 1]
         b2_area = b2_wh[..., 0] * b2_wh[..., 1]
         union_area = b1_area + b2_area - intersect_area
         iou = intersect_area / torch.clamp(union_area, min=1e-6)
         center_distance = torch.sum(torch.pow((b1_xy - b2_xy), 2), dim=-1)
-        enclose_mins = torch.min(b1_mins, b2_mins)
-        enclose_maxes = torch.max(b1_maxes, b2_maxes)
-        enclose_wh = torch.max(enclose_maxes - enclose_mins, torch.zeros_like(intersect_maxes))
+        enclose_min = torch.min(b1_min, b2_min)
+        enclose_max = torch.max(b1_maxes, b2_maxes)
+        enclose_wh = torch.max(enclose_max - enclose_min, torch.zeros_like(intersect_max))
         enclose_diagonal = torch.sum(torch.pow(enclose_wh, 2), dim=-1)
-        ciou = iou - 1.0 * center_distance / torch.clamp(enclose_diagonal, min=1e-6)
+        c_iou = iou - 1.0 * center_distance / torch.clamp(enclose_diagonal, min=1e-6)
         v = (4 / (math.pi ** 2)) * torch.pow(
             (torch.atan(b1_wh[..., 0] / torch.clamp(b1_wh[..., 1], min=1e-6)) - torch.atan(
                 b2_wh[..., 0] / torch.clamp(b2_wh[..., 1], min=1e-6))), 2)
         alpha = v / torch.clamp((1.0 - iou + v), min=1e-6)
-        ciou = ciou - alpha * v
-        return ciou
+        c_iou -= alpha * v
+        return c_iou
 
     def forward(self, l, _input, targets=None):
         bs = _input.size(0)
@@ -920,17 +924,17 @@ class YoloLoss(nn.Module):
         h = prediction[..., 3]
         conf = torch.sigmoid(prediction[..., 4])
         pred_cls = torch.sigmoid(prediction[..., 5:])
-        y_true, noobj_mask, _ = self.get_target(l, targets, scaled_anchors, in_h, in_w)
-        noobj_mask, pred_boxes = self.get_ignore(l, x, y, h, w, targets, scaled_anchors, in_h, in_w, noobj_mask)
+        y_true, no_obj_mask, _ = self.get_target(l, targets, scaled_anchors, in_h, in_w)
+        no_obj_mask, pred_boxes = self.get_ignore(l, x, y, h, w, targets, scaled_anchors, in_h, in_w, no_obj_mask)
         if self.cuda:
             y_true = y_true.type_as(x)
-            noobj_mask = noobj_mask.type_as(x)
+            no_obj_mask = no_obj_mask.type_as(x)
         loss = 0
         obj_mask = y_true[..., 4] == 1
         n = torch.sum(obj_mask)
         if n != 0:
-            ciou = self.box_ciou(pred_boxes, y_true[..., :4]).type_as(x)
-            loss_loc = torch.mean((1 - ciou)[obj_mask])
+            c_iou = self.box_c_iou(pred_boxes, y_true[..., :4]).type_as(x)
+            loss_loc = torch.mean((1 - c_iou)[obj_mask])
             loss_cls = torch.mean(self.bce_loss(pred_cls[obj_mask], y_true[..., 5:][obj_mask]))
             loss += loss_loc * self.box_ratio + loss_cls * self.cls_ratio
         if self.focal_loss:
@@ -938,9 +942,9 @@ class YoloLoss(nn.Module):
                                         torch.ones_like(conf) * (1 - self.alpha))
             hard_easy_ratio = torch.where(obj_mask, torch.ones_like(conf) - conf, conf) ** self.gamma
             loss_conf = torch.mean((self.bce_loss(conf, obj_mask.type_as(conf)) * pos_neg_ratio * hard_easy_ratio)[
-                                       noobj_mask.bool() | obj_mask]) * self.focal_loss_ratio
+                                       no_obj_mask.bool() | obj_mask]) * self.focal_loss_ratio
         else:
-            loss_conf = torch.mean(self.bce_loss(conf, obj_mask.type_as(conf))[noobj_mask.bool() | obj_mask])
+            loss_conf = torch.mean(self.bce_loss(conf, obj_mask.type_as(conf))[no_obj_mask.bool() | obj_mask])
         loss += loss_conf * self.balance[l] * self.obj_ratio
         return loss
 
@@ -966,7 +970,7 @@ class YoloLoss(nn.Module):
 
     def get_target(self, l, targets, anchors, in_h, in_w):
         bs = len(targets)
-        noobj_mask = torch.ones(bs, len(self.anchors_mask[l]), in_h, in_w, requires_grad=False)
+        no_obj_mask = torch.ones(bs, len(self.anchors_mask[l]), in_h, in_w, requires_grad=False)
         box_loss_scale = torch.zeros(bs, len(self.anchors_mask[l]), in_h, in_w, requires_grad=False)
         y_true = torch.zeros(bs, len(self.anchors_mask[l]), in_h, in_w, self.bbox_attrs, requires_grad=False)
         for b in range(bs):
@@ -988,7 +992,7 @@ class YoloLoss(nn.Module):
                 i = torch.floor(batch_target[t, 0]).long()
                 j = torch.floor(batch_target[t, 1]).long()
                 c = batch_target[t, 4].long()
-                noobj_mask[b, k, j, i] = 0
+                no_obj_mask[b, k, j, i] = 0
                 y_true[b, k, j, i, 0] = batch_target[t, 0]
                 y_true[b, k, j, i, 1] = batch_target[t, 1]
                 y_true[b, k, j, i, 2] = batch_target[t, 2]
@@ -996,9 +1000,9 @@ class YoloLoss(nn.Module):
                 y_true[b, k, j, i, 4] = 1
                 y_true[b, k, j, i, c + 5] = 1
                 box_loss_scale[b, k, j, i] = batch_target[t, 2] * batch_target[t, 3] / in_w / in_h
-        return y_true, noobj_mask, box_loss_scale
+        return y_true, no_obj_mask, box_loss_scale
 
-    def get_ignore(self, l, x, y, h, w, targets, scaled_anchors, in_h, in_w, noobj_mask):
+    def get_ignore(self, l, x, y, h, w, targets, scaled_anchors, in_h, in_w, no_obj_mask):
         bs = len(targets)
         grid_x = torch.linspace(0, in_w - 1, in_w).repeat(in_h, 1).repeat(
             int(bs * len(self.anchors_mask[l])), 1, 1).view(x.shape).type_as(x)
@@ -1021,8 +1025,8 @@ class YoloLoss(nn.Module):
                 batch_target[:, [0, 2]] = targets[b][:, [0, 2]] * in_w
                 batch_target[:, [1, 3]] = targets[b][:, [1, 3]] * in_h
                 batch_target = batch_target[:, :4].type_as(x)
-                anch_ious = self.calculate_iou(batch_target, pred_boxes_for_ignore)
-                anch_ious_max, _ = torch.max(anch_ious, dim=0)
-                anch_ious_max = anch_ious_max.view(pred_boxes[b].size()[:3])
-                noobj_mask[b][anch_ious_max > self.ignore_threshold] = 0
-        return noobj_mask, pred_boxes
+                anchor_iou = self.calculate_iou(batch_target, pred_boxes_for_ignore)
+                anchor_iou_max, _ = torch.max(anchor_iou, dim=0)
+                anchor_iou_max = anchor_iou_max.view(pred_boxes[b].size()[:3])
+                no_obj_mask[b][anchor_iou_max > self.ignore_threshold] = 0
+        return no_obj_mask, pred_boxes

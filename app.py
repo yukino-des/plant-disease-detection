@@ -15,7 +15,7 @@ from starlette.responses import FileResponse
 from thop import clever_format, profile
 from torchsummary import summary
 from tqdm import tqdm
-from utils import avg_iou, get_classes, get_map, kmeans, load_data
+from utils import avg_iou, get_classes, get_map, k_means, load_data
 from xml.etree import ElementTree as ET
 
 app = FastAPI()
@@ -49,7 +49,7 @@ def data(file_path):
 
 
 if __name__ == "__main__":
-    mode = input("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]: ")
+    mode = input("Input mode in [app, dir, fps, heatmap, img, k-means, map, onnx, sum, video]: ")
     if mode == "app":
         yolo = Yolo()
         shutil.rmtree("data/cache", ignore_errors=True)
@@ -89,20 +89,20 @@ if __name__ == "__main__":
         image_save_path = f"data/cache/img/out/{img_name}.png"
         image.save(image_save_path, quality=95, subsampling=0)
         print(f"{image_save_path} saved.")
-    elif mode == "kmeans":
+    elif mode == "k-means":
         np.random.seed(0)
         input_shape = [416, 416]
         anchors_num = 9
         data = load_data()
-        cluster, near = kmeans(data, anchors_num)
+        cluster, near = k_means(data, anchors_num)
         data = data * np.array([input_shape[1], input_shape[0]])
         cluster = cluster * np.array([input_shape[1], input_shape[0]])
         for j in range(anchors_num):
             plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
             plt.scatter(cluster[j][0], cluster[j][1], marker="x", c="black")
         os.makedirs("data/cache", exist_ok=True)
-        plt.savefig("data/cache/kmeans.jpg")
-        print("data/cache/kmeans.jpg saved.")
+        plt.savefig("data/cache/k-means.jpg")
+        print("data/cache/k-means.jpg saved.")
         cluster = cluster[np.argsort(cluster[:, 0] * cluster[:, 1])]
         print("avg_ratio: %.2f" % (avg_iou(data, cluster)))
         print(f"cluster:\n{cluster}")
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         num_classes = 80
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        m = YoloBody(anchors_mask, num_classes).to(device)
+        m = YoloBody(num_classes).to(device)
         summary(m, (3, input_shape[0], input_shape[1]))
         dummy_input = torch.randn(1, 3, input_shape[0], input_shape[1]).to(device)
         flops, params = profile(m.to(device), (dummy_input,), verbose=False)
@@ -202,4 +202,4 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         print(video_save_path + " saved")
     else:
-        raise ValueError("Input mode in [app, dir, fps, heatmap, img, kmeans, map, onnx, sum, video]")
+        raise ValueError("Input mode in [app, dir, fps, heatmap, img, k-means, map, onnx, sum, video]")
