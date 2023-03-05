@@ -128,8 +128,8 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
         optimizer.zero_grad()
         outputs = model_train(images)
         loss_sum = 0
-        for l in range(len(outputs)):
-            loss_item = yolo_loss(l, outputs[l], targets)
+        for i in range(len(outputs)):
+            loss_item = yolo_loss(i, outputs[i], targets)
             loss_sum += loss_item
         loss_value = loss_sum
         loss_value.backward()
@@ -151,8 +151,8 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
             optimizer.zero_grad()
             outputs = model_train(images)
             loss_value_all = 0
-            for l in range(len(outputs)):
-                loss_item = yolo_loss(l, outputs[l], targets)
+            for i in range(len(outputs)):
+                loss_item = yolo_loss(i, outputs[i], targets)
                 loss_value_all += loss_item
             loss_value = loss_value_all
         val_loss += loss_value.item()

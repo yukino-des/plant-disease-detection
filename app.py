@@ -33,8 +33,8 @@ def upload(file: UploadFile):
     with open(img_path, "wb+") as buffer:
         shutil.copyfileobj(file.file, buffer)
     if extend_name.lower() in ("bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"):
-        image, image_info = yolo.detect_image(Image.open(img_path))
-        image.save(img_out_path, quality=95, subsampling=0)
+        _image, image_info = yolo.detect_image(Image.open(img_path))
+        _image.save(img_out_path, quality=95, subsampling=0)
         return {"status": 1,
                 "image_url": "http://0.0.0.0:8081/" + img_path,
                 "draw_url": "http://0.0.0.0:8081/" + img_out_path,

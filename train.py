@@ -57,12 +57,12 @@ if __name__ == "__main__":
                 temp_dict[k] = v
         model_dict.update(temp_dict)
         model.load_state_dict(model_dict)
-    cuda = torch.cuda.is_available()
-    yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, focal_loss, focal_alpha, focal_gamma)
+    yolo_loss = YoloLoss(anchors, num_classes, input_shape, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
     log_dir = f"data/cache/loss{time_str}"
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
     model_train = model.train()
+    cuda = torch.cuda.is_available()
     if cuda:
         model_train = torch.nn.DataParallel(model)
         cudnn.benchmark = True
