@@ -49,8 +49,8 @@ if __name__ == "__main__":
     num_workers = 2
     ngpus_per_node = torch.cuda.device_count()
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    class_names, num_classes = get_classes("data/classes.txt")
-    anchors, num_anchors = get_anchors("data/anchors.txt")
+    class_names, num_classes = get_classes()
+    anchors, num_anchors = get_anchors()
     model = YoloBody(anchors_mask, num_classes)
     if model_path != "":
         model_dict = model.state_dict()
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         model_dict.update(temp_dict)
         model.load_state_dict(model_dict)
     cuda = torch.cuda.is_available()
-    yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, anchors_mask, focal_loss, focal_alpha, focal_gamma)
+    yolo_loss = YoloLoss(anchors, num_classes, input_shape, cuda, focal_loss, focal_alpha, focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
     log_dir = os.path.join("data/cache/loss", time_str)
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
@@ -77,8 +77,9 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    print_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt", anchors_mask=anchors_mask,
-                 model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=freeze_epoch,
+    print_config(classes_path="data/classes.txt", anchors_path="data/anchors.txt",
+                 anchors_mask=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
+                 model_path=model_path, input_shape=input_shape, init_epoch=init_epoch, freeze_epoch=50,
                  unfreeze_epoch=unfreeze_epoch, freeze_batch_size=freeze_batch_size,
                  unfreeze_batch_size=unfreeze_batch_size, freeze_train=freeze_train, init_lr=init_lr, min_lr=min_lr,
                  optimizer_type=optimizer_type, momentum=momentum, lr_decay_type=lr_decay_type, save_period=save_period,
@@ -128,7 +129,7 @@ if __name__ == "__main__":
                      pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=train_sampler)
     gen_val = DataLoader(val_dataset, shuffle=shuffle, batch_size=batch_size, num_workers=num_workers,
                          pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=val_sampler)
-    eval_callback = EvalCallback(model, input_shape, anchors, anchors_mask, class_names, num_classes, val_lines,
+    eval_callback = EvalCallback(model, input_shape, anchors, class_names, num_classes, val_lines,
                                  log_dir, cuda, eval_flag=eval_flag, period=eval_period)
     for epoch in range(init_epoch, unfreeze_epoch):
         if epoch >= freeze_epoch and not unfreeze_flag and freeze_train:

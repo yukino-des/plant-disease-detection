@@ -81,7 +81,7 @@ if __name__ == "__main__":
         yolo = Yolo()
         img = input("Input image path: ")
         image = Image.open(img)
-        yolo.detect_heatmap(image, "data/cache/heatmap.png")
+        yolo.detect_heatmap(image)
     elif mode == "img":
         yolo = Yolo()
         img = input("Input image path: ")
@@ -96,7 +96,7 @@ if __name__ == "__main__":
         np.random.seed(0)
         input_shape = [416, 416]
         anchors_num = 9
-        data = load_data("data/VOC/Annotations")
+        data = load_data()
         cluster, near = kmeans(data, anchors_num)
         data = data * np.array([input_shape[1], input_shape[0]])
         cluster = cluster * np.array([input_shape[1], input_shape[0]])
@@ -126,12 +126,12 @@ if __name__ == "__main__":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/.gt", exist_ok=True)
         os.makedirs("data/cache/map/.dr", exist_ok=True)
-        class_names, _ = get_classes("data/classes.txt")
+        class_names, _ = get_classes()
         yolo = Yolo(confidence=confidence, nms_iou=nms_iou)
         for image_id in tqdm(image_ids):
             image_path = f"data/VOC/JPEGImages/{image_id}.jpg"
             image = Image.open(image_path)
-            yolo.get_map_txt(image_id, image, class_names, "data/cache/map")
+            yolo.get_map_txt(image_id, image, class_names)
             with open(f"data/cache/map/.gt/{image_id}.txt", "w") as new_f:
                 root = ET.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
@@ -155,7 +155,7 @@ if __name__ == "__main__":
         get_map(min_overlap, True, score_threshold=score_threshold)
     elif mode == "onnx":
         yolo = Yolo()
-        yolo.convert_to_onnx(simplify=False, model_path="data/model.onnx")
+        yolo.convert_to_onnx(simplify=False)
     elif mode == "sum":
         input_shape = [416, 416]
         anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]

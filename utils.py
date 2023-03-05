@@ -104,7 +104,7 @@ def draw_plot(dictionary, n_classes, window_title, plot_title, x_label, output_p
     plt.close()
 
 
-def file_lines_to_list(path):
+def lines_to_list(path):
     with open(path) as f:
         content = f.readlines()
     content = [x.strip() for x in content]
@@ -172,16 +172,16 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimi
     torch.save(model.state_dict(), "data/cache/current.pth")
 
 
-def get_anchors(anchors_path):
-    with open(anchors_path, encoding="utf-8") as f:
+def get_anchors():
+    with open("data/anchors.txt", encoding="utf-8") as f:
         anchors = f.readline()
     anchors = [float(x) for x in anchors.split(",")]
     anchors = np.array(anchors).reshape(-1, 2)
     return anchors, len(anchors)
 
 
-def get_classes(classes_path):
-    with open(classes_path, encoding="utf-8") as f:
+def get_classes():
+    with open("data/classes.txt", encoding="utf-8") as f:
         class_names = f.readlines()
     class_names = [c.strip() for c in class_names]
     return class_names, len(class_names)
@@ -206,7 +206,7 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iters, warmup_iters_ratio=
     return func
 
 
-def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
+def get_map(min_overlap, draw, score_threshold=0.5):
     gt_path = "data/cache/map/.gt"
     dr_path = "data/cache/map/.dr"
     tf_path = "data/cache/map/.tf"
@@ -218,7 +218,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
         os.makedirs("data/cache/map/precision", exist_ok=True)
     ground_truth_files = glob.glob(gt_path + "/*.txt")
     if len(ground_truth_files) == 0:
-        raise FileNotFoundError("Ground-truth files not found error.")
+        raise FileNotFoundError("Ground-truth files not found.")
     ground_truth_files.sort()
     gt_counter_per_class = {}
     counter_images_per_class = {}
@@ -227,8 +227,8 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
         file_id = os.path.basename(os.path.normpath(file_id))
         temp_path = os.path.join(dr_path, (file_id + ".txt"))
         if not os.path.exists(temp_path):
-            raise FileNotFoundError(f"File not found error: {temp_path}.\n")
-        lines_list = file_lines_to_list(txt_file)
+            raise FileNotFoundError(f"{temp_path} not found.")
+        lines_list = lines_to_list(txt_file)
         bounding_boxes = []
         is_difficult = False
         already_seen_classes = []
@@ -239,7 +239,8 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
                     is_difficult = True
                 else:
                     class_name, left, top, right, bottom = line.split()
-            except:
+            except ValueError as e:
+                # print(repr(e))
                 if "difficult" in line:
                     line_split = line.split()
                     _difficult = line_split[-1]
@@ -293,12 +294,12 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
             temp_path = os.path.join(gt_path, file_id + ".txt")
             if class_index == 0:
                 if not os.path.exists(temp_path):
-                    raise FileNotFoundError(f"File not found error: {temp_path}.\n")
-            lines = file_lines_to_list(txt_file)
+                    raise FileNotFoundError(f"{temp_path} not found.")
+            lines = lines_to_list(txt_file)
             for line in lines:
                 try:
                     tmp_class_name, confidence, left, top, right, bottom = line.split()
-                except:
+                except ValueError:
                     line_split = line.split()
                     bottom = line_split[-1]
                     right = line_split[-2]
@@ -310,7 +311,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
                         tmp_class_name += name + " "
                     tmp_class_name = tmp_class_name[:-1]
                 if tmp_class_name == class_name:
-                    bbox = left + " " + top + " " + right + " " + bottom
+                    bbox = f"{left} {top} {right} {bottom}"
                     bounding_boxes.append({"confidence": confidence, "file_id": file_id, "bbox": bbox})
         bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
         with open(os.path.join(tf_path, f"{class_name}_dr.json"), "w") as outfile:
@@ -318,7 +319,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
     sum_ap = 0.0
     ap_dictionary = {}
     lamr_dictionary = {}
-    with open(f"{path}/results.txt", "w") as results_file:
+    with open("data/cache/map/results.txt", "w") as results_file:
         results_file.write("AP, precision, recall per class\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
@@ -412,7 +413,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"{path}/AP/{class_name}.png")
+                fig.savefig(f"data/cache/map/AP/{class_name}.png")
                 plt.cla()
                 plt.plot(score, f1, "-", color="orangered")
                 plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
@@ -421,7 +422,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"{path}/F1/{class_name}.png")
+                fig.savefig(f"data/cache/map/F1/{class_name}.png")
                 plt.cla()
                 plt.plot(score, rec, "-H", color="gold")
                 plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
@@ -430,7 +431,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"{path}/recall/{class_name}.png")
+                fig.savefig(f"data/cache/map/recall/{class_name}.png")
                 plt.cla()
                 plt.plot(score, prec, "-s", color="palevioletred")
                 plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
@@ -439,7 +440,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
                 axes = plt.gca()
                 axes.set_xlim([0.0, 1.0])
                 axes.set_ylim([0.0, 1.05])
-                fig.savefig(f"{path}/precision/{class_name}.png")
+                fig.savefig(f"data/cache/map/precision/{class_name}.png")
                 plt.cla()
         if n_classes == 0:
             raise ValueError("data/classes.txt error.")
@@ -450,7 +451,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
     shutil.rmtree(tf_path)
     det_counter_per_class = {}
     for txt_file in dr_files_list:
-        lines_list = file_lines_to_list(txt_file)
+        lines_list = lines_to_list(txt_file)
         for line in lines_list:
             class_name = line.split()[0]
             if class_name in det_counter_per_class:
@@ -461,7 +462,7 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
-    with open(f"{path}/results.txt", "a") as results_file:
+    with open("data/cache/map/results.txt", "a") as results_file:
         results_file.write("\nnumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
             results_file.write(f"{class_name}: {str(gt_counter_per_class[class_name])}\n")
@@ -473,23 +474,23 @@ def get_map(min_overlap, draw, score_threshold=0.5, path="data/cache/map"):
             text += f", fp: {str(n_det - count_true_positives[class_name])})\n"
             results_file.write(text)
     if draw:
-        window_title = "ground truth"
+        window_title = "ground-truth"
         plot_title = f"{window_title}\n"
         plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
         x_label = "number of objects per class"
-        output_path = f"{path}/gt.png"
+        output_path = "data/cache/map/gt.png"
         plot_color = "forestgreen"
         draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "log-average miss rate"
         plot_title = window_title
         x_label = "log-average miss rate"
-        output_path = f"{path}/lamr.png"
+        output_path = "data/cache/map/lamr.png"
         plot_color = "royalblue"
         draw_plot(lamr_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
         window_title = "mAP={:.2f}%".format(mAP * 100)
         plot_title = window_title
         x_label = "average precision"
-        output_path = f"{path}/mAP.png"
+        output_path = "data/cache/map/mAP.png"
         plot_color = "royalblue"
         draw_plot(ap_dictionary, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     return mAP
@@ -499,7 +500,7 @@ def get_txts(seed=0, trainval_percent=0.9, train_percent=0.9):
     random.seed(seed)
     trainval_percent = trainval_percent
     train_percent = train_percent
-    classes, _ = get_classes("data/classes.txt")
+    classes, _ = get_classes()
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
     temp_xml = os.listdir("data/VOC/Annotations")
@@ -591,9 +592,9 @@ def kmeans(box, k):
     return cluster, near
 
 
-def load_data(path):
+def load_data():
     data = []
-    for xml_file in tqdm(glob.glob(f"{path}/*xml")):
+    for xml_file in tqdm(glob.glob("data/VOC/Annotations/*xml")):
         tree = ET.parse(xml_file)
         height = int(tree.findtext("./size/height"))
         width = int(tree.findtext("./size/width"))
@@ -633,10 +634,8 @@ def logistic(x):
         return np.exp(x) / (1 + np.exp(x))
 
 
-def make_divisible(v, divisor, min_value=None):
-    if min_value is None:
-        min_value = divisor
-    new_v = max(min_value, int(v + divisor / 2) // divisor * divisor)
+def make_divisible(v, divisor):
+    new_v = max(divisor, int(v + divisor / 2) // divisor * divisor)
     if new_v < 0.9 * v:
         new_v += divisor
     return new_v
@@ -698,17 +697,17 @@ def voc_ap(rec, prec):
     mrec = rec[:]
     prec.insert(0, 0.0)
     prec.append(0.0)
-    mpre = prec[:]
-    for i in range(len(mpre) - 2, -1, -1):
-        mpre[i] = max(mpre[i], mpre[i + 1])
+    mprec = prec[:]
+    for i in range(len(mprec) - 2, -1, -1):
+        mprec[i] = max(mprec[i], mprec[i + 1])
     i_list = []
     for i in range(1, len(mrec)):
         if mrec[i] != mrec[i - 1]:
             i_list.append(i)
     ap = 0.0
     for i in i_list:
-        ap += ((mrec[i] - mrec[i - 1]) * mpre[i])
-    return ap, mrec, mpre
+        ap += ((mrec[i] - mrec[i - 1]) * mprec[i])
+    return ap, mrec, mprec
 
 
 def yolo_dataset_collate(batch):

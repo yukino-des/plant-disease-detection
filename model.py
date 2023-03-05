@@ -50,13 +50,11 @@ class ConvBNReLU(nn.Sequential):
 class DecodeBox:
     def __init__(self, anchors, num_classes, input_shape, anchors_mask=None):
         super(DecodeBox, self).__init__()
-        if anchors_mask is None:
-            anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
         self.input_shape = input_shape
-        self.anchors_mask = anchors_mask
+        self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]] if anchors_mask is None else anchors_mask
 
     def decode_box(self, inputs):
         outputs = []
@@ -223,7 +221,7 @@ class EvalCallback:
                         left, top, right, bottom, obj = box
                         obj_name = self.class_names[obj]
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
-            temp_map = get_map(self.min_overlap, False, path=self.maps_path)
+            temp_map = get_map(self.min_overlap, False)
             self.maps.append(temp_map)
             self.epochs.append(epoch)
             with open(os.path.join(self.log_dir, "map.txt"), "a") as f:
@@ -318,7 +316,7 @@ class MobileNetV2(nn.Module):
             inverted_residual_setting = [[1, 16, 1, 1], [6, 24, 2, 2], [6, 32, 3, 2], [6, 64, 4, 2], [6, 96, 3, 1],
                                          [6, 160, 3, 2], [6, 320, 1, 1]]
         if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
-            raise ValueError("Length of `inverted_residual_setting` error.")
+            raise ValueError("inverted_residual_setting error.")
         input_channel = make_divisible(input_channel * width_mult, round_nearest)
         self.last_channel = make_divisible(last_channel * max(1.0, width_mult), round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]
@@ -367,7 +365,7 @@ class Upsample(nn.Module):
         self.upsample = nn.Sequential(conv2d(in_channels, out_channels, 1),
                                       nn.Upsample(scale_factor=2, mode="nearest"))
 
-    def forward(self, x, ):
+    def forward(self, x):
         return self.upsample(x)
 
 
@@ -381,8 +379,8 @@ class Yolo(object):
         self.classes_path = "data/classes.txt"
         self.confidence = confidence
         self.nms_iou = nms_iou
-        self.class_names, self.num_classes = get_classes(self.classes_path)
-        self.anchors, self.num_anchors = get_anchors(self.anchors_path)
+        self.class_names, self.num_classes = get_classes()
+        self.anchors, self.num_anchors = get_anchors()
         self.bbox_util = DecodeBox(self.anchors, self.num_classes, (self.input_shape[0], self.input_shape[1]),
                                    self.anchors_mask)
         hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
@@ -476,7 +474,7 @@ class Yolo(object):
         tact_time = (t2 - t1) / test_interval
         return tact_time
 
-    def detect_heatmap(self, image, heatmap_save_path):
+    def detect_heatmap(self, image):
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
@@ -500,27 +498,27 @@ class Yolo(object):
         plt.axis("off")
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
-        plt.savefig(heatmap_save_path, dpi=200, bbox_inches="tight", pad_inches=-0.1)
-        print(heatmap_save_path + " saved.")
+        plt.savefig("data/cache/heatmap.png", dpi=200, bbox_inches="tight", pad_inches=-0.1)
+        print("data/cache/heatmap.png saved.")
 
-    def convert_to_onnx(self, simplify, model_path):
+    def convert_to_onnx(self, simplify):
         self.generate(onnx=True)
         im = torch.zeros(1, 3, *self.input_shape).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        torch.onnx.export(self.net, im, f=model_path, verbose=False, opset_version=12,
+        torch.onnx.export(self.net, im, f="data/cache/model.onnx", verbose=False, opset_version=12,
                           training=torch.onnx.TrainingMode.EVAL, do_constant_folding=True,
                           input_names=input_layer_names, output_names=output_layer_names, dynamic_axes=None)
-        model_onnx = onnx.load(model_path)
+        model_onnx = onnx.load("data/cache/model.onnx")
         onnx.checker.check_model(model_onnx)
         if simplify:
             model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
             assert check, "assert check failed"
-            onnx.save(model_onnx, model_path)
-        print(model_path + " saved.")
+            onnx.save(model_onnx, "data/cache/model.onnx")
+        print("data/cache/model.onnx saved.")
 
-    def get_map_txt(self, image_id, image, class_names, maps_path):
-        f = open(os.path.join(maps_path, ".dr/" + image_id + ".txt"), "w")
+    def get_map_txt(self, image_id, image, class_names):
+        f = open(f"data/cache/map/.dr/{image_id}.txt", "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (self.input_shape[1], self.input_shape[0]))
@@ -641,10 +639,10 @@ class YoloDataset(Dataset):
             box[:, 0:2] = box[:, 0:2] + box[:, 2:4] / 2
         return image, box
 
-    def rand(self, a=0.0, b=1.0):
+    def rand(self, a=0, b=1):
         return np.random.rand() * (b - a) + a
 
-    def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=0.7, val=0.4, random=True):
+    def get_random_data(self, annotation_line, input_shape, jitter=.3, hue=.1, sat=.7, val=.4, random=True):
         line = annotation_line.split()
         image = Image.open(line[0])
         image = cvt_color(image)
@@ -864,7 +862,7 @@ class YoloLoss(nn.Module):
         self.ignore_threshold = 0.5
         self.cuda = cuda
 
-    def clip_by_tensor(self, t: torch.Tensor, t_min: float, t_max: float):
+    def clip_by_tensor(self, t, t_min, t_max):
         t = t.float()
         result = (t >= t_min).float() * t + (t < t_min).float() * t_min
         return (result <= t_max).float() * result + (result > t_max).float() * t_max
