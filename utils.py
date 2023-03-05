@@ -111,8 +111,18 @@ def lines_to_list(path):
     return content
 
 
-def fit1epoch(model_train, model, yolo_loss, loss_history, eval_callback, optimizer, epoch, epoch_step, epoch_step_val,
-              gen, gen_val, unfreeze_epoch):
+def fit1epoch(model_train,
+              model,
+              yolo_loss,
+              loss_history,
+              eval_callback,
+              optimizer,
+              epoch,
+              epoch_step,
+              epoch_step_val,
+              gen,
+              gen_val,
+              unfreeze_epoch):
     loss = 0
     val_loss = 0
     bar = tqdm(total=epoch_step, desc=f"epoch {epoch + 1}/{unfreeze_epoch}", postfix=dict, mininterval=0.3)
@@ -192,8 +202,14 @@ def get_lr(optimizer):
         return param_group["lr"]
 
 
-def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter, warmup_iter_ratio=0.05, warmup_lr_ratio=0.1,
-                     no_aug_iter_ratio=0.05, step_num=10):
+def get_lr_scheduler(lr_decay_type,
+                     lr,
+                     min_lr,
+                     total_iter,
+                     warmup_iter_ratio=0.05,
+                     warmup_lr_ratio=0.1,
+                     no_aug_iter_ratio=0.05,
+                     step_num=10):
     if lr_decay_type == "cos":
         warmup_total_iter = min(max(warmup_iter_ratio * total_iter, 1), 3)
         warmup_lr_start = max(warmup_lr_ratio * lr, 1e-6)

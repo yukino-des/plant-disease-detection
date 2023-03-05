@@ -42,7 +42,7 @@ if __name__ == "__main__":
     min_lr = init_lr * 0.01
     focal_alpha = 0.25
     focal_gamma = 2
-    eval_period = 10
+    period = 10
     num_workers = 2  # 4
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names, num_classes = get_classes()
@@ -57,7 +57,12 @@ if __name__ == "__main__":
                 temp_dict[k] = v
         model_dict.update(temp_dict)
         model.load_state_dict(model_dict)
-    yolo_loss = YoloLoss(anchors, num_classes, input_shape, focal_loss, focal_alpha, focal_gamma)
+    yolo_loss = YoloLoss(anchors=anchors,
+                         num_classes=num_classes,
+                         input_shape=input_shape,
+                         focal_loss=focal_loss,
+                         alpha=focal_alpha,
+                         gamma=focal_gamma)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
     log_dir = f"data/cache/loss{time_str}"
     loss_history = LossHistory(log_dir, model, input_shape=input_shape)
@@ -161,8 +166,15 @@ if __name__ == "__main__":
                          drop_last=True,
                          collate_fn=yolo_dataset_collate,
                          sampler=None)
-    eval_callback = EvalCallback(model, input_shape, anchors, class_names, num_classes, val_lines,
-                                 log_dir, eval_flag=eval_flag, period=eval_period)
+    eval_callback = EvalCallback(net=model,
+                                 input_shape=input_shape,
+                                 anchors=anchors,
+                                 class_names=class_names,
+                                 num_classes=num_classes,
+                                 val_lines=val_lines,
+                                 log_dir=log_dir,
+                                 eval_flag=eval_flag,
+                                 period=period)
     for epoch in range(init_epoch, unfreeze_epoch):
         if epoch >= freeze_epoch and not unfreeze_flag and freeze_train:
             batch_size = unfreeze_batch_size

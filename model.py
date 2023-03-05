@@ -141,9 +141,20 @@ class DecodeBox:
 
 
 class EvalCallback:
-    def __init__(self, net, input_shape, anchors, class_names, num_classes, val_lines, log_dir,
-                 max_boxes=100, confidence=0.05, nms_iou=0.5, min_overlap=0.5,
-                 eval_flag=True, period=1):
+    def __init__(self,
+                 net,
+                 input_shape,
+                 anchors,
+                 class_names,
+                 num_classes,
+                 val_lines,
+                 log_dir,
+                 max_boxes=100,
+                 confidence=0.05,
+                 nms_iou=0.5,
+                 min_overlap=0.5,
+                 eval_flag=True,
+                 period=1):
         super(EvalCallback, self).__init__()
         self.net = net
         self.input_shape = input_shape
@@ -166,8 +177,7 @@ class EvalCallback:
         self.epochs = [0]
         if self.eval_flag:
             with open(f"{self.log_dir}/map.txt", "a") as f:
-                f.write(str(0))
-                f.write("\n")
+                f.write(str(0) + "\n")
 
     def get_map_txt(self, image_id, image, class_names, map_path):
         f = open(f"{map_path}/.dr/{image_id}.txt", "w", encoding="utf-8")
