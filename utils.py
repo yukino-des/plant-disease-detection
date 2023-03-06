@@ -212,7 +212,7 @@ def get_map(min_overlap, score_threshold):
     os.makedirs("data/cache/map/F1", exist_ok=True)
     os.makedirs("data/cache/map/recall", exist_ok=True)
     os.makedirs("data/cache/map/precision", exist_ok=True)
-    ground_truth_files = glob.glob("data/cache/map/.gt/*.txt")
+    ground_truth_files = glob.glob("data/cache/map/groud-trust/*.txt")
     if len(ground_truth_files) == 0:
         raise FileNotFoundError("Ground-truth files not found.")
     ground_truth_files.sort()
@@ -221,7 +221,7 @@ def get_map(min_overlap, score_threshold):
     for txt_file in ground_truth_files:
         file_id = txt_file.split(".txt", 1)[0]
         file_id = os.path.basename(os.path.normpath(file_id))
-        temp_path = f"data/cache/map/.dr/{file_id}.txt"
+        temp_path = f"data/cache/map/result/{file_id}.txt"
         if not os.path.exists(temp_path):
             raise FileNotFoundError(f"{temp_path} not found.")
         lines_list = lines_to_list(txt_file)
@@ -278,14 +278,14 @@ def get_map(min_overlap, score_threshold):
     gt_classes = list(gt_counter_per_class.keys())
     gt_classes = sorted(gt_classes)
     n_classes = len(gt_classes)
-    dr_files_list = glob.glob("data/cache/map/.dr/*.txt")
+    dr_files_list = glob.glob("data/cache/map/result/*.txt")
     dr_files_list.sort()
     for class_index, class_name in enumerate(gt_classes):
         bounding_boxes = []
         for txt_file in dr_files_list:
             file_id = txt_file.split(".txt", 1)[0]
             file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = f"data/cache/map/.gt/{file_id}.txt"
+            temp_path = f"data/cache/map/groud-trust/{file_id}.txt"
             if class_index == 0:
                 if not os.path.exists(temp_path):
                     raise FileNotFoundError(f"{temp_path} not found.")
@@ -312,7 +312,7 @@ def get_map(min_overlap, score_threshold):
             json.dump(bounding_boxes, outfile)
     sum_ap = 0.0
     ap_dict = {}
-    loss_avg_miss_rate_dict = {}
+    log_avg_miss_rate_dict = {}
     with open("data/cache/map/results.txt", "w") as results_file:
         results_file.write("AP, precision, recall per class\n")
         count_true_positives = {}
@@ -380,27 +380,27 @@ def get_map(min_overlap, score_threshold):
             sum_ap += ap
             text = class_name + "\nAP={:.2f}%".format(ap * 100)
             if len(precision) > 0:
-                f1_text = class_name + "; F1={:.2f}".format(f1[score_threshold_idx])
-                recall_text = class_name + "; recall=" + "{:.2f}%".format(rec[score_threshold_idx] * 100)
-                precision_text = class_name + "; precision=" + "{:.2f}%".format(precision[score_threshold_idx] * 100)
+                f1_text = class_name + "\nF1={:.2f}".format(f1[score_threshold_idx])
+                recall_text = class_name + "\nrecall={:.2f}%".format(rec[score_threshold_idx] * 100)
+                precision_text = class_name + "\nprecision={:.2f}%".format(precision[score_threshold_idx] * 100)
             else:
-                f1_text = class_name + "; F1=0.00"
-                recall_text = class_name + "; recall=0.00%"
-                precision_text = class_name + "; precision=0.00%"
+                f1_text = class_name + "\nF1=0.00"
+                recall_text = class_name + "\nrecall=0.00%"
+                precision_text = class_name + "\nprecision=0.00%"
             rounded_precision = ["%.2f" % elem for elem in precision]
             rounded_rec = ["%.2f" % elem for elem in rec]
-            results_file.write(f"{text}\nprecision: {str(rounded_precision)}\nrecall: {str(rounded_rec)}\n\n")
+            results_file.write(f"{text}\nprecision={str(rounded_precision)}\nrecall={str(rounded_rec)}\n\n")
             ap_dict[class_name] = ap
             n_images = counter_images_per_class[class_name]
-            loss_avg_miss_rate, mr, false_pos_per_image = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
-            loss_avg_miss_rate_dict[class_name] = loss_avg_miss_rate
+            log_avg_miss_rate, mr, false_pos_per_image = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
+            log_avg_miss_rate_dict[class_name] = log_avg_miss_rate
             plt.plot(rec, precision, "-o")
             area_under_curve_x = m_recall[:-1] + [m_recall[-2]] + [m_recall[-1]]
             area_under_curve_y = m_precision[:-1] + [0.0] + [m_precision[-1]]
             plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor="r")
             fig = plt.gcf()
-            fig.canvas.manager.set_window_title("AP " + class_name)
-            plt.title("class: " + text)
+            # fig.canvas.manager.set_window_title("AP " + class_name)
+            plt.title(text)
             plt.xlabel("recall")
             plt.ylabel("precision")
             axes = plt.gca()
@@ -409,8 +409,8 @@ def get_map(min_overlap, score_threshold):
             fig.savefig(f"data/cache/map/AP/{class_name}.png")
             plt.cla()
             plt.plot(score, f1, "-", color="orangered")
-            plt.title("class: " + f1_text + "\nscore_threshold=" + str(score_threshold))
-            plt.xlabel("score threshold")
+            plt.title(f1_text)
+            plt.xlabel("score_threshold=" + str(score_threshold))
             plt.ylabel("F1")
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
@@ -418,8 +418,8 @@ def get_map(min_overlap, score_threshold):
             fig.savefig(f"data/cache/map/F1/{class_name}.png")
             plt.cla()
             plt.plot(score, rec, "-H", color="gold")
-            plt.title("class: " + recall_text + "\nscore_threshold=" + str(score_threshold))
-            plt.xlabel("score threshold")
+            plt.title(recall_text)
+            plt.xlabel("score_threshold=" + str(score_threshold))
             plt.ylabel("recall")
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
@@ -427,8 +427,8 @@ def get_map(min_overlap, score_threshold):
             fig.savefig(f"data/cache/map/recall/{class_name}.png")
             plt.cla()
             plt.plot(score, precision, "-s", color="palevioletred")
-            plt.title("class: " + precision_text + "\nscore_threshold=" + str(score_threshold))
-            plt.xlabel("score threshold")
+            plt.title("class: " + precision_text)
+            plt.xlabel("score_threshold="+ str(score_threshold))
             plt.ylabel("precision")
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
@@ -470,18 +470,18 @@ def get_map(min_overlap, score_threshold):
     plot_title = f"{window_title}\n"
     plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
     x_label = "number of objects per class"
-    output_path = "data/cache/map/gt.png"
+    output_path = "data/cache/map/ground-trust.png"
     plot_color = "forestgreen"
     draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     window_title = "log-average miss rate"
     plot_title = window_title
     x_label = "log-average miss rate"
-    output_path = "data/cache/map/loss_avg_miss_rate.png"
+    output_path = "data/cache/map/log-average-miss-rate.png"
     plot_color = "forestgreen"
-    draw_plot(loss_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
+    draw_plot(log_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     window_title = "mAP={:.2f}%".format(m_ap * 100)
     plot_title = window_title
-    x_label = "average precision"
+    x_label = "mean Average Precision"
     output_path = "data/cache/map/mAP.png"
     plot_color = "forestgreen"
     draw_plot(ap_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
@@ -601,10 +601,10 @@ def load_data():
 
 def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     if precision.size == 0:
-        loss_avg_miss_rate = 0
+        log_avg_miss_rate = 0
         mr = 1
         false_pos_per_image = 0
-        return loss_avg_miss_rate, mr, false_pos_per_image
+        return log_avg_miss_rate, mr, false_pos_per_image
     false_pos_per_image = false_pos_cum_sum / float(num_images)
     mr = (1 - precision)
     fp_per_image_tmp = np.insert(false_pos_per_image, 0, -1.0)
@@ -613,8 +613,8 @@ def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     for i, ref_i in enumerate(ref):
         j = np.where(fp_per_image_tmp <= ref_i)[-1][-1]
         ref[i] = mr_tmp[j]
-    loss_avg_miss_rate = math.exp(np.mean(np.log(np.maximum(1e-10, ref))))
-    return loss_avg_miss_rate, mr, false_pos_per_image
+    log_avg_miss_rate = math.exp(np.mean(np.log(np.maximum(1e-10, ref))))
+    return log_avg_miss_rate, mr, false_pos_per_image
 
 
 def logistic(x):

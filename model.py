@@ -473,7 +473,7 @@ class Yolo(object):
         return tact_time
 
     def get_map_txt(self, image_id, image, class_names):
-        f = open(f"data/cache/map/.dr/{image_id}.txt", "w")
+        f = open(f"data/cache/map/result/{image_id}.txt", "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))

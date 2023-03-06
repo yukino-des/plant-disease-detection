@@ -132,15 +132,15 @@ if __name__ == "__main__":
     # mode == "map"
     elif mode == "map":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
-        os.makedirs("data/cache/map/.gt", exist_ok=True)
-        os.makedirs("data/cache/map/.dr", exist_ok=True)
+        os.makedirs("data/cache/map/groud-trust", exist_ok=True)
+        os.makedirs("data/cache/map/result", exist_ok=True)
         class_names, _ = get_classes()
         yolo = Yolo(confidence=0.001, nms_iou=0.5)
         for image_id in tqdm(image_ids):
             image_path = f"data/VOC/JPEGImages/{image_id}.jpg"
             image = Image.open(image_path)
             yolo.get_map_txt(image_id, image, class_names)
-            with open(f"data/cache/map/.gt/{image_id}.txt", "w") as new_f:
+            with open(f"data/cache/map/groud-trust/{image_id}.txt", "w") as new_f:
                 root = ElementTree.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
