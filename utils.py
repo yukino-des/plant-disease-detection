@@ -16,6 +16,7 @@ from torch import nn
 from tqdm import tqdm
 from xml.etree import ElementTree
 
+# 2022-03-04  https://gihub.com/yukino-des/
 if os.name == "nt":
     matplotlib.use("Agg")
 else:
@@ -391,7 +392,7 @@ def get_map(min_overlap, score_threshold):
             results_file.write(f"{text}\nprecision: {str(rounded_precision)}\nrecall: {str(rounded_rec)}\n\n")
             ap_dict[class_name] = ap
             n_images = counter_images_per_class[class_name]
-            loss_avg_miss_rate, mr, false_pos_per_img = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
+            loss_avg_miss_rate, mr, false_pos_per_image = log_average_miss_rate(np.array(rec), np.array(fp), n_images)
             loss_avg_miss_rate_dict[class_name] = loss_avg_miss_rate
             plt.plot(rec, precision, "-o")
             area_under_curve_x = m_recall[:-1] + [m_recall[-2]] + [m_recall[-1]]
@@ -602,18 +603,18 @@ def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     if precision.size == 0:
         loss_avg_miss_rate = 0
         mr = 1
-        false_pos_per_img = 0
-        return loss_avg_miss_rate, mr, false_pos_per_img
-    false_pos_per_img = false_pos_cum_sum / float(num_images)
+        false_pos_per_image = 0
+        return loss_avg_miss_rate, mr, false_pos_per_image
+    false_pos_per_image = false_pos_cum_sum / float(num_images)
     mr = (1 - precision)
-    fp_per_img_tmp = np.insert(false_pos_per_img, 0, -1.0)
+    fp_per_image_tmp = np.insert(false_pos_per_image, 0, -1.0)
     mr_tmp = np.insert(mr, 0, 1.0)
     ref = np.logspace(-2.0, 0.0, num=9)
     for i, ref_i in enumerate(ref):
-        j = np.where(fp_per_img_tmp <= ref_i)[-1][-1]
+        j = np.where(fp_per_image_tmp <= ref_i)[-1][-1]
         ref[i] = mr_tmp[j]
     loss_avg_miss_rate = math.exp(np.mean(np.log(np.maximum(1e-10, ref))))
-    return loss_avg_miss_rate, mr, false_pos_per_img
+    return loss_avg_miss_rate, mr, false_pos_per_image
 
 
 def logistic(x):
@@ -702,8 +703,8 @@ def voc_ap(recall, precision):
 def yolo_dataset_collate(batch):
     image_list = []
     bbox_list = []
-    for img, box in batch:
-        image_list.append(img)
+    for image, box in batch:
+        image_list.append(image)
         bbox_list.append(box)
     images = torch.from_numpy(np.array(image_list)).type(torch.FloatTensor)
     bbox_list = [torch.from_numpy(ann).type(torch.FloatTensor) for ann in bbox_list]
@@ -767,9 +768,9 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
     model(*x)
     for h in hooks:
         h.remove()
-    lines = f"{'-' * 95}\n" \
-            f"{'{:>25}{:>58}{:>12}'.format('Layer (type)', 'Output Shape', 'Param #')}\n" \
-            f"{'=' * 95}\n"
+    lines = (f"{'-' * 95}\n"
+             f"{'{:>25}{:>58}{:>12}'.format('Layer (type)', 'Output Shape', 'Param #')}\n"
+             f"{'=' * 95}\n")
     total_params = 0
     total_output = 0
     trainable_params = 0

@@ -74,7 +74,7 @@ if __name__ == "__main__":
     wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
     total_step = num_train // 8 * epoch
     if total_step <= wanted_step and num_train // 8 == 0:
-        raise ValueError("Dataset not qualified.")
+        raise ValueError("数据集不合格")
     unfreeze_flag = False
     if freeze_train:
         for param in model.backbone.parameters():
@@ -102,7 +102,7 @@ if __name__ == "__main__":
     epoch_step = num_train // batch_size
     epoch_step_val = num_val // batch_size
     if epoch_step == 0 or epoch_step_val == 0:
-        raise ValueError("Dataset not qualified.")
+        raise ValueError("数据集不合格")
     train_dataset = YoloDataset(train_lines, num_classes, epoch, True, True, 0.5, 0.5, True, 0.7)
     val_dataset = YoloDataset(val_lines, num_classes, epoch, False, False, 0, 0, False, 0)
     gen = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers, pin_memory=True,
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             epoch_step = num_train // batch_size
             epoch_step_val = num_val // batch_size
             if epoch_step == 0 or epoch_step_val == 0:
-                raise ValueError("Dataset not qualified.")
+                raise ValueError("数据集不合格")
             gen = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers,
                              pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=None)
             gen_val = DataLoader(val_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers,

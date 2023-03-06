@@ -22,89 +22,88 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
                    allow_headers=["Content-Type", "X-Requested-With"])
 
 
-# 响应检测
+# 响应检测图像、model.onnx、model.pth、summary.txt
 @app.get("/data/{file_path:path}", response_class=FileResponse)
 def data(file_path):
-    return FileResponse(f"data/{file_path}", filename=file_path.rsplit("/", 1)[1],
-                        headers={"Content-Type": "image/png"})
+    try:
+        filename = file_path.rsplit("/", 1)[1]
+    except IndexError:
+        filename = file_path
+    return FileResponse(f"data/{file_path}", filename=filename, headers={"Content-Type": "multipart/form-data"})
 
 
 # 请求图像
 @app.post("/image", response_model=dict)
 def image(file: UploadFile):
     if file is None:
-        return {"status": 0}
+        return {"status": 404}
     file_name, extend_name = file.filename.rsplit(".", 1)
-    img_path = f"data/cache/img/{file.filename}"
-    img_out_path = f"data/cache/img/out/{file_name}.png"
-    with open(img_path, "wb+") as wb:
+    _image_path = f"data/cache/image/{file.filename}"
+    image_out_path = f"data/cache/image/out/{file_name}.png"
+    image_heatmap_path = f"data/cache/image/heatmap/{file_name}.png"
+    with open(_image_path, "wb+") as wb:
         shutil.copyfileobj(file.file, wb)
     if extend_name.lower() not in ["bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"]:
-        return {"status": 0}
-    _image, image_info = yolo.detect_image(Image.open(img_path))
-    _image.save(img_out_path, quality=95, subsampling=0)
-    return {"status": 1,
-            "image_url": f"http://0.0.0.0:8081/{img_path}",
-            "draw_url": f"http://0.0.0.0:8081/{img_out_path}",
-            "image_info": image_info}
-
-
-# 下载model.onnx
-@app.get("/onnx/{n}", response_class=FileResponse)
-def onnx(n: int):
-    simplify = False if n == 0 else True
-    yolo.convert_to_onnx(simplify)
-    return FileResponse("data/cache/model.onnx", filename="model.onnx")
-
-
-# 下载model.pth
-@app.get("/pth", response_class=FileResponse)
-def pth():
-    return FileResponse("data/cache/model.pth", filename="model.pth")
+        return {"status": 404}
+    target_info = yolo.detect_image(_image_path)
+    yolo.detect_heatmap(_image_path)
+    return {"status": "ok",
+            "imageUrl": f"http://0.0.0.0:8080/{_image_path}",
+            "imageOutUrl": f"http://0.0.0.0:8080/{image_out_path}",
+            "imageHeatmapUrl": f"http://0.0.0.0:8080/{image_heatmap_path}",
+            "targetInfo": target_info}
 
 
 if __name__ == "__main__":
     mode = input("Input mode in [app, directory, fps, heatmap, image, k-means, map, onnx, summary, video]: ")
+
+    # mode == "app"
     if mode == "app":
         yolo = Yolo()
+        # 生成model.onnx
+        yolo.convert_to_onnx(simplify=False)
+        # 生成summary.txt
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        m = YoloBody(80).to(device)
+        _sum = summary(m, (3, 416, 416))
+        dummy_input = torch.randn(1, 3, 416, 416).to(device)
+        flops, params = profile(m.to(device), (dummy_input,), verbose=False)
+        flops = flops * 2
+        flops, params = clever_format([flops, params], "%.3f")
+        _sum += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
+        with open("data/summary.txt", "w") as sum_txt:
+            sum_txt.write(_sum)
+        sum_txt.close()
+        # 清空缓存
         shutil.rmtree("data/cache", ignore_errors=True)
-        os.makedirs("data/cache/img/out", exist_ok=True)
-        os.makedirs("data/cache/img/hm", exist_ok=True)
-        uvicorn.run(app, host="0.0.0.0", port=8081)
+        os.makedirs("data/cache/image/out", exist_ok=True)
+        os.makedirs("data/cache/image/heatmap", exist_ok=True)
+        uvicorn.run(app, host="0.0.0.0", port=8080)
+
+    # mode == "directory"
     elif mode == "directory":
         yolo = Yolo()
-        img_dir = input("Input directory path: ")
-        img_names = os.listdir(img_dir)
-        for img_name in tqdm(img_names):
-            if not img_name.lower().endswith(
+        image_dir = input("Input directory path: ")
+        image_names = os.listdir(image_dir)
+        for image_name in tqdm(image_names):
+            if not image_name.lower().endswith(
                     [".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff"]):
                 continue
-            image_path = os.path.join(img_dir, img_name)
-            image = Image.open(image_path)
-            image, _ = yolo.detect_image(image)
-            os.makedirs("data/cache/img/out", exist_ok=True)
-            image.save(f"data/cache/img/out/{img_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
+            image_path = os.path.join(image_dir, image_name)
+
+            image = yolo.detect_image(image_path)
+            os.makedirs("data/cache/image/out", exist_ok=True)
+            image.save(f"data/cache/image/out/{image_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
+
+    # mode == "fps"
     elif mode == "fps":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
-        img = Image.open(fps_image_path)
-        tact_time = yolo.get_fps(img, test_interval=100)
+        image = Image.open(fps_image_path)
+        tact_time = yolo.get_fps(image, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
-    elif mode == "heatmap":
-        yolo = Yolo()
-        img = input("Input image path: ")
-        image = Image.open(img)
-        img_name = img.rsplit("/", 1)[1].rsplit(".", 1)[0]
-        yolo.detect_heatmap(image, img_name)
-    elif mode == "image":
-        yolo = Yolo()
-        img = input("Input image path: ")
-        img_name = img.rsplit("/", 1)[1].rsplit(".", 1)[0]
-        image = Image.open(img)
-        image, _ = yolo.detect_image(image)
-        image_save_path = f"data/cache/img/out/{img_name}.png"
-        image.save(image_save_path, quality=95, subsampling=0)
-        print(f"{image_save_path} saved.")
+
+    # mode == "k-means"
     elif mode == "k-means":
         np.random.seed(0)
         data = load_data()
@@ -129,6 +128,8 @@ if __name__ == "__main__":
                 xy = ", %d,%d" % (cluster[i][0], cluster[i][1])
             f.write(xy)
         f.close()
+
+    # mode == "map"
     elif mode == "map":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/.gt", exist_ok=True)
@@ -160,9 +161,13 @@ if __name__ == "__main__":
                     else:
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(0.5, 0.5)
+
+    # mode == "onnx"
     elif mode == "onnx":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
+
+    # mode == "summary"
     elif mode == "summary":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
@@ -172,41 +177,50 @@ if __name__ == "__main__":
         flops = flops * 2
         flops, params = clever_format([flops, params], "%.3f")
         _sum += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
+        sum_txt = open("data/summary.txt", "w")
+        sum_txt.write(_sum)
+        sum_txt.close()
         print(_sum)
+
+    # mode == "video"
     elif mode == "video":
         yolo = Yolo()
         video_path = input("Input video path, default camera.: ")
-        capture = cv2.VideoCapture(0 if video_path == "" else video_path)
         os.makedirs("data/cache/video", exist_ok=True)
-        video_save_path = f"data/cache/video/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
-        fourcc = cv2.VideoWriter_fourcc(*"XVID")
-        size = (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-        out = cv2.VideoWriter(video_save_path, fourcc, 25.0, size)
-        ref, frame = capture.read()
-        if not ref:
-            raise ValueError("Failed to read the camera/video.")
-        fps = 0.0
-        while True:
-            t1 = time.time()
+        video_out_path = f"data/cache/video/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
+        capture = cv2.VideoCapture(0 if video_path == "" else video_path)
+        out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*"XVID"), 25.0,
+                              (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+        ref = False
+        while not ref:
             ref, frame = capture.read()
-            if not ref:
-                break
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = Image.fromarray(np.uint8(frame))
-            image, _ = yolo.detect_image(frame)
-            frame = np.array(image)
-            frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            fps = (fps + (1. / (time.time() - t1))) / 2
-            frame = cv2.putText(frame, "fps=%.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            if video_path == "":
-                cv2.imshow("video", frame)
-            c = cv2.waitKey(1) & 0xff
-            out.write(frame)
-            if c == 27:
-                break
+        fps = 0.0
+        try:
+            while True:
+                t1 = time.time()
+                ref, frame = capture.read()
+                if not ref:
+                    break
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame = Image.fromarray(np.uint8(frame))
+                image = yolo.detect_video(frame)
+                frame = np.array(image)
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                fps = (fps + (1. / (time.time() - t1))) / 2
+                frame = cv2.putText(frame, "fps=%.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                if video_path == "":
+                    cv2.imshow("video", frame)
+                c = cv2.waitKey(1) & 0xff
+                out.write(frame)
+                if c == 27:
+                    break
+        except KeyboardInterrupt:
+            pass
         out.release()
         capture.release()
         cv2.destroyAllWindows()
-        print(video_save_path + " saved")
+        print(video_out_path + " saved")
+
+    # raise ValueError
     else:
         raise ValueError("Input mode in [app, directory, fps, heatmap, image, k-means, map, onnx, summary, video].")

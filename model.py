@@ -297,21 +297,27 @@ class Yolo(object):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.net.load_state_dict(torch.load("data/model.pth", map_location=device))
         self.net = self.net.eval()
-        im = torch.zeros(1, 3, 416, 416).to("cpu")
+        image = torch.zeros(1, 3, 416, 416).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        torch.onnx.export(self.net, im, f="data/cache/model.onnx", verbose=False, opset_version=12,
+        torch.onnx.export(self.net, image, f="data/model.onnx", verbose=False, opset_version=12,
                           training=torch.onnx.TrainingMode.EVAL, do_constant_folding=True,
                           input_names=input_layer_names, output_names=output_layer_names, dynamic_axes=None)
-        model_onnx = onnx.load("data/cache/model.onnx")
+        model_onnx = onnx.load("data/model.onnx")
         onnx.checker.check_model(model_onnx)
         if simplify:
             model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
             assert check, "assert check failed"
-            onnx.save(model_onnx, "data/cache/model.onnx")
-        print("data/cache/model.onnx saved.")
+            onnx.save(model_onnx, "data/model.onnx")
+        print("data/model.onnx saved.")
 
-    def detect_heatmap(self, image, img_name):
+    def detect_heatmap(self, image_path):
+        image = Image.open(image_path)
+        try:
+            image_path = image_path.rsplit("/", 1)[1]
+        except IndexError:
+            pass
+        image_name, extend_name = image_path.split(".")
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
@@ -331,15 +337,21 @@ class Yolo(object):
             score = cv2.resize(score, (image.size[0], image.size[1]))
             normed_score = (score * 255).astype("uint8")
             mask = np.maximum(mask, normed_score)
-        # plt.imshow(mask, alpha=0.5, interpolation="nearest", cmap="jet")
+        plt.imshow(mask, alpha=0.5, interpolation="nearest", cmap="jet")
         plt.axis("off")
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
-        os.makedirs("data/cache/img/hm", exist_ok=True)
-        plt.savefig(f"data/cache/img/hm/{img_name}.png", dpi=200, bbox_inches="tight", pad_inches=-0.1)
-        print(f"data/cache/img/hm/{img_name}.png saved.")
+        os.makedirs("data/cache/image/heatmap", exist_ok=True)
+        plt.savefig(f"data/cache/image/heatmap/{image_name}.png", dpi=200, bbox_inches="tight", pad_inches=-0.1)
+        print(f"data/cache/image/heatmap/{image_name}.png saved.")
 
-    def detect_image(self, image):
+    def detect_image(self, image_path):
+        image = Image.open(image_path)
+        try:
+            image_path = image_path.rsplit("/", 1)[1]
+        except IndexError:
+            pass
+        image_name, extend_name = image_path.split(".")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
@@ -353,13 +365,15 @@ class Yolo(object):
             results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
                                                          self.confidence, self.nms_iou)
             if results[0] is None:
-                return image, {}
+                image.save(f"data/cache/image/out/{image_name}.png", quality=95, subsampling=0)
+                print(f"data/cache/image/out/{image_name}.png saved")
+                return {}
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font="data/あ.ttc", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
+        font = ImageFont.truetype(font="data/font.ttc", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean([416, 416]), 1))
-        image_info = {}
+        target_info = {}
         count = 0
         for i, c in list(enumerate(top_label)):
             predicted_class = self.class_names[int(c)]
@@ -373,7 +387,7 @@ class Yolo(object):
             label = "{} {:.2f}".format(predicted_class, score)
             count += 1
             key = "{}-{:02}".format(predicted_class, count)
-            image_info[key] = [f"{right - left}×{bottom - top}", np.round(float(score), 3)]
+            target_info[key] = [f"{right - left}×{bottom - top}", np.round(float(score), 3)]
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
             label = label.encode("utf-8")
@@ -386,7 +400,53 @@ class Yolo(object):
             draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
             draw.text(tuple(text_origin), str(label, "UTF-8"), fill=(0, 0, 0), font=font)
             del draw
-        return image, image_info
+        image.save(f"data/cache/image/out/{image_name}.png", quality=95, subsampling=0)
+        print(f"data/cache/image/out/{image_name}.png saved")
+        return target_info
+
+    def detect_video(self, image):
+        image_shape = np.array(np.shape(image)[0:2])
+        image = cvt_color(image)
+        image_data = resize_image(image, (416, 416))
+        image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
+        with torch.no_grad():
+            images = torch.from_numpy(image_data)
+            if torch.cuda.is_available():
+                images = images.cuda()
+            outputs = self.net(images)
+            outputs = self.bbox_util.decode_box(outputs)
+            results = self.bbox_util.non_max_suppression(torch.cat(outputs, 1), self.num_classes, image_shape,
+                                                         self.confidence, self.nms_iou)
+            if results[0] is None:
+                return image
+            top_label = np.array(results[0][:, 6], dtype="int32")
+            top_conf = results[0][:, 4] * results[0][:, 5]
+            top_boxes = results[0][:, :4]
+        font = ImageFont.truetype(font="data/font.ttc", size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
+        thickness = int(max((image.size[0] + image.size[1]) // np.mean([416, 416]), 1))
+        for i, c in list(enumerate(top_label)):
+            predicted_class = self.class_names[int(c)]
+            box = top_boxes[i]
+            score = top_conf[i]
+            top, left, bottom, right = box
+            top = max(0, np.floor(top).astype("int32"))
+            left = max(0, np.floor(left).astype("int32"))
+            bottom = min(image.size[1], np.floor(bottom).astype("int32"))
+            right = min(image.size[0], np.floor(right).astype("int32"))
+            label = "{} {:.2f}".format(predicted_class, score)
+            draw = ImageDraw.Draw(image)
+            label_size = draw.textsize(label, font)
+            label = label.encode("utf-8")
+            if top - label_size[1] >= 0:
+                text_origin = np.array([left, top - label_size[1]])
+            else:
+                text_origin = np.array([left, top + 1])
+            for d in range(thickness):
+                draw.rectangle((left + d, top + d, right - d, bottom - d), outline=self.colors[c])
+            draw.rectangle((tuple(text_origin), tuple(text_origin + label_size)), fill=self.colors[c])
+            draw.text(tuple(text_origin), str(label, "UTF-8"), fill=(0, 0, 0), font=font)
+            del draw
+        return image
 
     def get_fps(self, image, test_interval):
         image_shape = np.array(np.shape(image)[0:2])
