@@ -16,9 +16,9 @@ from torch import nn
 from tqdm import tqdm
 from xml.etree import ElementTree
 
-if os.name == "nt":  # windows
+if os.name == "nt":
     matplotlib.use("Agg")
-else:  # mac, linux
+else:
     matplotlib.use("TkAgg")
 
 
@@ -230,14 +230,13 @@ def get_map(min_overlap, score_threshold):
         for line in lines_list:
             try:
                 if "difficult" in line:
-                    class_name, left, top, right, bottom, _difficult = line.split()
+                    class_name, left, top, right, bottom, _ = line.split()
                     is_difficult = True
                 else:
                     class_name, left, top, right, bottom = line.split()
             except ValueError:
                 if "difficult" in line:
                     line_split = line.split()
-                    _difficult = line_split[-1]
                     bottom = line_split[-2]
                     right = line_split[-3]
                     top = line_split[-4]
@@ -724,3 +723,76 @@ def yolo_x_warm_cos_lr(lr, min_lr, total_iter, warmup_total_iter, warmup_lr_star
         lr = min_lr + 0.5 * (lr - min_lr) * (1.0 + math.cos(
             math.pi * (_iter - warmup_total_iter) / (total_iter - warmup_total_iter - no_aug_iter)))
     return lr
+
+
+def summary(model, input_size, batch_size=-1, device="cuda"):
+    def register_hook(module):
+        def hook(_module, _input, _output):
+            class_name = str(_module.__class__).split(".")[-1].split("'")[0]
+            module_idx = len(_sum)
+            m_key = "%s-%i" % (class_name, module_idx + 1)
+            _sum[m_key] = OrderedDict()
+            _sum[m_key]["input_shape"] = list(_input[0].size())
+            _sum[m_key]["input_shape"][0] = batch_size
+            if isinstance(_output, (list, tuple)):
+                _sum[m_key]["output_shape"] = [
+                    [-1] + list(o.size())[1:] for o in _output]
+            else:
+                _sum[m_key]["output_shape"] = list(_output.size())
+                _sum[m_key]["output_shape"][0] = batch_size
+            params = 0
+            if hasattr(_module, "weight") and hasattr(_module.weight, "size"):
+                params += torch.prod(torch.LongTensor(list(_module.weight.size())))
+                _sum[m_key]["trainable"] = _module.weight.requires_grad
+            if hasattr(_module, "bias") and hasattr(_module.bias, "size"):
+                params += torch.prod(torch.LongTensor(list(_module.bias.size())))
+            _sum[m_key]["nb_params"] = params
+
+        if (not isinstance(module, nn.Sequential)
+                and not isinstance(module, nn.ModuleList)
+                and not (module == model)):
+            hooks.append(module.register_forward_hook(hook))
+
+    device = device.lower()
+    if device == "cuda" and torch.cuda.is_available():
+        d_type = torch.cuda.FloatTensor
+    else:
+        d_type = torch.FloatTensor
+    if isinstance(input_size, tuple):
+        input_size = [input_size]
+    x = [torch.rand(2, *in_size).type(d_type) for in_size in input_size]
+    _sum = OrderedDict()
+    hooks = []
+    model.apply(register_hook)
+    model(*x)
+    for h in hooks:
+        h.remove()
+    lines = f"{'-' * 95}\n" \
+            f"{'{:>25}{:>58}{:>12}'.format('Layer (type)', 'Output Shape', 'Param #')}\n" \
+            f"{'=' * 95}\n"
+    total_params = 0
+    total_output = 0
+    trainable_params = 0
+    for layer in _sum:
+        lines += '{:>25}{:>58}{:>12}\n'.format(
+            layer, str(_sum[layer]['output_shape']), '{0:,}'.format(_sum[layer]['nb_params']))
+        total_params += _sum[layer]["nb_params"]
+        total_output += np.prod(_sum[layer]["output_shape"])
+        if "trainable" in _sum[layer]:
+            if _sum[layer]["trainable"]:
+                trainable_params += _sum[layer]["nb_params"]
+    total_input_size = abs(np.prod(input_size) * batch_size * 4. / (1024 ** 2.))
+    total_output_size = abs(2. * total_output * 4. / (1024 ** 2.))
+    total_params_size = abs(total_params.numpy() * 4. / (1024 ** 2.))
+    total_size = total_params_size + total_output_size + total_input_size
+    lines += (f"{'=' * 95}\n"
+              f"{'Total params: {0:,}'.format(total_params)}\n"
+              f"{'Trainable params: {0:,}'.format(trainable_params)}\n"
+              f"{'Non-trainable params: {0:,}'.format(total_params - trainable_params)}\n"
+              f"{'-' * 95}\n"
+              f"{'Input size (MB): %0.2f' % total_input_size}\n"
+              f"{'Forward/backward pass size (MB): %0.2f' % total_output_size}\n"
+              f"{'Params size (MB): %0.2f' % total_params_size}\n"
+              f"{'Estimated Total Size (MB): %0.2f' % total_size}\n"
+              f"{'-' * 95}\n")
+    return lines

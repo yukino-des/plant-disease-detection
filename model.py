@@ -51,7 +51,6 @@ class DecodeBox:
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
-        self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 
     @staticmethod
@@ -269,7 +268,6 @@ class Upsample(nn.Module):
 
 class Yolo(object):
     def __init__(self, confidence=0.5, nms_iou=0.3):
-        self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.confidence = confidence
         self.nms_iou = nms_iou
@@ -313,7 +311,7 @@ class Yolo(object):
             onnx.save(model_onnx, "data/cache/model.onnx")
         print("data/cache/model.onnx saved.")
 
-    def detect_heatmap(self, image):
+    def detect_heatmap(self, image, img_name):
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
@@ -333,12 +331,13 @@ class Yolo(object):
             score = cv2.resize(score, (image.size[0], image.size[1]))
             normed_score = (score * 255).astype("uint8")
             mask = np.maximum(mask, normed_score)
-        plt.imshow(mask, alpha=0.5, interpolation="nearest", cmap="jet")
+        # plt.imshow(mask, alpha=0.5, interpolation="nearest", cmap="jet")
         plt.axis("off")
         plt.subplots_adjust(top=1, bottom=0, right=1, left=0, hspace=0, wspace=0)
         plt.margins(0, 0)
-        plt.savefig("data/cache/heatmap.png", dpi=200, bbox_inches="tight", pad_inches=-0.1)
-        print("data/cache/heatmap.png saved.")
+        os.makedirs("data/cache/img/hm", exist_ok=True)
+        plt.savefig(f"data/cache/img/hm/{img_name}.png", dpi=200, bbox_inches="tight", pad_inches=-0.1)
+        print(f"data/cache/img/hm/{img_name}.png saved.")
 
     def detect_image(self, image):
         image_shape = np.array(np.shape(image)[0:2])
@@ -498,7 +497,6 @@ class YoloDataset(Dataset):
                  mix_up_prob, train, special_aug_ratio=0.7):
         super(YoloDataset, self).__init__()
         self.annotation_lines = annotation_lines
-        self.input_shape = [416, 416]
         self.num_classes = num_classes
         self.epoch_length = epoch_length
         self.mosaic = mosaic
@@ -749,7 +747,6 @@ class YoloLoss(nn.Module):
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
-        self.input_shape = [416, 416]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.balance = [0.4, 1.0, 4]
         self.box_ratio = 0.05

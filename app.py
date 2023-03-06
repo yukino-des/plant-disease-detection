@@ -13,9 +13,8 @@ from model import Yolo, YoloBody
 from PIL import Image
 from starlette.responses import FileResponse
 from thop import clever_format, profile
-from torchsummary import summary
 from tqdm import tqdm
-from utils import avg_iou, get_classes, get_map, k_means, load_data
+from utils import avg_iou, get_classes, get_map, k_means, load_data, summary
 from xml.etree import ElementTree
 
 app = FastAPI()
@@ -23,45 +22,62 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, 
                    allow_headers=["Content-Type", "X-Requested-With"])
 
 
+# 响应检测
 @app.get("/data/{file_path:path}", response_class=FileResponse)
 def data(file_path):
-    return FileResponse(f"data/{file_path}", headers={"Content-Type": "image/png"})
+    return FileResponse(f"data/{file_path}", filename=file_path.rsplit("/", 1)[1],
+                        headers={"Content-Type": "image/png"})
 
 
-@app.post("/upload", response_model=dict)
-def upload(file: UploadFile):
+# 请求图像
+@app.post("/image", response_model=dict)
+def image(file: UploadFile):
     if file is None:
         return {"status": 0}
     file_name, extend_name = file.filename.rsplit(".", 1)
     img_path = f"data/cache/img/{file.filename}"
     img_out_path = f"data/cache/img/out/{file_name}.png"
-    with open(img_path, "wb+") as buffer:
-        shutil.copyfileobj(file.file, buffer)
-    if extend_name.lower() in ("bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"):
-        _image, image_info = yolo.detect_image(Image.open(img_path))
-        _image.save(img_out_path, quality=95, subsampling=0)
-        return {"status": 1,
-                "image_url": "http://0.0.0.0:8081/" + img_path,
-                "draw_url": "http://0.0.0.0:8081/" + img_out_path,
-                "image_info": image_info}
-    else:
+    with open(img_path, "wb+") as wb:
+        shutil.copyfileobj(file.file, wb)
+    if extend_name.lower() not in ["bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"]:
         return {"status": 0}
+    _image, image_info = yolo.detect_image(Image.open(img_path))
+    _image.save(img_out_path, quality=95, subsampling=0)
+    return {"status": 1,
+            "image_url": f"http://0.0.0.0:8081/{img_path}",
+            "draw_url": f"http://0.0.0.0:8081/{img_out_path}",
+            "image_info": image_info}
+
+
+# 下载model.onnx
+@app.get("/onnx/{n}", response_class=FileResponse)
+def onnx(n: int):
+    simplify = False if n == 0 else True
+    yolo.convert_to_onnx(simplify)
+    return FileResponse("data/cache/model.onnx", filename="model.onnx")
+
+
+# 下载model.pth
+@app.get("/pth", response_class=FileResponse)
+def pth():
+    return FileResponse("data/cache/model.pth", filename="model.pth")
 
 
 if __name__ == "__main__":
-    mode = input("Input mode in [app, dir, fps, heatmap, img, k-means, map, onnx, sum, video]: ")
+    mode = input("Input mode in [app, directory, fps, heatmap, image, k-means, map, onnx, summary, video]: ")
     if mode == "app":
         yolo = Yolo()
         shutil.rmtree("data/cache", ignore_errors=True)
         os.makedirs("data/cache/img/out", exist_ok=True)
+        os.makedirs("data/cache/img/hm", exist_ok=True)
         uvicorn.run(app, host="0.0.0.0", port=8081)
-    elif mode == "dir":
+    elif mode == "directory":
         yolo = Yolo()
         img_dir = input("Input directory path: ")
         img_names = os.listdir(img_dir)
         for img_name in tqdm(img_names):
             if not img_name.lower().endswith(
-                    (".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff")):
+                    [".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff"]):
                 continue
             image_path = os.path.join(img_dir, img_name)
             image = Image.open(image_path)
@@ -78,26 +94,24 @@ if __name__ == "__main__":
         yolo = Yolo()
         img = input("Input image path: ")
         image = Image.open(img)
-        yolo.detect_heatmap(image)
-    elif mode == "img":
+        img_name = img.rsplit("/", 1)[1].rsplit(".", 1)[0]
+        yolo.detect_heatmap(image, img_name)
+    elif mode == "image":
         yolo = Yolo()
         img = input("Input image path: ")
-        img_name = img.rsplit("/", 1)[1].split(".")[0]
+        img_name = img.rsplit("/", 1)[1].rsplit(".", 1)[0]
         image = Image.open(img)
         image, _ = yolo.detect_image(image)
-        # image.show()
         image_save_path = f"data/cache/img/out/{img_name}.png"
         image.save(image_save_path, quality=95, subsampling=0)
         print(f"{image_save_path} saved.")
     elif mode == "k-means":
         np.random.seed(0)
-        input_shape = [416, 416]
-        anchors_num = 9
         data = load_data()
-        cluster, near = k_means(data, anchors_num)
+        cluster, near = k_means(data, 9)
         data = data * np.array([416, 416])
         cluster = cluster * np.array([416, 416])
-        for j in range(anchors_num):
+        for j in range(9):
             plt.scatter(data[near == j][:, 0], data[near == j][:, 1])
             plt.scatter(cluster[j][0], cluster[j][1], marker="x", c="black")
         os.makedirs("data/cache", exist_ok=True)
@@ -149,17 +163,16 @@ if __name__ == "__main__":
     elif mode == "onnx":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
-    elif mode == "sum":
-        input_shape = [416, 416]
+    elif mode == "summary":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
-        summary(m, (3, 416, 416))
+        _sum = summary(m, (3, 416, 416))
         dummy_input = torch.randn(1, 3, 416, 416).to(device)
         flops, params = profile(m.to(device), (dummy_input,), verbose=False)
         flops = flops * 2
         flops, params = clever_format([flops, params], "%.3f")
-        print(f"Total flops: {flops}")
-        print(f"Total params: {params}")
+        _sum += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
+        print(_sum)
     elif mode == "video":
         yolo = Yolo()
         video_path = input("Input video path, default camera.: ")
@@ -196,4 +209,4 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         print(video_save_path + " saved")
     else:
-        raise ValueError("Input mode in [app, dir, fps, heatmap, img, k-means, map, onnx, sum, video]")
+        raise ValueError("Input mode in [app, directory, fps, heatmap, image, k-means, map, onnx, summary, video].")
