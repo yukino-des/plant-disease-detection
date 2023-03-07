@@ -300,16 +300,16 @@ class Yolo(object):
         image = torch.zeros(1, 3, 416, 416).to("cpu")
         input_layer_names = ["images"]
         output_layer_names = ["output"]
-        torch.onnx.export(self.net, image, f="data/model.onnx", verbose=False, opset_version=12,
+        torch.onnx.export(self.net, image, f="data/cache/model.onnx", verbose=False, opset_version=12,
                           training=torch.onnx.TrainingMode.EVAL, do_constant_folding=True,
                           input_names=input_layer_names, output_names=output_layer_names, dynamic_axes=None)
-        model_onnx = onnx.load("data/model.onnx")
+        model_onnx = onnx.load("data/cache/model.onnx")
         onnx.checker.check_model(model_onnx)
         if simplify:
             model_onnx, check = onnxsim.simplify(model_onnx, dynamic_input_shape=False, input_shapes=None)
             assert check, "assert check failed"
-            onnx.save(model_onnx, "data/model.onnx")
-        print("data/model.onnx saved.")
+            onnx.save(model_onnx, "data/cache/model.onnx")
+        print("data/cache/model.onnx saved.")
 
     def detect_heatmap(self, image_path):
         image = Image.open(image_path)

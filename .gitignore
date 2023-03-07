@@ -6,7 +6,6 @@
 !data/classes.txt
 !requirements.txt
 data/mobilenet_v2-b0353104.pth
-data/model.onnx
 __pycache__
 */__pycache__
 .idea
