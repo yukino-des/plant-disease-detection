@@ -207,12 +207,12 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter, warmup_iter_ratio=0.
 
 
 def get_map(min_overlap, score_threshold):
-    os.makedirs("data/map/temp", exist_ok=True)
-    os.makedirs("data/map/AP", exist_ok=True)
-    os.makedirs("data/map/F1", exist_ok=True)
-    os.makedirs("data/map/recall", exist_ok=True)
-    os.makedirs("data/map/precision", exist_ok=True)
-    ground_truth_files = glob.glob("data/map/ground-trust/*.txt")
+    os.makedirs("data/cache/map/temp", exist_ok=True)
+    os.makedirs("data/cache/map/AP", exist_ok=True)
+    os.makedirs("data/cache/map/F1", exist_ok=True)
+    os.makedirs("data/cache/map/recall", exist_ok=True)
+    os.makedirs("data/cache/map/precision", exist_ok=True)
+    ground_truth_files = glob.glob("data/cache/map/ground-trust/*.txt")
     if len(ground_truth_files) == 0:
         raise FileNotFoundError("Ground-truth files not found.")
     ground_truth_files.sort()
@@ -221,7 +221,7 @@ def get_map(min_overlap, score_threshold):
     for txt_file in ground_truth_files:
         file_id = txt_file.split(".txt", 1)[0]
         file_id = os.path.basename(os.path.normpath(file_id))
-        temp_path = f"data/map/result/{file_id}.txt"
+        temp_path = f"data/cache/map/result/{file_id}.txt"
         if not os.path.exists(temp_path):
             raise FileNotFoundError(f"{temp_path} not found.")
         lines_list = lines_to_list(txt_file)
@@ -273,19 +273,19 @@ def get_map(min_overlap, score_threshold):
                     else:
                         counter_images_per_class[class_name] = 1
                     already_seen_classes.append(class_name)
-        with open(f"data/map/temp/{file_id}-ground-truth.json", "w") as outfile:
+        with open(f"data/cache/map/temp/{file_id}-ground-truth.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     gt_classes = list(gt_counter_per_class.keys())
     gt_classes = sorted(gt_classes)
     n_classes = len(gt_classes)
-    dr_files_list = glob.glob("data/map/result/*.txt")
+    dr_files_list = glob.glob("data/cache/map/result/*.txt")
     dr_files_list.sort()
     for class_index, class_name in enumerate(gt_classes):
         bounding_boxes = []
         for txt_file in dr_files_list:
             file_id = txt_file.split(".txt", 1)[0]
             file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = f"data/map/ground-trust/{file_id}.txt"
+            temp_path = f"data/cache/map/ground-trust/{file_id}.txt"
             if class_index == 0:
                 if not os.path.exists(temp_path):
                     raise FileNotFoundError(f"{temp_path} not found.")
@@ -308,17 +308,17 @@ def get_map(min_overlap, score_threshold):
                     bbox = f"{left} {top} {right} {bottom}"
                     bounding_boxes.append({"confidence": confidence, "file_id": file_id, "bbox": bbox})
         bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
-        with open(f"data/map/temp/{class_name}_dr.json", "w") as outfile:
+        with open(f"data/cache/map/temp/{class_name}_dr.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
     sum_ap = 0.0
     ap_dict = {}
     log_avg_miss_rate_dict = {}
-    with open("data/map/results.txt", "w") as results_file:
+    with open("data/cache/map/results.txt", "w") as results_file:
         results_file.write("AP, precision, recall per class\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0
-            dr_file = f"data/map/temp/{class_name}_dr.json"
+            dr_file = f"data/cache/map/temp/{class_name}_dr.json"
             dr_data = json.load(open(dr_file))
             nd = len(dr_data)
             tp = [0] * nd
@@ -330,7 +330,7 @@ def get_map(min_overlap, score_threshold):
                 score[idx] = float(detection["confidence"])
                 if score[idx] >= score_threshold:
                     score_threshold_idx = idx
-                gt_file = f"data/map/temp/{file_id}-ground-truth.json"
+                gt_file = f"data/cache/map/temp/{file_id}-ground-truth.json"
                 ground_truth_data = json.load(open(gt_file))
                 ov_max = -1
                 gt_match = -1
@@ -406,7 +406,7 @@ def get_map(min_overlap, score_threshold):
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
             axes.set_ylim([0.0, 1.05])
-            fig.savefig(f"data/map/AP/{class_name}.png")
+            fig.savefig(f"data/cache/map/AP/{class_name}.png")
             plt.cla()
             plt.plot(score, f1, "-", color="orangered")
             plt.title(f1_text)
@@ -415,7 +415,7 @@ def get_map(min_overlap, score_threshold):
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
             axes.set_ylim([0.0, 1.05])
-            fig.savefig(f"data/map/F1/{class_name}.png")
+            fig.savefig(f"data/cache/map/F1/{class_name}.png")
             plt.cla()
             plt.plot(score, rec, "-H", color="gold")
             plt.title(recall_text)
@@ -424,7 +424,7 @@ def get_map(min_overlap, score_threshold):
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
             axes.set_ylim([0.0, 1.05])
-            fig.savefig(f"data/map/recall/{class_name}.png")
+            fig.savefig(f"data/cache/map/recall/{class_name}.png")
             plt.cla()
             plt.plot(score, precision, "-s", color="palevioletred")
             plt.title("class: " + precision_text)
@@ -433,7 +433,7 @@ def get_map(min_overlap, score_threshold):
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
             axes.set_ylim([0.0, 1.05])
-            fig.savefig(f"data/map/precision/{class_name}.png")
+            fig.savefig(f"data/cache/map/precision/{class_name}.png")
             plt.cla()
         if n_classes == 0:
             raise ValueError("data/classes.txt error.")
@@ -441,7 +441,7 @@ def get_map(min_overlap, score_threshold):
         text = "mAP={:.2f}%".format(m_ap * 100)
         results_file.write(text + "\n")
         print(text)
-    shutil.rmtree("data/map/temp")
+    shutil.rmtree("data/cache/map/temp")
     det_counter_per_class = {}
     for txt_file in dr_files_list:
         lines_list = lines_to_list(txt_file)
@@ -455,7 +455,7 @@ def get_map(min_overlap, score_threshold):
     for class_name in dr_classes:
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
-    with open("data/map/results.txt", "a") as results_file:
+    with open("data/cache/map/results.txt", "a") as results_file:
         results_file.write("\nnumber of ground-truth objects per class\n")
         for class_name in sorted(gt_counter_per_class):
             results_file.write(f"{class_name}: {str(gt_counter_per_class[class_name])}\n")
@@ -470,19 +470,19 @@ def get_map(min_overlap, score_threshold):
     plot_title = f"{window_title}\n"
     plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
     x_label = "number of objects per class"
-    output_path = "data/map/ground-trust.png"
+    output_path = "data/cache/map/ground-trust.png"
     plot_color = "forestgreen"
     draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     window_title = "log-average miss rate"
     plot_title = window_title
     x_label = "log-average miss rate"
-    output_path = "data/map/log-average-miss-rate.png"
+    output_path = "data/cache/map/log-average-miss-rate.png"
     plot_color = "royalblue"
     draw_plot(log_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     window_title = "mAP={:.2f}%".format(m_ap * 100)
     plot_title = window_title
     x_label = "Average Precision"
-    output_path = "data/map/mAP.png"
+    output_path = "data/cache/map/mAP.png"
     plot_color = "royalblue"
     draw_plot(ap_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     return m_ap

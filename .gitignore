@@ -12,4 +12,3 @@ __pycache__
 .idea
 .ipynb_checkpoints
 data/cache
-data/map

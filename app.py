@@ -92,6 +92,7 @@ async def image(file: UploadFile):
 
 
 if __name__ == "__main__":
+    os.makedirs("data/cache", exist_ok=True)
     mode = input("Input d as directory, f as fps, k as k-means, m as map, o as onnx, s as summary, c as camera: ")
     if mode == "d":
         yolo = Yolo()
@@ -112,7 +113,7 @@ if __name__ == "__main__":
         tact_time = yolo.get_fps(image, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
-    # 开发者使用
+    # 开发者使用，生成"data/cache"目录下的anchors.txt"文件、"k-means.jpg"文件
     elif mode == "k":
         np.random.seed(0)
         data = load_data()
@@ -138,17 +139,17 @@ if __name__ == "__main__":
             f.write(xy)
         f.close()
 
-    # 开发者使用，生成"data/map"
+    # 开发者使用，生成"data/cache/map"目录
     elif mode == "m":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
-        os.makedirs("data/map/ground-trust", exist_ok=True)
-        os.makedirs("data/map/result", exist_ok=True)
+        os.makedirs("data/cache/map/ground-trust", exist_ok=True)
+        os.makedirs("data/cache/map/result", exist_ok=True)
         class_names, _ = get_classes()
         yolo = Yolo(confidence=0.001, nms_iou=0.5)
         for image_id in tqdm(image_ids):
             image = Image.open(f"data/VOC/JPEGImages/{image_id}.jpg")
             yolo.get_map_txt(image_id, image, class_names)
-            with open(f"data/map/ground-trust/{image_id}.txt", "w") as new_f:
+            with open(f"data/cache/map/ground-trust/{image_id}.txt", "w") as new_f:
                 root = ElementTree.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
@@ -170,12 +171,12 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(0.5, 0.5)
 
-    # 开发者使用，生成"data/model.onnx"
+    # 开发者使用，生成"data/cache/model.onnx"文件
     elif mode == "o":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
-    # 开发者使用，生成"data/summary.txt"
+    # 开发者使用，生成"data/cache/summary.txt"文件
     elif mode == "s":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
@@ -185,7 +186,7 @@ if __name__ == "__main__":
         flops = flops * 2
         flops, params = clever_format([flops, params], "%.3f")
         _sum += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
-        sum_txt = open("data/summary.txt", "w")
+        sum_txt = open("data/cache/summary.txt", "w")
         sum_txt.write(_sum)
         sum_txt.close()
         print(_sum)
@@ -227,12 +228,15 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         print(video_out_path + " saved")
 
-    # 启动FastAPI后端服务
+    # 开发者使用，启动FastAPI服务，监听1025端口
     else:
         yolo = Yolo()
-        # 清空缓存
-        shutil.rmtree("data/cache", ignore_errors=True)
+        # 清空图像缓存
+        shutil.rmtree("data/cache/image", ignore_errors=True)
         os.makedirs("data/cache/image/out", exist_ok=True)
         os.makedirs("data/cache/image/heatmap", exist_ok=True)
+        # 清空视频缓存
+        shutil.rmtree("data/cache/video", ignore_errors=True)
         os.makedirs("data/cache/video/out", exist_ok=True)
-        uvicorn.run(app, host="0.0.0.0", port=8080, workers=0)
+        # 允许局域网访问
+        uvicorn.run(app, host="0.0.0.0", port=1025, workers=0)
