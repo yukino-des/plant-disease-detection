@@ -1,8 +1,13 @@
 *.docx
 *.ipynb
+*.txt
+*/*.txt
+!data/anchors.txt
+!data/classes.txt
+data/mobilenet_v2-b0353104.pth
+data/model.onnx
 __pycache__
 */__pycache__
 .idea
 .ipynb_checkpoints
 data/cache
-tmp

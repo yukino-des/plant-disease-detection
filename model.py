@@ -317,7 +317,7 @@ class Yolo(object):
             image_path = image_path.rsplit("/", 1)[1]
         except IndexError:
             pass
-        image_name, extend_name = image_path.split(".")
+        image_name, extend_name = image_path.rsplit(".", 1)
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
@@ -351,7 +351,7 @@ class Yolo(object):
             image_path = image_path.rsplit("/", 1)[1]
         except IndexError:
             pass
-        image_name, extend_name = image_path.split(".")
+        image_name, extend_name = image_path.rsplit(".", 1)
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
@@ -473,7 +473,7 @@ class Yolo(object):
         return tact_time
 
     def get_map_txt(self, image_id, image, class_names):
-        f = open(f"data/cache/map/result/{image_id}.txt", "w")
+        f = open(f"data/map/result/{image_id}.txt", "w")
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))

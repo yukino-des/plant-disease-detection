@@ -11,7 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from matplotlib import pyplot as plt
 from model import Yolo, YoloBody
 from PIL import Image
-from starlette.responses import FileResponse
+from starlette.responses import FileResponse, JSONResponse
 from thop import clever_format, profile
 from tqdm import tqdm
 from utils import avg_iou, get_classes, get_map, k_means, load_data, summary
@@ -19,69 +19,81 @@ from xml.etree import ElementTree
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["GET", "POST"],
-                   allow_headers=["Content-Type", "X-Requested-With"])
+                   allow_headers=["*"])
 
 
 # 响应检测图像、model.onnx、model.pth、summary.txt
-@app.get("/data/{file_path:path}", response_class=FileResponse)
-def data(file_path):
-    try:
-        filename = file_path.rsplit("/", 1)[1]
-    except IndexError:
-        filename = file_path
-    return FileResponse(f"data/{file_path}", filename=filename, headers={"Content-Type": "multipart/form-data"})
+@app.get("/data/{file_path:path}")
+async def data(file_path, time_str=""):
+    filename = file_path.rsplit("/", 1)[-1]
+    extend_name = filename.rsplit(".", 1)[1]
+    if extend_name in ["avi", "mov", "mp4"]:
+        while os.path.exists(f"/data/video/out/{time_str}.avi"):
+            pass
+        return FileResponse(f"data/{file_path}", filename=filename, headers={"Content-Type": "video/avi"})
+    elif extend_name in ["jpeg", "jpg", "png"]:
+        return FileResponse(f"data/{file_path}", filename=filename)
+    else:
+        raise ValueError("不支持的文件格式")
 
 
-# 请求图像
-@app.post("/image", response_model=dict)
-def image(file: UploadFile):
+# 请求图像、视频
+@app.post("/file", response_class=JSONResponse)
+async def image(file: UploadFile):
     if file is None:
-        return {"status": 404}
+        return JSONResponse({}, 404)
     file_name, extend_name = file.filename.rsplit(".", 1)
-    _image_path = f"data/cache/image/{file.filename}"
-    image_out_path = f"data/cache/image/out/{file_name}.png"
-    image_heatmap_path = f"data/cache/image/heatmap/{file_name}.png"
-    with open(_image_path, "wb+") as wb:
-        shutil.copyfileobj(file.file, wb)
-    if extend_name.lower() not in ["bmp", "dib", "jpeg", "jpg", "pbm", "pgm", "png", "ppm", "tif", "tiff"]:
-        return {"status": 404}
-    target_info = yolo.detect_image(_image_path)
-    yolo.detect_heatmap(_image_path)
-    return {"status": "ok",
-            "imageUrl": f"http://0.0.0.0:8080/{_image_path}",
-            "imageOutUrl": f"http://0.0.0.0:8080/{image_out_path}",
-            "imageHeatmapUrl": f"http://0.0.0.0:8080/{image_heatmap_path}",
-            "targetInfo": target_info}
+    if extend_name.lower() in ["jpeg", "jpg", "png"]:
+        image_path = f"data/cache/image/{file.filename}"
+        image_out_path = f"data/cache/image/out/{file_name}.png"
+        image_heatmap_path = f"data/cache/image/heatmap/{file_name}.png"
+        with open(image_path, "wb+") as wb:
+            shutil.copyfileobj(file.file, wb)
+        target_info = yolo.detect_image(image_path)
+        yolo.detect_heatmap(image_path)
+        return JSONResponse({"imageUrl": f"http://0.0.0.0:8080/{image_path}",
+                             "imageOutUrl": f"http://0.0.0.0:8080/{image_out_path}",
+                             "imageHeatmapUrl": f"http://0.0.0.0:8080/{image_heatmap_path}",
+                             "targetInfo": target_info}, 200)
+    elif extend_name.lower() in ["mp4", "mov", "avi"]:
+        video_path = f"data/cache/video/{file.filename}"
+        time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        with open(video_path, "wb+") as wb:
+            shutil.copyfileobj(file.file, wb)
+        _capture = cv2.Video_capture(video_path)
+        _out = cv2.VideoWriter(f"data/cache/video/_out/{time_str}.avi", cv2.VideoWriter_fourcc(*"XVID"), 25.0,
+                               (int(_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                                int(_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+        _fps = 0.0
+        while True:
+            _t = time.time()
+            _ref, _frame = _capture.read()
+            if not _ref:
+                break
+            _frame = cv2.cvtColor(_frame, cv2.COLOR_BGR2RGB)
+            _frame = Image.fromarray(np.uint8(_frame))
+            _image = yolo.detect_video(_frame)
+            _frame = np.array(_image)
+            _frame = cv2.cvtColor(_frame, cv2.COLOR_RGB2BGR)
+            _fps = (_fps + (1. / (time.time() - _t))) / 2
+            _frame = cv2.putText(_frame, "_fps=%.2f" % _fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            _c = cv2.waitKey(1) & 0xff
+            _out.write(_frame)
+            if _c == 27:
+                break
+        _out.release()
+        _capture.release()
+        cv2.destroyAllWindows()
+        os.rename(f"data/cache/video/_out/{time_str}.avi", f"data/cache/video/_out/{file_name}.avi")
+        return JSONResponse({{"videoPath": f"data/cache/video/_out/{file_name}.avi",
+                              "timeStr": time_str}}, 200)
+    else:
+        return JSONResponse({}, 404)
 
 
 if __name__ == "__main__":
-    mode = input("Input mode in [app, directory, fps, heatmap, image, k-means, map, onnx, summary, video]: ")
-
-    # mode == "app"
-    if mode == "app":
-        yolo = Yolo()
-        # 生成model.onnx
-        yolo.convert_to_onnx(simplify=False)
-        # 生成summary.txt
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        m = YoloBody(80).to(device)
-        _sum = summary(m, (3, 416, 416))
-        dummy_input = torch.randn(1, 3, 416, 416).to(device)
-        flops, params = profile(m.to(device), (dummy_input,), verbose=False)
-        flops = flops * 2
-        flops, params = clever_format([flops, params], "%.3f")
-        _sum += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
-        with open("data/summary.txt", "w") as sum_txt:
-            sum_txt.write(_sum)
-        sum_txt.close()
-        # 清空缓存
-        shutil.rmtree("data/cache", ignore_errors=True)
-        os.makedirs("data/cache/image/out", exist_ok=True)
-        os.makedirs("data/cache/image/heatmap", exist_ok=True)
-        uvicorn.run(app, host="0.0.0.0", port=8080)
-
-    # mode == "directory"
-    elif mode == "directory":
+    mode = input("Input d as directory, f as fps, k as k-means, m as map, o as onnx, s as summary, c as camera: ")
+    if mode == "d":
         yolo = Yolo()
         image_dir = input("Input directory path: ")
         image_names = os.listdir(image_dir)
@@ -89,22 +101,19 @@ if __name__ == "__main__":
             if not image_name.lower().endswith(
                     [".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff"]):
                 continue
-            image_path = os.path.join(image_dir, image_name)
-
-            image = yolo.detect_image(image_path)
+            image = yolo.detect_image(os.path.join(image_dir, image_name))
             os.makedirs("data/cache/image/out", exist_ok=True)
             image.save(f"data/cache/image/out/{image_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
 
-    # mode == "fps"
-    elif mode == "fps":
+    elif mode == "f":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
         image = Image.open(fps_image_path)
         tact_time = yolo.get_fps(image, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
-    # mode == "k-means"
-    elif mode == "k-means":
+    # 开发者使用
+    elif mode == "k":
         np.random.seed(0)
         data = load_data()
         cluster, near = k_means(data, 9)
@@ -129,18 +138,17 @@ if __name__ == "__main__":
             f.write(xy)
         f.close()
 
-    # mode == "map"
-    elif mode == "map":
+    # 开发者使用，生成"data/map"
+    elif mode == "m":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
-        os.makedirs("data/cache/map/groud-trust", exist_ok=True)
-        os.makedirs("data/cache/map/result", exist_ok=True)
+        os.makedirs("data/map/ground-trust", exist_ok=True)
+        os.makedirs("data/map/result", exist_ok=True)
         class_names, _ = get_classes()
         yolo = Yolo(confidence=0.001, nms_iou=0.5)
         for image_id in tqdm(image_ids):
-            image_path = f"data/VOC/JPEGImages/{image_id}.jpg"
-            image = Image.open(image_path)
+            image = Image.open(f"data/VOC/JPEGImages/{image_id}.jpg")
             yolo.get_map_txt(image_id, image, class_names)
-            with open(f"data/cache/map/groud-trust/{image_id}.txt", "w") as new_f:
+            with open(f"data/map/ground-trust/{image_id}.txt", "w") as new_f:
                 root = ElementTree.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
@@ -162,13 +170,13 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(0.5, 0.5)
 
-    # mode == "onnx"
-    elif mode == "onnx":
+    # 开发者使用，生成"data/model.onnx"
+    elif mode == "o":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
-    # mode == "summary"
-    elif mode == "summary":
+    # 开发者使用，生成"data/summary.txt"
+    elif mode == "s":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
         _sum = summary(m, (3, 416, 416))
@@ -182,13 +190,12 @@ if __name__ == "__main__":
         sum_txt.close()
         print(_sum)
 
-    # mode == "video"
-    elif mode == "video":
+    # 开发者使用，调用摄像头
+    elif mode == "c":
         yolo = Yolo()
-        video_path = input("Input video path, default camera.: ")
-        os.makedirs("data/cache/video", exist_ok=True)
-        video_out_path = f"data/cache/video/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
-        capture = cv2.VideoCapture(0 if video_path == "" else video_path)
+        os.makedirs("data/cache/dev", exist_ok=True)
+        video_out_path = f"data/cache/dev/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
+        capture = cv2.VideoCapture(0)
         out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*"XVID"), 25.0,
                               (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
         ref = False
@@ -197,7 +204,7 @@ if __name__ == "__main__":
         fps = 0.0
         try:
             while True:
-                t1 = time.time()
+                t = time.time()
                 ref, frame = capture.read()
                 if not ref:
                     break
@@ -206,10 +213,9 @@ if __name__ == "__main__":
                 image = yolo.detect_video(frame)
                 frame = np.array(image)
                 frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                fps = (fps + (1. / (time.time() - t1))) / 2
+                fps = (fps + (1. / (time.time() - t))) / 2
                 frame = cv2.putText(frame, "fps=%.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                if video_path == "":
-                    cv2.imshow("video", frame)
+                cv2.imshow("video", frame)
                 c = cv2.waitKey(1) & 0xff
                 out.write(frame)
                 if c == 27:
@@ -221,6 +227,12 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         print(video_out_path + " saved")
 
-    # raise ValueError
+    # 启动FastAPI后端服务
     else:
-        raise ValueError("Input mode in [app, directory, fps, heatmap, image, k-means, map, onnx, summary, video].")
+        yolo = Yolo()
+        # 清空缓存
+        shutil.rmtree("data/cache", ignore_errors=True)
+        os.makedirs("data/cache/image/out", exist_ok=True)
+        os.makedirs("data/cache/image/heatmap", exist_ok=True)
+        os.makedirs("data/cache/video/out", exist_ok=True)
+        uvicorn.run(app, host="0.0.0.0", port=8080, workers=0)
