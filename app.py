@@ -18,27 +18,19 @@ from utils import avg_iou, get_classes, get_map, k_means, load_data, summary
 from xml.etree import ElementTree
 
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["GET", "POST"],
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
                    allow_headers=["*"])
 
 
 # 响应检测图像、model.onnx、model.pth、summary.txt
 @app.get("/data/{file_path:path}")
-async def data(file_path, time_str=""):
+async def data(file_path):
     filename = file_path.rsplit("/", 1)[-1]
-    extend_name = filename.rsplit(".", 1)[1]
-    if extend_name in ["avi", "mov", "mp4"]:
-        while os.path.exists(f"/data/video/out/{time_str}.avi"):
-            pass
-        return FileResponse(f"data/{file_path}", filename=filename, headers={"Content-Type": "video/avi"})
-    elif extend_name in ["jpeg", "jpg", "png", "onnx", "pth", "txt"]:
-        return FileResponse(f"data/{file_path}", filename=filename)
-    else:
-        raise ValueError("不支持的文件格式")
+    return FileResponse(f"data/{file_path}", filename=filename)
 
 
 # 请求图像、视频
-@app.post("/file", response_class=JSONResponse)
+@app.post("/file")
 async def image(file: UploadFile):
     if file is None:
         return JSONResponse({}, 404)
@@ -51,9 +43,9 @@ async def image(file: UploadFile):
             shutil.copyfileobj(file.file, wb)
         target_info = yolo.detect_image(image_path)
         yolo.detect_heatmap(image_path)
-        return JSONResponse({"imageUrl": f"http://0.0.0.0:8080/{image_path}",
-                             "imageOutUrl": f"http://0.0.0.0:8080/{image_out_path}",
-                             "imageHeatmapUrl": f"http://0.0.0.0:8080/{image_heatmap_path}",
+        return JSONResponse({"imageUrl": f"http://0.0.0.0:2475/{image_path}",
+                             "imageOutUrl": f"http://0.0.0.0:2475/{image_out_path}",
+                             "imageHeatmapUrl": f"http://0.0.0.0:2475/{image_heatmap_path}",
                              "targetInfo": target_info}, 200)
     elif extend_name.lower() in ["mp4", "mov", "avi"]:
         video_path = f"data/cache/video/{file.filename}"
@@ -85,8 +77,7 @@ async def image(file: UploadFile):
         _capture.release()
         cv2.destroyAllWindows()
         os.rename(f"data/cache/video/out/{time_str}.avi", f"data/cache/video/out/{file_name}.avi")
-        return JSONResponse({"videoPath": f"data/cache/video/out/{file_name}.avi",
-                              "timeStr": time_str}, 200)
+        return JSONResponse({"videoPath": f"data/cache/video/out/{file_name}.avi"}, 200)
     else:
         return JSONResponse({}, 404)
 
@@ -228,7 +219,7 @@ if __name__ == "__main__":
         cv2.destroyAllWindows()
         print(video_out_path + " saved")
 
-    # 开发者使用，启动FastAPI服务，监听1025端口
+    # 开发者使用，启动后端服务器，监听2475号端口
     else:
         yolo = Yolo()
         # 清空图像缓存
@@ -239,4 +230,4 @@ if __name__ == "__main__":
         shutil.rmtree("data/cache/video", ignore_errors=True)
         os.makedirs("data/cache/video/out", exist_ok=True)
         # 允许局域网访问
-        uvicorn.run(app, host="0.0.0.0", port=1025, workers=0)
+        uvicorn.run(app, host="0.0.0.0", port=2475, workers=0)
