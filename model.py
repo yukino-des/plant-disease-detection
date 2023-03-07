@@ -295,9 +295,11 @@ class Yolo(object):
     def convert_to_onnx(self, simplify):
         self.net = YoloBody(self.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        image = torch.zeros(1, 3, 416, 416).to(device)  # to("cpu") -> to(device)
         self.net.load_state_dict(torch.load("data/model.pth", map_location=device))
         self.net = self.net.eval()
-        image = torch.zeros(1, 3, 416, 416).to("cpu")
+        if torch.cuda.is_available():
+            self.net = nn.DataParallel(self.net).cuda()
         input_layer_names = ["images"]
         output_layer_names = ["output"]
         torch.onnx.export(self.net, image, f="data/cache/model.onnx", verbose=False, opset_version=12,
