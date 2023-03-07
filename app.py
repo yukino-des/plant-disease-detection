@@ -31,7 +31,7 @@ async def data(file_path, time_str=""):
         while os.path.exists(f"/data/video/out/{time_str}.avi"):
             pass
         return FileResponse(f"data/{file_path}", filename=filename, headers={"Content-Type": "video/avi"})
-    elif extend_name in ["jpeg", "jpg", "png"]:
+    elif extend_name in ["jpeg", "jpg", "png", "onnx", "pth", "txt"]:
         return FileResponse(f"data/{file_path}", filename=filename)
     else:
         raise ValueError("不支持的文件格式")
@@ -60,8 +60,8 @@ async def image(file: UploadFile):
         time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
         with open(video_path, "wb+") as wb:
             shutil.copyfileobj(file.file, wb)
-        _capture = cv2.Video_capture(video_path)
-        _out = cv2.VideoWriter(f"data/cache/video/_out/{time_str}.avi", cv2.VideoWriter_fourcc(*"XVID"), 25.0,
+        _capture = cv2.VideoCapture(video_path)
+        _out = cv2.VideoWriter(f"data/cache/video/out/{time_str}.avi", cv2.VideoWriter_fourcc(*"XVID"), 25.0,
                                (int(_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
                                 int(_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
         _fps = 0.0
@@ -76,7 +76,7 @@ async def image(file: UploadFile):
             _frame = np.array(_image)
             _frame = cv2.cvtColor(_frame, cv2.COLOR_RGB2BGR)
             _fps = (_fps + (1. / (time.time() - _t))) / 2
-            _frame = cv2.putText(_frame, "_fps=%.2f" % _fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+            _frame = cv2.putText(_frame, "fps=%.2f" % _fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
             _c = cv2.waitKey(1) & 0xff
             _out.write(_frame)
             if _c == 27:
@@ -84,9 +84,9 @@ async def image(file: UploadFile):
         _out.release()
         _capture.release()
         cv2.destroyAllWindows()
-        os.rename(f"data/cache/video/_out/{time_str}.avi", f"data/cache/video/_out/{file_name}.avi")
-        return JSONResponse({{"videoPath": f"data/cache/video/_out/{file_name}.avi",
-                              "timeStr": time_str}}, 200)
+        os.rename(f"data/cache/video/out/{time_str}.avi", f"data/cache/video/out/{file_name}.avi")
+        return JSONResponse({"videoPath": f"data/cache/video/out/{file_name}.avi",
+                              "timeStr": time_str}, 200)
     else:
         return JSONResponse({}, 404)
 
