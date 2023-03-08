@@ -5,6 +5,7 @@ numpy==1.24.2
 notebook==6.5.2
 onnx==1.13.0
 onnxsim==0.4.17
+onnxruntime==1.13.1
 opencv-python==4.7.0.68
 pandas==1.5.3
 Pillow==9.4.0

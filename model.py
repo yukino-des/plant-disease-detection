@@ -188,13 +188,13 @@ class LossHistory:
         plt.plot(_iter, self.losses, "red", linewidth=2, label="train loss")
         plt.plot(_iter, self.val_loss, "green", linewidth=2, label="val loss")
         num = 5 if len(self.losses) < 25 else 15
-        try:
-            plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
-                     label="train loss")
-            plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "#21b3b9", linestyle="--", linewidth=2,
-                     label="val loss")
-        except ValueError:
-            pass
+        # try:
+        #     plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
+        #              label="train loss")
+        #     plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "#21b3b9", linestyle="--", linewidth=2,
+        #              label="val loss")
+        # except ValueError:
+        #     pass
         plt.grid(True)
         plt.xlabel("epoch")
         plt.ylabel("loss")
@@ -316,10 +316,7 @@ class Yolo(object):
 
     def detect_heatmap(self, image_path):
         image = Image.open(image_path)
-        try:
-            image_path = image_path.rsplit("/", 1)[1]
-        except IndexError:
-            pass
+        image_path = image_path.rsplit("/", 1)[-1]
         image_name, extend_name = image_path.rsplit(".", 1)
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
@@ -351,10 +348,7 @@ class Yolo(object):
 
     def detect_image(self, image_path):
         image = Image.open(image_path)
-        try:
-            image_path = image_path.rsplit("/", 1)[1]
-        except IndexError:
-            pass
+        image_path = image_path.rsplit("/", 1)[-1]
         image_name, extend_name = image_path.rsplit(".", 1)
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)

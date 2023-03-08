@@ -165,6 +165,8 @@ if __name__ == "__main__":
     # 开发者使用，启动后端服务器，监听2475号端口
     else:
         yolo = Yolo()
+        # 清空训练缓存
+        shutil.rmtree("data/cache/loss", ignore_errors=True)
         # 清空图像缓存
         shutil.rmtree("data/cache/image", ignore_errors=True)
         os.makedirs("data/cache/image/out", exist_ok=True)

@@ -9,7 +9,7 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
                    yolo_dataset_collate)
 
 if __name__ == "__main__":
-    # 如果训练中断，请修改：model_path = "data/cache/current.pth"
+    # 如果训练中断，请修改：model_path = "data/cache/loss/current.pth"
     model_path = ""
     # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
     init_epoch = 0
@@ -59,18 +59,18 @@ if __name__ == "__main__":
                  anchors_path="data/anchors.txt",
                  save_dir="data/cache",
                  anchors_mask=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
-                 model_path=model_path,  # ["", "data/cache/current.pth"]
+                 model_path=model_path,  # ["", "data/cache/loss/current.pth"]
                  input_shape=[416, 416],  # [416, 416]
                  init_epoch=init_epoch,  # [0, ...]
                  epoch=epoch,  # [300, 500]
-                 freeze_train=freeze_train,  # 是否
-                 init_lr=init_lr,  # 1e-3或1e-2
-                 optimizer_type=optimizer_type,  # "adam"或"adam_w"或"step"
-                 lr_decay_type=lr_decay_type,  # "cos"或"step"
-                 num_workers=num_workers,  # 2或4，取决于设备性能
-                 num_train=num_train,  # 取决于数据集
-                 num_val=num_val,  # 取决于数据集
-                 cuda=torch.cuda.is_available())  # 是否支持cuda加速
+                 freeze_train=freeze_train,
+                 init_lr=init_lr,  # [1e-3, 1e-2]
+                 optimizer_type=optimizer_type,  # ["adam", "adam_w", "step"]
+                 lr_decay_type=lr_decay_type,  # ["cos", "step"]
+                 num_workers=num_workers,  # [2, 4]
+                 num_train=num_train,
+                 num_val=num_val,
+                 cuda=torch.cuda.is_available())  # [True, False]
     wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
     total_step = num_train // 8 * epoch
     if total_step <= wanted_step and num_train // 8 == 0:
