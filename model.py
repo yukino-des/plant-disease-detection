@@ -299,7 +299,7 @@ class Yolo(object):
         self.net.load_state_dict(torch.load("data/model.pth", map_location=device))
         self.net = self.net.eval()
         if torch.cuda.is_available():
-            self.net = nn.DataParallel(self.net).cuda()
+            self.net = self.net.cuda()  # self.net = nn.DataParallel(self.net).cuda()
         input_layer_names = ["images"]
         output_layer_names = ["output"]
         torch.onnx.export(self.net, image, f="data/cache/model.onnx", verbose=False, opset_version=12,

@@ -85,7 +85,7 @@ async def image(file: UploadFile):
 if __name__ == "__main__":
     os.makedirs("data/cache", exist_ok=True)
     mode = input("Input d as directory, f as fps, k as k-means, m as map, o as onnx, s as summary, c as camera: ")
-    if mode == "d":
+    if mode == "d" or mode == "D":
         yolo = Yolo()
         image_dir = input("Input directory path: ")
         image_names = os.listdir(image_dir)
@@ -97,7 +97,7 @@ if __name__ == "__main__":
             os.makedirs("data/cache/image/out", exist_ok=True)
             image.save(f"data/cache/image/out/{image_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
 
-    elif mode == "f":
+    elif mode == "f" or mode == "F":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
         image = Image.open(fps_image_path)
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
     # 开发者使用，生成"data/cache"目录下的anchors.txt"文件、"k-means.jpg"文件
-    elif mode == "k":
+    elif mode == "k" or mode == "K":
         np.random.seed(0)
         data = load_data()
         cluster, near = k_means(data, 9)
@@ -131,7 +131,7 @@ if __name__ == "__main__":
         f.close()
 
     # 开发者使用，生成"data/cache/map"目录
-    elif mode == "m":
+    elif mode == "m" or mode == "M":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-trust", exist_ok=True)
         os.makedirs("data/cache/map/result", exist_ok=True)
@@ -163,12 +163,12 @@ if __name__ == "__main__":
         get_map(0.5, 0.5)
 
     # 开发者使用，生成"data/cache/model.onnx"文件
-    elif mode == "o":
+    elif mode == "o" or mode == "O":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
     # 开发者使用，生成"data/cache/summary.txt"文件
-    elif mode == "s":
+    elif mode == "s" or mode == "S":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
         _sum = summary(m, (3, 416, 416))
@@ -182,8 +182,8 @@ if __name__ == "__main__":
         sum_txt.close()
         print(_sum)
 
-    # 开发者使用，调用摄像头
-    elif mode == "c":
+    # 开发者使用，调用摄像头进行视频检测
+    elif mode == "c" or mode == "C":
         yolo = Yolo()
         os.makedirs("data/cache/dev", exist_ok=True)
         video_out_path = f"data/cache/dev/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
