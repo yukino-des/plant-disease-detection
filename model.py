@@ -316,8 +316,7 @@ class Yolo(object):
 
     def detect_heatmap(self, image_path):
         image = Image.open(image_path)
-        image_path = image_path.rsplit("/", 1)[-1]
-        image_name, extend_name = image_path.rsplit(".", 1)
+        image_name = image_path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
         image_data = np.expand_dims(np.transpose(np.array(image_data, dtype="float32") / 255.0, (2, 0, 1)), 0)
@@ -348,8 +347,7 @@ class Yolo(object):
 
     def detect_image(self, image_path):
         image = Image.open(image_path)
-        image_path = image_path.rsplit("/", 1)[-1]
-        image_name, extend_name = image_path.rsplit(".", 1)
+        image_name = image_path.rsplit("/", 1)[-1].rsplit(".", 1)[0]
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
