@@ -314,7 +314,7 @@ def get_map(min_overlap, score_threshold):
     ap_dict = {}
     log_avg_miss_rate_dict = {}
     with open("data/cache/map/results.txt", "w") as results_file:
-        results_file.write("AP, precision, recall per class\n")
+        results_file.write("AP, precision and recall\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0
@@ -456,10 +456,10 @@ def get_map(min_overlap, score_threshold):
         if class_name not in gt_classes:
             count_true_positives[class_name] = 0
     with open("data/cache/map/results.txt", "a") as results_file:
-        results_file.write("\nnumber of ground-truth objects per class\n")
+        results_file.write("\nnumber of ground-truth objects\n")
         for class_name in sorted(gt_counter_per_class):
             results_file.write(f"{class_name}: {str(gt_counter_per_class[class_name])}\n")
-        results_file.write("\nnumber of detected objects per class\n")
+        results_file.write("\nnumber of detected objects\n")
         for class_name in sorted(dr_classes):
             n_det = det_counter_per_class[class_name]
             text = class_name + ": " + str(n_det)
@@ -469,7 +469,7 @@ def get_map(min_overlap, score_threshold):
     window_title = "ground-truth"
     plot_title = f"{window_title}\n"
     plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
-    x_label = "number of objects per class"
+    x_label = "number of ground-trust objects"
     output_path = "data/cache/map/ground-trust.png"
     plot_color = "forestgreen"
     draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
