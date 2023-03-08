@@ -9,18 +9,11 @@
 │   ├── VOC
 │   │   ├── Annotations
 │   │   ├── ImageSets/Main
-│   │   │   ├── test.txt
-│   │   │   ├── train.txt
-│   │   │   ├── trainval.txt
-│   │   │   └── val.txt
 │   │   └── JPEGImages
 │   ├── anchors.txt
 │   ├── classes.txt
-│   ├── mobilenet_v2-b0353104.pth
-│   ├── model.pth
-│   ├── train.txt
-│   ├── あ.txt
-│   └── val.txt
+│   ├── font.ttc
+│   └── model.pth
 ├── model.py
 ├── requirements.txt
 ├── train.py
