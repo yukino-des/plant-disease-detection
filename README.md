@@ -1,6 +1,6 @@
-# 作物病虫害の検出
+# 农业病虫害检测
 
-### プロジェクト構造
+### 结构
 ```text
 ├── LICENSE
 ├── README.md
@@ -27,26 +27,24 @@
 └── utils.py
 ```
 
-### はじめましょう！
-
-1. インストールパッケージ。
+1. 依赖
 ```shell
 cd plant-disease-detection
 pip install -r requirements.txt
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 ```
 
-2. トレーニングモデル。
+2. 训练
 ```shell
 python train.py
 ```
 
-3. 检测が始まり、27種類の作物病虫害と多重检测モードをサポートします。
+3. 检测
 ```shell
 python app.py
 ```
 
-4. 次の単語のスペルを無視
+4. 字典
 ```text
-[bndbox, trainval, upsample, xmax, xmin, ymax, ymin, xvid]
+bndbox, trainval, upsample, xmax, xmin, ymax, ymin, xvid
 ```

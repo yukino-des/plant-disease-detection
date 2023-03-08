@@ -16,7 +16,7 @@ from torch import nn
 from tqdm import tqdm
 from xml.etree import ElementTree
 
-# 2022-03-04  https://gihub.com/yukino-des/
+# 2022-03-04  https://gihub.com/yukino-des
 if os.name == "nt":
     matplotlib.use("Agg")
 else:
