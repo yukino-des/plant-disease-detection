@@ -1,8 +1,6 @@
-import cv2
 import numpy as np
 import os
 import shutil
-import time
 import torch
 import uvicorn
 from datetime import datetime
@@ -49,41 +47,17 @@ async def image(file: UploadFile):
                              "targetInfo": target_info}, 200)
     elif extend_name.lower() in ["mp4", "mov", "avi"]:
         video_path = f"data/cache/video/{file.filename}"
-        time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
         with open(video_path, "wb+") as wb:
             shutil.copyfileobj(file.file, wb)
-        _capture = cv2.VideoCapture(video_path)
-        _out = cv2.VideoWriter(f"data/cache/video/out/{time_str}.avi", cv2.VideoWriter_fourcc(*"XVID"), 25.0,
-                               (int(_capture.get(cv2.CAP_PROP_FRAME_WIDTH)),
-                                int(_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-        _fps = 0.0
-        while True:
-            _t = time.time()
-            _ref, _frame = _capture.read()
-            if not _ref:
-                break
-            _frame = cv2.cvtColor(_frame, cv2.COLOR_BGR2RGB)
-            _frame = Image.fromarray(np.uint8(_frame))
-            _image = yolo.detect_video(_frame)
-            _frame = np.array(_image)
-            _frame = cv2.cvtColor(_frame, cv2.COLOR_RGB2BGR)
-            _fps = (_fps + (1. / (time.time() - _t))) / 2
-            _frame = cv2.putText(_frame, "fps=%.2f" % _fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            _c = cv2.waitKey(1) & 0xff
-            _out.write(_frame)
-            if _c == 27:
-                break
-        _out.release()
-        _capture.release()
-        cv2.destroyAllWindows()
-        os.rename(f"data/cache/video/out/{time_str}.avi", f"data/cache/video/out/{file_name}.avi")
+        _time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        yolo.detect_video(video_path, _time_str)
+        os.rename(f"data/cache/video/out/{_time_str}.avi", f"data/cache/video/out/{file_name}.avi")
         return JSONResponse({"videoPath": f"data/cache/video/out/{file_name}.avi"}, 200)
     else:
         return JSONResponse({}, 404)
 
 
 if __name__ == "__main__":
-    os.makedirs("data/cache", exist_ok=True)
     mode = input("Input d as directory, f as fps, k as k-means, m as map, o as onnx, s as summary, c as camera: ")
     if mode == "d" or mode == "D":
         yolo = Yolo()
@@ -171,53 +145,22 @@ if __name__ == "__main__":
     elif mode == "s" or mode == "S":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
-        _sum = summary(m, (3, 416, 416))
+        model_summary = summary(m, (3, 416, 416))
         dummy_input = torch.randn(1, 3, 416, 416).to(device)
         flops, params = profile(m.to(device), (dummy_input,), verbose=False)
         flops = flops * 2
         flops, params = clever_format([flops, params], "%.3f")
-        _sum += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
+        model_summary += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
         sum_txt = open("data/cache/summary.txt", "w")
-        sum_txt.write(_sum)
+        sum_txt.write(model_summary)
         sum_txt.close()
-        print(_sum)
+        print("data/cache/summary.txt saved.")
 
-    # 开发者使用，调用摄像头进行视频检测
+    # 开发者使用，调用摄像头
     elif mode == "c" or mode == "C":
         yolo = Yolo()
-        os.makedirs("data/cache/dev", exist_ok=True)
-        video_out_path = f"data/cache/dev/{datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')}.avi"
-        capture = cv2.VideoCapture(0)
-        out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*"XVID"), 25.0,
-                              (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-        ref = False
-        while not ref:
-            ref, frame = capture.read()
-        fps = 0.0
-        try:
-            while True:
-                t = time.time()
-                ref, frame = capture.read()
-                if not ref:
-                    break
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                frame = Image.fromarray(np.uint8(frame))
-                image = yolo.detect_video(frame)
-                frame = np.array(image)
-                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-                fps = (fps + (1. / (time.time() - t))) / 2
-                frame = cv2.putText(frame, "fps=%.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-                cv2.imshow("video", frame)
-                c = cv2.waitKey(1) & 0xff
-                out.write(frame)
-                if c == 27:
-                    break
-        except KeyboardInterrupt:
-            pass
-        out.release()
-        capture.release()
-        cv2.destroyAllWindows()
-        print(video_out_path + " saved")
+        time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        yolo.detect_video(0, time_str)
 
     # 开发者使用，启动后端服务器，监听2475号端口
     else:

@@ -103,7 +103,8 @@ class DecodeBox:
             outputs.append(output.data)
         return outputs
 
-    def non_max_suppression(self, prediction, num_classes, image_shape, conf_threshold=0.5, nms_threshold=0.4):
+    def non_max_suppression(self, prediction: torch.Tensor, num_classes, image_shape, conf_threshold=0.5,
+                            nms_threshold=0.4):
         box_corner = prediction.new(prediction.shape)
         box_corner[:, :, 0] = prediction[:, :, 0] - prediction[:, :, 2] / 2
         box_corner[:, :, 1] = prediction[:, :, 1] - prediction[:, :, 3] / 2
@@ -345,6 +346,7 @@ class Yolo(object):
         plt.margins(0, 0)
         os.makedirs("data/cache/image/heatmap", exist_ok=True)
         plt.savefig(f"data/cache/image/heatmap/{image_name}.png", dpi=200, bbox_inches="tight", pad_inches=-0.1)
+        plt.close("all")
         print(f"data/cache/image/heatmap/{image_name}.png saved.")
 
     def detect_image(self, image_path):
@@ -368,7 +370,7 @@ class Yolo(object):
                                                          self.confidence, self.nms_iou)
             if results[0] is None:
                 image.save(f"data/cache/image/out/{image_name}.png", quality=95, subsampling=0)
-                print(f"data/cache/image/out/{image_name}.png saved")
+                print(f"{image_name}.png saved.")
                 return {}
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
@@ -389,7 +391,7 @@ class Yolo(object):
             label = "{} {:.2f}".format(predicted_class, score)
             count += 1
             key = "{}-{:02}".format(predicted_class, count)
-            target_info[key] = [f"{right - left}×{bottom - top}", np.round(float(score), 3)]
+            target_info[key] = [f"{right - left} x {bottom - top}", np.round(float(score), 3)]
             draw = ImageDraw.Draw(image)
             label_size = draw.textsize(label, font)
             label = label.encode("utf-8")
@@ -403,10 +405,46 @@ class Yolo(object):
             draw.text(tuple(text_origin), str(label, "UTF-8"), fill=(0, 0, 0), font=font)
             del draw
         image.save(f"data/cache/image/out/{image_name}.png", quality=95, subsampling=0)
-        print(f"data/cache/image/out/{image_name}.png saved")
+        print(f"data/cache/image/out/{image_name}.png saved.")
         return target_info
 
-    def detect_video(self, image):
+    def detect_video(self, video_path, time_str):
+        video_out_path = f"data/cache/video/out/{time_str}.avi"
+        capture = cv2.VideoCapture(video_path)
+        out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*"XVID"), 25.0,
+                              (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+        if video_path == 0:  # 调用摄像头
+            ref = False
+            while not ref:
+                ref, frame = capture.read()
+        fps = 0.0
+        try:
+            while True:
+                t = time.time()
+                ref, frame = capture.read()
+                if not ref:
+                    break
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                frame = Image.fromarray(np.uint8(frame))
+                image = self.detect_video_image(frame)
+                frame = np.array(image)
+                frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+                fps = (fps + (1. / (time.time() - t))) / 2
+                frame = cv2.putText(frame, "fps=%.2f" % fps, (0, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+                if video_path == 0:
+                    cv2.imshow("video", frame)
+                c = cv2.waitKey(1) & 0xff
+                out.write(frame)
+                if c == 27:
+                    break
+        except KeyboardInterrupt:
+            pass
+        out.release()
+        capture.release()
+        cv2.destroyAllWindows()
+        print(f"{video_out_path} saved.")
+
+    def detect_video_image(self, image):
         image_shape = np.array(np.shape(image)[0:2])
         image = cvt_color(image)
         image_data = resize_image(image, (416, 416))
@@ -925,7 +963,7 @@ class YoloLoss(nn.Module):
         loss += loss_conf * self.balance[idx] * self.obj_ratio
         return loss
 
-    def get_ignore(self, idx, x, y, h, w, targets, scaled_anchors, in_h, in_w, no_obj_mask):
+    def get_ignore(self, idx, x: torch.Tensor, y: torch.Tensor, h, w, targets, scaled_anchors, in_h, in_w, no_obj_mask):
         bs = len(targets)
         grid_x = torch.linspace(0, in_w - 1, in_w).repeat(in_h, 1).repeat(
             int(bs * len(self.anchors_mask[idx])), 1, 1).view(x.shape).type_as(x)

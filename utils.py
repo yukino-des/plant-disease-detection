@@ -127,7 +127,7 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
                 targets = [ann.cuda(0) for ann in targets]
         optimizer.zero_grad()  # 清零梯度
         outputs = model_train(images)  # 前向传播
-        loss_sum = 0
+        loss_sum = torch.tensor(0, dtype=torch.float32)
         # 计算损失
         for i in range(len(outputs)):
             loss_item = yolo_loss(i, outputs[i], targets)
@@ -150,7 +150,7 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
                 targets = [ann.cuda(0) for ann in targets]
             optimizer.zero_grad()  # 清零梯度
             outputs = model_train(images)  # 前向传播
-            val_loss_sum = 0
+            val_loss_sum = torch.tensor(0, dtype=torch.float32)
             # 计算损失
             for i in range(len(outputs)):
                 val_loss_item = yolo_loss(i, outputs[i], targets)
@@ -428,7 +428,7 @@ def get_map(min_overlap, score_threshold):
             plt.cla()
             plt.plot(score, precision, "-s", color="palevioletred")
             plt.title("class: " + precision_text)
-            plt.xlabel("score_threshold="+ str(score_threshold))
+            plt.xlabel("score_threshold=" + str(score_threshold))
             plt.ylabel("precision")
             axes = plt.gca()
             axes.set_xlim([0.0, 1.0])
@@ -771,9 +771,9 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
     lines = (f"{'-' * 95}\n"
              f"{'{:>25}{:>58}{:>12}'.format('Layer (type)', 'Output Shape', 'Param #')}\n"
              f"{'=' * 95}\n")
-    total_params = 0
+    total_params = torch.tensor(0, dtype=torch.int64)
     total_output = 0
-    trainable_params = 0
+    trainable_params = torch.tensor(0, dtype=torch.int64)
     for layer in _sum:
         lines += '{:>25}{:>58}{:>12}\n'.format(
             layer, str(_sum[layer]['output_shape']), '{0:,}'.format(_sum[layer]['nb_params']))
