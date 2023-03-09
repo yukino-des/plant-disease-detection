@@ -399,7 +399,6 @@ def get_map(min_overlap, score_threshold):
             area_under_curve_y = m_precision[:-1] + [0.0] + [m_precision[-1]]
             plt.fill_between(area_under_curve_x, 0, area_under_curve_y, alpha=0.2, edgecolor="r")
             fig = plt.gcf()
-            # fig.canvas.manager.set_window_title("AP " + class_name)
             plt.title(text)
             plt.xlabel("recall")
             plt.ylabel("precision")
@@ -769,7 +768,7 @@ def summary(model, input_size, batch_size=-1, device="cuda"):
     for h in hooks:
         h.remove()
     lines = (f"{'-' * 95}\n"
-             f"{'{:>25}{:>58}{:>12}'.format('Layer (type)', 'Output Shape', 'Param #')}\n"
+             f"{'{:>25}{:>58}{:>12}'.format('Layer (type)', 'Output Shape', 'Param')}\n"
              f"{'=' * 95}\n")
     total_params = torch.tensor(0, dtype=torch.int64)
     total_output = 0

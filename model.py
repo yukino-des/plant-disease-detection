@@ -191,7 +191,7 @@ class LossHistory:
         try:
             plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
                      label="train loss")
-            plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "#21b3b9", linestyle="--", linewidth=2,
+            plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "cyan", linestyle="--", linewidth=2,
                      label="val loss")
         except ValueError:
             pass
@@ -296,11 +296,11 @@ class Yolo(object):
     def convert_to_onnx(self, simplify):
         self.net = YoloBody(self.num_classes)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        image = torch.zeros(1, 3, 416, 416).to(device)  # to("cpu") -> to(device)
+        image = torch.zeros(1, 3, 416, 416).to(device)
         self.net.load_state_dict(torch.load("data/model.pth", map_location=device))
         self.net = self.net.eval()
         if torch.cuda.is_available():
-            self.net = self.net.cuda()  # self.net = nn.DataParallel(self.net).cuda()
+            self.net = self.net.cuda()
         input_layer_names = ["images"]
         output_layer_names = ["output"]
         torch.onnx.export(self.net, image, f="data/cache/model.onnx", verbose=False, opset_version=12,
