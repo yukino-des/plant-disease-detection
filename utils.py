@@ -66,6 +66,7 @@ def conv_dw(filter_in, filter_out, stride=1):
                          nn.ReLU6(inplace=True))  # ReLU6激活
 
 
+# 将输入图像（灰度图）转为rgb图像
 def cvt_color(image):
     if len(np.shape(image)) != 3 or np.shape(image)[2] != 3:
         image = image.convert("RGB")
@@ -172,6 +173,7 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
     torch.save(model.state_dict(), "data/cache/loss/current.pth")
 
 
+# 获得先验框
 def get_anchors():
     with open("data/anchors.txt", encoding="utf-8") as f:
         anchors = f.readline()
@@ -180,6 +182,7 @@ def get_anchors():
     return anchors, len(anchors)
 
 
+# 获得类名
 def get_classes():
     with open("data/classes.txt", encoding="utf-8") as f:
         class_names = f.readlines()
@@ -187,6 +190,7 @@ def get_classes():
     return class_names, len(class_names)
 
 
+# 获得学习率
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group["lr"]
@@ -661,6 +665,7 @@ def print_table(table_data, col_widths):
     print("-" * (sum(col_widths) + 7))
 
 
+# 调整输入图像尺寸
 def resize_image(image, size):
     w, h = size
     new_image = image.resize((w, h), Image.BICUBIC)

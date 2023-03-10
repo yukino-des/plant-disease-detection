@@ -51,6 +51,9 @@ class DecodeBox:
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
+        # 13x13特征层对应anchor：[[142, 110], [192, 243], [459, 401]]
+        # 26x26特征层对应anchor：[[ 36,  75], [ 76,  55], [ 72, 146]]
+        # 52x52特征层对应anchor：[[ 12,  16], [ 19,  36], [ 40,  28]]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 
     @staticmethod
@@ -66,21 +69,31 @@ class DecodeBox:
 
     def decode_box(self, inputs):
         outputs = []
+        #  输入shape1 = torch.Size([batch_size, 255, 13, 13])
+        #  输入shape2 = torch.Size([batch_size, 255, 26, 26])
+        #  输入shape1 = torch.Size([batch_size, 255, 52, 52])
         for i, _input in enumerate(inputs):
             batch_size = _input.size(0)
             input_height = _input.size(2)
             input_width = _input.size(3)
+            # 对于416*416的输入，stride_h = stride_w = 416 / 13, 416 / 26, 416 / 52 = 32, 16, 8
             stride_h = 416 / input_height
             stride_w = 416 / input_width
             scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
-                              self.anchors[self.anchors_mask[i]]]
+                              self.anchors[self.anchors_mask[i]]]  # scaled_anchors相对特征层的大小
+            #  三个输入的shape
+            #  输入shape1 = torch.Size([batch_size, 3, 13, 13， 85])
+            #  输入shape2 = torch.Size([batch_size, 3, 26, 26， 85])
+            #  输入shape1 = torch.Size([batch_size, 3, 52, 52， 85])
             prediction = _input.view(batch_size, len(self.anchors_mask[i]), self.bbox_attrs, input_height,
                                      input_width).permute(0, 1, 3, 4, 2).contiguous()
+            # 先验框中心调整参数
             x = torch.sigmoid(prediction[..., 0])
             y = torch.sigmoid(prediction[..., 1])
+            # 先验框宽高调整参数
             w = prediction[..., 2]
             h = prediction[..., 3]
-            conf = torch.sigmoid(prediction[..., 4])
+            conf = torch.sigmoid(prediction[..., 4])  # 置信度
             pred_cls = torch.sigmoid(prediction[..., 5:])
             float_tensor = torch.cuda.FloatTensor if x.is_cuda else torch.FloatTensor
             long_tensor = torch.cuda.LongTensor if x.is_cuda else torch.LongTensor
@@ -603,6 +616,7 @@ class YoloDataset(Dataset):
     def __len__(self):
         return self.length
 
+    # 训练时进行数据随机增强，验证时不进行数据随机增强
     def __getitem__(self, index):
         index = index % self.length
         if self.mosaic and self.rand() < self.mosaic_prob and self.epoch_now < (
@@ -687,10 +701,10 @@ class YoloDataset(Dataset):
     def get_random_data(self, annotation_line, jitter=0.3, hue=0.1, sat=0.7, val=0.4, random=True):
         line = annotation_line.split()
         image = Image.open(line[0])
-        image = cvt_color(image)
-        iw, ih = image.size
-        h, w = 416, 416
-        box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
+        image = cvt_color(image)  # 将输入图像（灰度图）转为RGB图像
+        iw, ih = image.size  # 图像宽高
+        h, w = 416, 416  # 目标宽高
+        box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])  # 预测框
         if not random:
             scale = min(w / iw, h / ih)
             nw = int(iw * scale)
@@ -701,7 +715,7 @@ class YoloDataset(Dataset):
             new_image = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image, np.float32)
-            if len(box) > 0:
+            if len(box) > 0:  # 调整真实框
                 np.random.shuffle(box)
                 box[:, [0, 2]] = box[:, [0, 2]] * nw / iw + dx
                 box[:, [1, 3]] = box[:, [1, 3]] * nh / ih + dy
@@ -710,7 +724,7 @@ class YoloDataset(Dataset):
                 box[:, 3][box[:, 3] > h] = h
                 box_w = box[:, 2] - box[:, 0]
                 box_h = box[:, 3] - box[:, 1]
-                box = box[np.logical_and(box_w > 1, box_h > 1)]
+                box = box[np.logical_and(box_w > 1, box_h > 1)]  # 丢弃无效框
             return image_data, box
         new_ar = iw / ih * self.rand(1 - jitter, 1 + jitter) / self.rand(1 - jitter, 1 + jitter)
         scale = self.rand(0.25, 2)
@@ -725,11 +739,10 @@ class YoloDataset(Dataset):
         dy = int(self.rand(0, h - nh))
         new_image = Image.new("RGB", (w, h), (128, 128, 128))
         new_image.paste(image, (dx, dy))
-        image = new_image
         flip = self.rand() < 0.5
         if flip:
-            image = image.transpose(Image.FLIP_LEFT_RIGHT)
-        image_data = np.array(image, np.uint8)
+            new_image = new_image.transpose(Image.FLIP_LEFT_RIGHT)
+        image_data = np.array(new_image, np.uint8)
         r = np.random.uniform(-1, 1, 3) * [hue, sat, val] + 1
         hue, sat, val = cv2.split(cv2.cvtColor(image_data, cv2.COLOR_RGB2HSV))
         d_type = image_data.dtype
