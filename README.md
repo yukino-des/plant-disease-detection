@@ -26,6 +26,7 @@
 cd plant-disease-detection
 pip install -r requirements.txt
 pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
+# bndbox, trainval, upsample, xmax, xmin, ymax, ymin, xvid
 ```
 
 2. 训练
@@ -36,11 +37,6 @@ python train.py
 3. 检测
 ```shell
 python app.py
-```
-
-4. 字典
-```text
-bndbox, trainval, upsample, xmax, xmin, ymax, ymin, xvid
 ```
 
 ### keymap
