@@ -49,21 +49,30 @@ def cas_iou(box, cluster):
 # 标准卷积
 def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
     pad = (kernel_size - 1) // 2 if kernel_size else 0
-    return nn.Sequential(OrderedDict([("conv", nn.Conv2d(filter_in, filter_out, kernel_size=kernel_size, stride=stride,
-                                                         padding=pad, groups=groups, bias=False)),  # 3x3标准卷积
-                                      ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
-                                      ("relu", nn.ReLU6(inplace=True))]))  # ReLU6激活
+    return nn.Sequential(OrderedDict([
+        ("conv", nn.Conv2d(filter_in, filter_out,
+                           kernel_size=kernel_size,
+                           stride=stride,
+                           padding=pad,
+                           groups=groups, bias=False)),  # 3x3标准卷积
+        ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
+        ("relu", nn.ReLU6(inplace=True))]))  # ReLU6激活
 
 
 # 深度可分离卷积
 def conv_dw(filter_in, filter_out, stride=1):
-    return nn.Sequential(nn.Conv2d(filter_in, filter_in, kernel_size=3, stride=stride, padding=1, groups=filter_in,
-                                   bias=False),  # 3x3深度卷积
-                         nn.BatchNorm2d(filter_in),  # 批量归一化
-                         nn.ReLU6(inplace=True),  # ReLU6激活
-                         nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),  # 1x1点卷积
-                         nn.BatchNorm2d(filter_out),  # 批量归一化
-                         nn.ReLU6(inplace=True))  # ReLU6激活
+    return nn.Sequential(
+        nn.Conv2d(filter_in, filter_in,
+                  kernel_size=3,
+                  stride=stride,
+                  padding=1,
+                  groups=filter_in,
+                  bias=False),  # 3x3深度卷积
+        nn.BatchNorm2d(filter_in),  # 批量归一化
+        nn.ReLU6(inplace=True),  # ReLU6激活
+        nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),  # 1x1卷积
+        nn.BatchNorm2d(filter_out),  # 批量归一化
+        nn.ReLU6(inplace=True))  # ReLU6激活
 
 
 # 将输入图像（灰度图）转为rgb图像
