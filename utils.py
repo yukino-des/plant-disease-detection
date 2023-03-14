@@ -514,21 +514,21 @@ def get_txt(seed, train_val_percent, train_percent):
     num_list = range(num)
     tv = int(num * train_val_percent)
     tr = int(tv * train_percent)
-    trainval = random.sample(num_list, tv)
-    train = random.sample(trainval, tr)
+    train_val = random.sample(num_list, tv)
+    train = random.sample(train_val, tr)
     os.makedirs("data/VOC/ImageSets/Main", exist_ok=True)
-    trainval_txt = open("data/VOC/ImageSets/Main/trainval.txt", "w")
+    train_val_txt = open("data/VOC/ImageSets/Main/trainval.txt", "w")
     test_txt = open("data/VOC/ImageSets/Main/test.txt", "w")
     train_txt = open("data/VOC/ImageSets/Main/train.txt", "w")
     val_txt = open("data/VOC/ImageSets/Main/val.txt", "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
-        if i in trainval:
-            trainval_txt.write(name)
+        if i in train_val:
+            train_val_txt.write(name)
             train_txt.write(name) if i in train else val_txt.write(name)
         else:
             test_txt.write(name)
-    trainval_txt.close()
+    train_val_txt.close()
     train_txt.close()
     val_txt.close()
     test_txt.close()
@@ -603,11 +603,11 @@ def load_data():
         if height <= 0 or width <= 0:
             continue
         for obj in tree.iter("object"):
-            xmin = np.float64(int(float(obj.findtext("bndbox/xmin"))) / width)
-            ymin = np.float64(int(float(obj.findtext("bndbox/ymin"))) / height)
-            xmax = np.float64(int(float(obj.findtext("bndbox/xmax"))) / width)
-            ymax = np.float64(int(float(obj.findtext("bndbox/ymax"))) / height)
-            data.append([xmax - xmin, ymax - ymin])
+            x_min = np.float64(int(float(obj.findtext("bndbox/xmin"))) / width)
+            y_min = np.float64(int(float(obj.findtext("bndbox/ymin"))) / height)
+            x_max = np.float64(int(float(obj.findtext("bndbox/xmax"))) / width)
+            y_max = np.float64(int(float(obj.findtext("bndbox/ymax"))) / height)
+            data.append([x_max - x_min, y_max - y_min])
     return np.array(data)
 
 
