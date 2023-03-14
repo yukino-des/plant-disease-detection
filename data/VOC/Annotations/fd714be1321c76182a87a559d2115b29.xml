@@ -12,7 +12,7 @@
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>Corn leaf blight</name>
+		<name>corn leaf blight</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -25,7 +25,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Corn leaf blight</name>
+		<name>corn leaf blight</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -38,7 +38,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Corn leaf blight</name>
+		<name>corn leaf blight</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -51,7 +51,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Corn leaf blight</name>
+		<name>corn leaf blight</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -64,7 +64,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Corn leaf blight</name>
+		<name>corn leaf blight</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>

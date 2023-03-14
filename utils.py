@@ -327,7 +327,7 @@ def get_map(min_overlap, score_threshold):
     ap_dict = {}
     log_avg_miss_rate_dict = {}
     with open("data/cache/map/results.txt", "w") as results_file:
-        results_file.write("AP, precision and recall\n")
+        results_file.write("AP, precision, recall\n")
         count_true_positives = {}
         for class_index, class_name in enumerate(gt_classes):
             count_true_positives[class_name] = 0

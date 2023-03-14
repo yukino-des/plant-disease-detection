@@ -12,7 +12,7 @@
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -25,7 +25,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -38,7 +38,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -51,7 +51,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -64,7 +64,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -77,7 +77,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -90,7 +90,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -103,7 +103,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -116,7 +116,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -129,7 +129,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -142,7 +142,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Blueberry leaf</name>
+		<name>blueberry leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>

@@ -12,7 +12,7 @@
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>Tomato leaf bacterial spot</name>
+		<name>tomato leaf bacterial spot</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -25,7 +25,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Tomato leaf bacterial spot</name>
+		<name>tomato leaf bacterial spot</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>

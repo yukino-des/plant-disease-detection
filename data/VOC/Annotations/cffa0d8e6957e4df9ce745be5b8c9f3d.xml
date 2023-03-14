@@ -12,7 +12,7 @@
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>Tomato leaf</name>
+		<name>tomato leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -25,7 +25,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Tomato leaf mosaic virus</name>
+		<name>tomato leaf mosaic virus</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -38,7 +38,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Tomato leaf mosaic virus</name>
+		<name>tomato leaf mosaic virus</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>

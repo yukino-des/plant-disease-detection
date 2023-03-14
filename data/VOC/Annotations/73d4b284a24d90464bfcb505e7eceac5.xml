@@ -12,7 +12,7 @@
 	</size>
 	<segmented>0</segmented>
 	<object>
-		<name>Corn rust leaf</name>
+		<name>corn rust leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -25,7 +25,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Corn rust leaf</name>
+		<name>corn rust leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
@@ -38,7 +38,7 @@
 		</bndbox>
 	</object>
 	<object>
-		<name>Corn rust leaf</name>
+		<name>corn rust leaf</name>
 		<pose>Unspecified</pose>
 		<truncated>0</truncated>
 		<difficult>0</difficult>
