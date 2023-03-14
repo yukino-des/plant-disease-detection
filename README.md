@@ -29,21 +29,8 @@ pip install torch torchvision torchaudio --extra-index-url https://download.pyto
 # bndbox, trainval, upsample, xmax, xmin, ymax, ymin, xvid
 ```
 
-2. 训练
+2. 训练、检测
 ```shell
 python train.py
-```
-
-3. 检测
-```shell
 python app.py
 ```
-
-### keymap
-| keymap                                      | shortcut             |  
-|---------------------------------------------|----------------------|  
-| delete line                                 | shift + command + K  |  
-| select all occurrences of current selection | shift + command + L  |  
-| find                                        | command + F          |  
-| replace                                     | option + command + F |  
-| format document                             | shift + option + F   |  
