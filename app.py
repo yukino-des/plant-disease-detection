@@ -80,7 +80,7 @@ if __name__ == "__main__":
         tact_time = yolo.get_fps(image, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
-    # 得到"data/cache"目录下的anchors.txt"文件、"k-means.jpg"文件
+    # 得到data/cache/anchors.txt、data/cache/k-means.jpg
     if str.__contains__(str.lower(mode), "k"):
         np.random.seed(0)
         data = load_data()
@@ -106,7 +106,7 @@ if __name__ == "__main__":
             f.write(xy)
         f.close()
 
-    # 得到"data/cache/map"目录
+    # 得到data/cache/map
     if str.__contains__(str.lower(mode), "m"):
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-trust", exist_ok=True)
@@ -138,12 +138,12 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(0.5, 0.5)
 
-    # 得到"data/cache/model.onnx"文件
+    # 得到data/cache/model.onnx
     if str.__contains__(str.lower(mode), "o"):
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
-    # 得到"data/cache/summary.txt"文件
+    # 得到data/cache/summary.txt
     if str.__contains__(str.lower(mode), "s"):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
