@@ -59,7 +59,8 @@ async def image(file: UploadFile):
 
 if __name__ == "__main__":
     mode = input("Input d as directory, f as fps, k as k-means, m as map, o as onnx, s as summary, c as camera: ")
-    if mode == "d" or mode == "D":
+    # 目录检测
+    if str.__contains__(str.lower(mode), "d"):
         yolo = Yolo()
         image_dir = input("Input directory path: ")
         image_names = os.listdir(image_dir)
@@ -71,15 +72,16 @@ if __name__ == "__main__":
             os.makedirs("data/cache/image/out", exist_ok=True)
             image.save(f"data/cache/image/out/{image_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
 
-    elif mode == "f" or mode == "F":
+    # fps检测
+    if str.__contains__(str.lower(mode), "f"):
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
         image = Image.open(fps_image_path)
         tact_time = yolo.get_fps(image, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
-    # 开发者使用，生成"data/cache"目录下的anchors.txt"文件、"k-means.jpg"文件
-    elif mode == "k" or mode == "K":
+    # 得到"data/cache"目录下的anchors.txt"文件、"k-means.jpg"文件
+    if str.__contains__(str.lower(mode), "k"):
         np.random.seed(0)
         data = load_data()
         cluster, near = k_means(data, 9)
@@ -104,8 +106,8 @@ if __name__ == "__main__":
             f.write(xy)
         f.close()
 
-    # 开发者使用，生成"data/cache/map"目录
-    elif mode == "m" or mode == "M":
+    # 得到"data/cache/map"目录
+    if str.__contains__(str.lower(mode), "m"):
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-trust", exist_ok=True)
         os.makedirs("data/cache/map/result", exist_ok=True)
@@ -136,13 +138,13 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(0.5, 0.5)
 
-    # 开发者使用，生成"data/cache/model.onnx"文件
-    elif mode == "o" or mode == "O":
+    # 得到"data/cache/model.onnx"文件
+    if str.__contains__(str.lower(mode), "o"):
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
-    # 开发者使用，生成"data/cache/summary.txt"文件
-    elif mode == "s" or mode == "S":
+    # 得到"data/cache/summary.txt"文件
+    if str.__contains__(str.lower(mode), "s"):
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
         model_summary = summary(m, (3, 416, 416))
@@ -156,14 +158,14 @@ if __name__ == "__main__":
         sum_txt.close()
         print("data/cache/summary.txt saved.")
 
-    # 开发者使用，调用摄像头
-    elif mode == "c" or mode == "C":
+    # 调用摄像头
+    if str.__contains__(str.lower(mode), "c"):
         yolo = Yolo()
         time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
         yolo.detect_video(0, time_str)
 
-    # 开发者使用，启动后端服务器，监听2475号端口
-    else:
+    # 启动后端服务器，监听2475号端口
+    if mode == "":
         yolo = Yolo()
         # 清空训练缓存
         shutil.rmtree("data/cache/loss", ignore_errors=True)
