@@ -1,5 +1,4 @@
 ~$🎓.docx
-*.ipynb
 *.txt
 */*.txt
 !data/anchors.txt
