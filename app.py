@@ -125,11 +125,11 @@ if __name__ == "__main__":
                     obj_name = obj.find("name").text
                     if obj_name not in class_names:
                         continue
-                    bndbox = obj.find("bndbox")
-                    left = bndbox.find("xmin").text
-                    top = bndbox.find("ymin").text
-                    right = bndbox.find("xmax").text
-                    bottom = bndbox.find("ymax").text
+                    bnd_box = obj.find("bndbox")
+                    left = bnd_box.find("xmin").text
+                    top = bnd_box.find("ymin").text
+                    right = bnd_box.find("xmax").text
+                    bottom = bnd_box.find("ymax").text
                     if difficult_flag:
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom} difficult\n")
                     else:
