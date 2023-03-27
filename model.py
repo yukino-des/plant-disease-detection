@@ -69,9 +69,9 @@ class DecodeBox:
 
     def decode_box(self, inputs):
         outputs = []
-        #  输入shape1 = torch.Size([batch_size, 255, 13, 13])
-        #  输入shape2 = torch.Size([batch_size, 255, 26, 26])
-        #  输入shape1 = torch.Size([batch_size, 255, 52, 52])
+        # 输入shape1 = torch.Size([batch_size, 255, 13, 13])
+        # 输入shape2 = torch.Size([batch_size, 255, 26, 26])
+        # 输入shape1 = torch.Size([batch_size, 255, 52, 52])
         for i, _input in enumerate(inputs):
             batch_size = _input.size(0)
             input_height = _input.size(2)
@@ -81,10 +81,10 @@ class DecodeBox:
             stride_w = 416 / input_width
             scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
                               self.anchors[self.anchors_mask[i]]]  # scaled_anchors相对特征层的大小
-            #  三个输入的shape
-            #  输入shape1 = torch.Size([batch_size, 3, 13, 13， 85])
-            #  输入shape2 = torch.Size([batch_size, 3, 26, 26， 85])
-            #  输入shape1 = torch.Size([batch_size, 3, 52, 52， 85])
+            # 三个输入的shape
+            # 输入shape1 = torch.Size([batch_size, 3, 13, 13， 85])
+            # 输入shape2 = torch.Size([batch_size, 3, 26, 26， 85])
+            # 输入shape1 = torch.Size([batch_size, 3, 52, 52， 85])
             prediction = _input.view(batch_size, len(self.anchors_mask[i]), self.bbox_attrs, input_height,
                                      input_width).permute(0, 1, 3, 4, 2).contiguous()
             # 先验框中心调整参数
@@ -558,7 +558,7 @@ class YoloBody(nn.Module):
         self.backbone = Backbone()
         in_filters = [32, 96, 320]
         self.conv1 = make3conv([512, 1024], in_filters[2])
-        self.SPP = SpatialPyramidPooling()
+        self.spp = SpatialPyramidPooling()
         self.conv2 = make3conv([512, 1024], 2048)
         self.up_sample1 = UpSample(512, 256)
         self.conv_for_p4 = conv2d(in_filters[1], 256, 1)
@@ -577,7 +577,7 @@ class YoloBody(nn.Module):
     def forward(self, x):
         x2, x1, x0 = self.backbone(x)
         p5 = self.conv1(x0)
-        p5 = self.SPP(p5)
+        p5 = self.spp(p5)
         p5 = self.conv2(p5)
         p5_up_sample = self.up_sample1(p5)
         p4 = self.conv_for_p4(x1)
