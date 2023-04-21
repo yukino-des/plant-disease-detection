@@ -12,7 +12,7 @@
 │   │   └── JPEGImages
 │   ├── anchors.txt
 │   ├── classes.txt
-│   ├── JetBrainsMono-Regular.ttc
+│   ├── simhei.ttf
 │   └── model.pth
 ├── model.py
 ├── requirements.txt

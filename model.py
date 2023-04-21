@@ -380,7 +380,7 @@ class Yolo(object):
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font="data/JetBrainsMono-Regular.ttc",
+        font = ImageFont.truetype(font="data/simhei.ttf",
                                   size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean([416, 416]), 1))
         target_info = {}
@@ -468,7 +468,7 @@ class Yolo(object):
             top_label = np.array(results[0][:, 6], dtype="int32")
             top_conf = results[0][:, 4] * results[0][:, 5]
             top_boxes = results[0][:, :4]
-        font = ImageFont.truetype(font="data/JetBrainsMono-Regular.ttc",
+        font = ImageFont.truetype(font="data/simhei.ttf",
                                   size=np.floor(3e-2 * image.size[1] + 0.5).astype("int32"))
         thickness = int(max((image.size[0] + image.size[1]) // np.mean([416, 416]), 1))
         for i, c in list(enumerate(top_label)):
