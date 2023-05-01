@@ -224,7 +224,7 @@ def get_map(min_overlap, score_threshold):
     os.makedirs("data/cache/map/F1", exist_ok=True)
     os.makedirs("data/cache/map/recall", exist_ok=True)
     os.makedirs("data/cache/map/precision", exist_ok=True)
-    ground_truth_files = glob.glob("data/cache/map/ground-trust/*.txt")
+    ground_truth_files = glob.glob("data/cache/map/ground-truth/*.txt")
     if len(ground_truth_files) == 0:
         raise FileNotFoundError("Ground-truth files not found.")
     ground_truth_files.sort()
@@ -297,7 +297,7 @@ def get_map(min_overlap, score_threshold):
         for txt_file in dr_files_list:
             file_id = txt_file.split(".txt", 1)[0]
             file_id = os.path.basename(os.path.normpath(file_id))
-            temp_path = f"data/cache/map/ground-trust/{file_id}.txt"
+            temp_path = f"data/cache/map/ground-truth/{file_id}.txt"
             if class_index == 0:
                 if not os.path.exists(temp_path):
                     raise FileNotFoundError(f"{temp_path} not found.")
@@ -480,8 +480,8 @@ def get_map(min_overlap, score_threshold):
     window_title = "ground-truth"
     plot_title = f"{window_title}\n"
     plot_title += str(len(ground_truth_files)) + " images; " + str(n_classes) + " classes"
-    x_label = "number of ground-trust objects"
-    output_path = "data/cache/map/ground-trust.png"
+    x_label = "number of ground-truth objects"
+    output_path = "data/cache/map/ground-truth.png"
     plot_color = "forestgreen"
     draw_plot(gt_counter_per_class, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     window_title = "log-average miss rate"
