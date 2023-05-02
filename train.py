@@ -12,13 +12,10 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
 
 if __name__ == "__main__":
     # 如果训练中断，请修改：model_path = "data/cache/loss/current.pth"
-    model_path = "pretrain.pth"
+    model_path = "data/pretrain.pth"
     # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
     init_epoch = 0
     get_txt(0, 0.9, 0.9)
-    flag = input("Start training (y/n)? ")
-    if flag != "y" and flag != "Y":
-        exit(0)
     lr_decay_type = "cos"  # "step"
     # ---------------------------------------------------------------
     # |  optimizer_type, freeze_train, epoch, init_lr, weight_decay |
@@ -28,7 +25,9 @@ if __name__ == "__main__":
     # |           "sgd",        False,   500,    1e-2,         5e-4 |
     # ---------------------------------------------------------------
     optimizer_type, freeze_train, epoch, init_lr, weight_decay = "adam", True, 100, 1e-3, 0
+    # 多线程训练
     num_workers = 2  # 4
+    # cpu训练或gpu训练
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names, num_classes = get_classes()
     anchors, num_anchors = get_anchors()
