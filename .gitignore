@@ -11,3 +11,4 @@ __pycache__
 .idea
 .ipynb_checkpoints
 data/cache
+cache.py

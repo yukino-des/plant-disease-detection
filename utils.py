@@ -1,20 +1,21 @@
 import glob
 import json
 import math
-import matplotlib
-import numpy as np
 import operator
 import os
 import random
 import shutil
-import torch
 from collections import OrderedDict
 from functools import partial
-from matplotlib import pyplot as plt
+from xml.etree import ElementTree as et
+
+import matplotlib
+import numpy as np
+import torch
 from PIL import Image
+from matplotlib import pyplot as plt
 from torch import nn
 from tqdm import tqdm
-from xml.etree import ElementTree
 
 if os.name == "nt":
     matplotlib.use("Agg")
@@ -136,11 +137,15 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
                 targets = [ann.cuda(0) for ann in targets]
         optimizer.zero_grad()  # 清零梯度
         outputs = model_train(images)  # 前向传播
-        loss_sum = torch.tensor(0, dtype=torch.float32)
+        if torch.cuda.is_available():
+            loss_sum_all = torch.cuda.tensor(0, dtype=torch.float32)
+        else:
+            loss_sum_all = torch.tensor(0, dtype=torch.float32)
         # 计算损失
         for i in range(len(outputs)):
             loss_item = yolo_loss(i, outputs[i], targets)
-            loss_sum += loss_item
+            loss_sum_all += loss_item
+        loss_sum = loss_sum_all
         loss_sum.backward()  # 反向传播
         optimizer.step()
         loss += loss_sum.item()
@@ -159,7 +164,10 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
                 targets = [ann.cuda(0) for ann in targets]
             optimizer.zero_grad()  # 清零梯度
             outputs = model_train(images)  # 前向传播
-            val_loss_sum = torch.tensor(0, dtype=torch.float32)
+            if torch.cuda.is_available():
+                val_loss_sum = torch.tensor(0, dtype=torch.float32, device="cuda")
+            else:
+                val_loss_sum = torch.tensor(0, dtype=torch.float32)
             # 计算损失
             for i in range(len(outputs)):
                 val_loss_item = yolo_loss(i, outputs[i], targets)
@@ -538,7 +546,7 @@ def get_txt(seed, train_val_percent, train_percent):
         for image_id in image_ids:
             list_file.write(f"data/VOC/JPEGImages/{image_id}.jpg")
             in_file = open(f"data/VOC/Annotations/{image_id}.xml", encoding="utf-8")
-            tree = ElementTree.parse(in_file)
+            tree = et.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
                 difficult = 0
@@ -596,7 +604,7 @@ def k_means(box, k):
 def load_data():
     data = []
     for xml_file in tqdm(glob.glob("data/VOC/Annotations/*xml")):
-        tree = ElementTree.parse(xml_file)
+        tree = et.parse(xml_file)
         height = int(tree.findtext("./size/height"))
         width = int(tree.findtext("./size/width"))
         if height <= 0 or width <= 0:

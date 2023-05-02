@@ -1,21 +1,22 @@
 import colorsys
-import cv2
 import math
+import os
+import time
+from random import sample, shuffle
+
+import cv2
 import numpy as np
 import onnx
 import onnxsim
-import os
-import time
 import torch
-from matplotlib import pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
-from random import sample, shuffle
-from scipy import signal
+from matplotlib import pyplot as plt
 from torch import nn
 from torch.hub import load_state_dict_from_url
 from torch.utils.data.dataset import Dataset
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.ops import nms
+
 from utils import (conv2d, conv_dw, cvt_color, get_anchors, get_classes, logistic, make3conv, make5conv, make_divisible,
                    resize_image, print_config, yolo_head)
 
@@ -24,16 +25,17 @@ class Backbone(nn.Module):
     def __init__(self):
         super(Backbone, self).__init__()
         model = MobileNetV2()
-        state_dict = load_state_dict_from_url(url="https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-                                              model_dir="data", progress=True)
+        state_dict = load_state_dict_from_url(
+            url="https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
+            model_dir="data", progress=True)
         model.load_state_dict(state_dict)
         self.model = model
 
     def forward(self, x):
-        out3 = self.model.features[:7](x)
-        out4 = self.model.features[7:14](out3)
-        out5 = self.model.features[14:18](out4)
-        return out3, out4, out5
+        out0 = self.model.features[:7](x)
+        out1 = self.model.features[7:14](out0)
+        out2 = self.model.features[14:18](out1)
+        return out0, out1, out2
 
 
 class ConvBNReLU(nn.Sequential):
@@ -200,14 +202,14 @@ class LossHistory:
         plt.figure()
         plt.plot(_iter, self.losses, "red", linewidth=2, label="train loss")
         plt.plot(_iter, self.val_loss, "green", linewidth=2, label="val loss")
-        num = 5 if len(self.losses) < 25 else 15
-        try:
-            plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
-                     label="train loss")
-            plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "cyan", linestyle="--", linewidth=2,
-                     label="val loss")
-        except ValueError:
-            pass
+        # num = 5 if len(self.losses) < 25 else 15
+        # try:
+        #     plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
+        #              label="train loss")
+        #     plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "cyan", linestyle="--", linewidth=2,
+        #              label="val loss")
+        # except ValueError:
+        #     pass
         plt.grid(True)
         plt.xlabel("epoch")
         plt.ylabel("loss")
