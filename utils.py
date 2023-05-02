@@ -138,7 +138,7 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
         optimizer.zero_grad()  # 清零梯度
         outputs = model_train(images)  # 前向传播
         if torch.cuda.is_available():
-            loss_sum_all = torch.cuda.tensor(0, dtype=torch.float32)
+            loss_sum_all = torch.tensor(0, dtype=torch.float32, device="cuda")
         else:
             loss_sum_all = torch.tensor(0, dtype=torch.float32)
         # 计算损失

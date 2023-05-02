@@ -601,16 +601,16 @@ class YoloBody(nn.Module):
 
 
 class YoloDataset(Dataset):
-    def __init__(self, annotation_lines, num_classes, epoch_length, mosaic, mix_up, mosaic_prob,
-                 mix_up_prob, train, special_aug_ratio=0.7):
+    def __init__(self, annotation_lines, num_classes, epoch_length, mosaic, mixup, mosaic_prob,
+                 mixup_prob, train, special_aug_ratio=0.7):
         super(YoloDataset, self).__init__()
         self.annotation_lines = annotation_lines
         self.num_classes = num_classes
         self.epoch_length = epoch_length
         self.mosaic = mosaic
         self.mosaic_prob = mosaic_prob
-        self.mix_up = mix_up
-        self.mix_up_prob = mix_up_prob
+        self.mixup = mixup
+        self.mixup_prob = mixup_prob
         self.train = train
         self.special_aug_ratio = special_aug_ratio
         self.epoch_now = -1
@@ -619,7 +619,7 @@ class YoloDataset(Dataset):
     def __len__(self):
         return self.length
 
-    # 训练时进行数据随机增强，验证时不进行数据随机增强
+    # 训练时进行数据增强，验证时不进行数据增强
     def __getitem__(self, index):
         index = index % self.length
         if self.mosaic and self.rand() < self.mosaic_prob and self.epoch_now < (
@@ -628,10 +628,10 @@ class YoloDataset(Dataset):
             lines.append(self.annotation_lines[index])
             shuffle(lines)
             image, box = self.get_random_data_with_mosaic(lines)
-            if self.mix_up and self.rand() < self.mix_up_prob:
+            if self.mixup and self.rand() < self.mixup_prob:
                 lines = sample(self.annotation_lines, 1)
                 image_2, box_2 = self.get_random_data(lines[0], random=self.train)
-                image, box = self.get_random_data_with_mix_up(image, box, image_2, box_2)
+                image, box = self.get_random_data_with_mixup(image, box, image_2, box_2)
         else:
             image, box = self.get_random_data(self.annotation_lines[index], random=self.train)
         image = np.transpose(np.array(image, dtype=np.float32) / 255.0, (2, 0, 1))
@@ -644,7 +644,7 @@ class YoloDataset(Dataset):
         return image, box
 
     @staticmethod
-    def get_random_data_with_mix_up(image_1, box_1, image_2, box_2):
+    def get_random_data_with_mixup(image_1, box_1, image_2, box_2):
         new_image = np.array(image_1, np.float32) * 0.5 + np.array(image_2, np.float32) * 0.5
         if len(box_1) == 0:
             new_boxes = box_2
@@ -867,7 +867,7 @@ class YoloLoss(nn.Module):
         self.ignore_threshold = 0.5
 
     @staticmethod
-    def box_c_iou(b1, b2):
+    def box_ciou(b1, b2):
         b1_xy = b1[..., :2]
         b1_wh = b1[..., 2:4]
         b1_wh_half = b1_wh / 2.
@@ -891,13 +891,13 @@ class YoloLoss(nn.Module):
         enclose_max = torch.max(b1_maxes, b2_maxes)
         enclose_wh = torch.max(enclose_max - enclose_min, torch.zeros_like(intersect_max))
         enclose_diagonal = torch.sum(torch.pow(enclose_wh, 2), dim=-1)
-        c_iou = iou - 1.0 * center_distance / torch.clamp(enclose_diagonal, min=1e-6)
+        ciou = iou - 1.0 * center_distance / torch.clamp(enclose_diagonal, min=1e-6)
         v = (4 / (math.pi ** 2)) * torch.pow(
             (torch.atan(b1_wh[..., 0] / torch.clamp(b1_wh[..., 1], min=1e-6)) - torch.atan(
                 b2_wh[..., 0] / torch.clamp(b2_wh[..., 1], min=1e-6))), 2)
         alpha = v / torch.clamp((1.0 - iou + v), min=1e-6)
-        c_iou -= alpha * v
-        return c_iou
+        ciou -= alpha * v
+        return ciou
 
     @staticmethod
     def calculate_iou(_box_a, _box_b):
@@ -956,8 +956,8 @@ class YoloLoss(nn.Module):
         obj_mask = y_true[..., 4] == 1
         n = torch.sum(obj_mask)
         if n != 0:
-            c_iou = self.box_c_iou(pred_boxes, y_true[..., :4]).type_as(x)
-            loss_loc = torch.mean((1 - c_iou)[obj_mask])
+            ciou = self.box_ciou(pred_boxes, y_true[..., :4]).type_as(x)
+            loss_loc = torch.mean((1 - ciou)[obj_mask])
             loss_cls = torch.mean(self.bce_loss(pred_cls[obj_mask], y_true[..., 5:][obj_mask]))
             loss += loss_loc * self.box_ratio + loss_cls * self.cls_ratio
         if self.focal_loss:
