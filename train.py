@@ -1,16 +1,18 @@
+from datetime import datetime
+
 import numpy as np
 import torch
-from datetime import datetime
-from model import LossHistory, YoloBody, YoloDataset, YoloLoss
 from torch import nn, optim
 from torch.backends import cudnn
 from torch.utils.data import DataLoader
+
+from model import LossHistory, YoloBody, YoloDataset, YoloLoss
 from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_txt, set_optimizer_lr, print_config,
-                   yolo_dataset_collate)
+                   weights_init, yolo_dataset_collate)
 
 if __name__ == "__main__":
     # 如果训练中断，请修改：model_path = "data/cache/loss/current.pth"
-    model_path = ""
+    model_path = "pretrain.pth"
     # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
     init_epoch = 0
     get_txt(0, 0.9, 0.9)
@@ -31,15 +33,15 @@ if __name__ == "__main__":
     class_names, num_classes = get_classes()
     anchors, num_anchors = get_anchors()
     model = YoloBody(num_classes)
-    if model_path != "":
-        model_dict = model.state_dict()
-        pretrained_dict = torch.load(model_path, map_location=device)
-        temp_dict = {}
-        for k, v in pretrained_dict.items():
-            if k in model_dict.keys() and np.shape(model_dict[k]) == np.shape(v):
-                temp_dict[k] = v
-        model_dict.update(temp_dict)
-        model.load_state_dict(model_dict)
+    weights_init(model)
+    model_dict = model.state_dict()
+    pretrained_dict = torch.load(model_path, map_location=device)
+    temp_dict = {}
+    for k, v in pretrained_dict.items():
+        if k in model_dict.keys() and np.shape(model_dict[k]) == np.shape(v):
+            temp_dict[k] = v
+    model_dict.update(temp_dict)
+    model.load_state_dict(model_dict)
     yolo_loss = YoloLoss(anchors, num_classes, True, 0.25, 2)
     time_str = datetime.strftime(datetime.now(), "%Y%m%d%H%M%S")
     log_dir = f"data/cache/loss/{time_str}"

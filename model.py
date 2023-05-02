@@ -12,7 +12,6 @@ import torch
 from PIL import Image, ImageDraw, ImageFont
 from matplotlib import pyplot as plt
 from torch import nn
-from torch.hub import load_state_dict_from_url
 from torch.utils.data.dataset import Dataset
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.ops import nms
@@ -25,10 +24,10 @@ class Backbone(nn.Module):
     def __init__(self):
         super(Backbone, self).__init__()
         model = MobileNetV2()
-        state_dict = load_state_dict_from_url(
-            url="https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-            model_dir="data", progress=True)
-        model.load_state_dict(state_dict)
+        # state_dict = load_state_dict_from_url(
+        #     url="https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
+        #     model_dir="data", progress=True)
+        # model.load_state_dict(state_dict)
         self.model = model
 
     def forward(self, x):

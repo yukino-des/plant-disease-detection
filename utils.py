@@ -720,6 +720,18 @@ def voc_ap(recall, precision):
     return ap, m_recall, m_precision
 
 
+def weights_init(net):
+    def init_func(m):
+        classname = m.__class__.__name__
+        if hasattr(m, 'weight') and classname.find('Conv') != -1:
+            torch.nn.init.normal_(m.weight.data, 0.0, 0.02)
+        elif classname.find('BatchNorm2d') != -1:
+            torch.nn.init.normal_(m.weight.data, 1.0, 0.02)
+            torch.nn.init.constant_(m.bias.data, 0.0)
+
+    net.apply(init_func)
+
+
 def yolo_dataset_collate(batch):
     image_list = []
     bbox_list = []

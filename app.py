@@ -1,19 +1,21 @@
-import numpy as np
 import os
 import shutil
+from datetime import datetime
+from xml.etree import ElementTree
+
+import numpy as np
 import torch
 import uvicorn
-from datetime import datetime
+from PIL import Image
 from fastapi import FastAPI, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from matplotlib import pyplot as plt
-from model import Yolo, YoloBody
-from PIL import Image
 from starlette.responses import FileResponse, JSONResponse
 from thop import clever_format, profile
 from tqdm import tqdm
+
+from model import Yolo, YoloBody
 from utils import avg_iou, get_classes, get_map, k_means, load_data, summary
-from xml.etree import ElementTree
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
