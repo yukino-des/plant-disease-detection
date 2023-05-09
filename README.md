@@ -28,7 +28,6 @@
 ```shell
 cd plant-disease-detection
 pip install -r requirements.txt
-pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 ```
 
 2. 训练、检测
@@ -38,6 +37,7 @@ python train.py
 python app.py
 ```
 
+@Deprecated
 ```python
 import os
 
