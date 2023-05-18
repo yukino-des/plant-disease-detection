@@ -75,7 +75,7 @@ def conv_dw(filter_in, filter_out, stride=1):
         nn.ReLU6(inplace=True))  # ReLU6激活
 
 
-# 将输入图像（灰度图）转为rgb图像
+# 将输入图像转换为3通道RGB图像
 def cvt_color(image):
     if len(np.shape(image)) != 3 or np.shape(image)[2] != 3:
         image = image.convert("RGB")
