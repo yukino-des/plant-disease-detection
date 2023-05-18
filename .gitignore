@@ -4,7 +4,6 @@
 !data/anchors.txt
 !data/classes.txt
 !requirements.txt
-data/mobilenet_v2-b0353104.pth
 __pycache__
 */__pycache__
 .idea
