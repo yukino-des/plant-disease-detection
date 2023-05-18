@@ -1,11 +1,12 @@
 *.ipynb
+.DS_Store
+*/.DS_Store
 *.txt
 */*.txt
 !data/anchors.txt
 !data/classes.txt
 !requirements.txt
 __pycache__
-*/__pycache__
-.idea
+*/__pycache__.idea
 .ipynb_checkpoints
 data/cache
