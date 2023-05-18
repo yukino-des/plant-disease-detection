@@ -495,7 +495,7 @@ def get_map(min_overlap, score_threshold):
     window_title = "log-average miss rate"
     plot_title = window_title
     x_label = "log-average miss rate"
-    output_path = "data/cache/map/log-average-miss-rate.png"
+    output_path = "data/cache/map/log-average_miss_rate.png"
     plot_color = "royalblue"
     draw_plot(log_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
     window_title = "mAP={:.2f}%".format(m_ap * 100)
