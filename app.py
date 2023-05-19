@@ -38,14 +38,11 @@ async def image(file: UploadFile):
     if extend_name.lower() in ["jpeg", "jpg", "png"]:
         image_path = f"data/cache/image/{file.filename}"
         image_out_path = f"data/cache/image/out/{file_name}.png"
-        image_heatmap_path = f"data/cache/image/heatmap/{file_name}.png"
         with open(image_path, "wb+") as wb:
             shutil.copyfileobj(file.file, wb)
         target_info = yolo.detect_image(image_path)
-        yolo.detect_heatmap(image_path)
         return JSONResponse({"imageUrl": f"http://0.0.0.0:2475/{image_path}",
                              "imageOutUrl": f"http://0.0.0.0:2475/{image_out_path}",
-                             "imageHeatmapUrl": f"http://0.0.0.0:2475/{image_heatmap_path}",
                              "targetInfo": target_info}, 200)
     elif extend_name.lower() in ["mp4", "mov", "avi"]:
         video_path = f"data/cache/video/{file.filename}"
@@ -174,9 +171,8 @@ if __name__ == "__main__":
         # 清空图像缓存
         shutil.rmtree("data/cache/image", ignore_errors=True)
         os.makedirs("data/cache/image/out", exist_ok=True)
-        os.makedirs("data/cache/image/heatmap", exist_ok=True)
         # 清空视频缓存
         shutil.rmtree("data/cache/video", ignore_errors=True)
         os.makedirs("data/cache/video/out", exist_ok=True)
-        # 允许局域网访问
+        #局域网访问
         uvicorn.run(app, host="0.0.0.0", port=2475, workers=0)
