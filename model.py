@@ -20,6 +20,7 @@ from utils import (conv2d, conv_dw, cvt_color, get_anchors, get_classes, logisti
                    resize_image, print_config, yolo_head)
 
 
+# 骨干网络
 class Backbone(nn.Module):
     def __init__(self):
         super(Backbone, self).__init__()
@@ -259,9 +260,10 @@ class MobileNetV2(nn.Module):
         return self.classifier(x)
 
 
-class SpatialPyramidPooling(nn.Module):
+# 空间金字塔池化
+class Spp(nn.Module):
     def __init__(self, pool_sizes=None):
-        super(SpatialPyramidPooling, self).__init__()
+        super(Spp, self).__init__()
         if pool_sizes is None:
             pool_sizes = [5, 9, 13]
         self.max_pools = nn.ModuleList([nn.MaxPool2d(pool_size, 1, pool_size // 2) for pool_size in pool_sizes])
@@ -271,6 +273,7 @@ class SpatialPyramidPooling(nn.Module):
         return torch.cat(features + [x], dim=1)
 
 
+# 上采样
 class UpSample(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(UpSample, self).__init__()
@@ -559,7 +562,7 @@ class YoloBody(nn.Module):
         self.backbone = Backbone()
         in_filters = [32, 96, 320]
         self.conv1 = make3conv([512, 1024], in_filters[2])
-        self.spp = SpatialPyramidPooling()
+        self.spp = Spp()
         self.conv2 = make3conv([512, 1024], 2048)
         self.up_sample1 = UpSample(512, 256)
         self.conv_for_p4 = conv2d(in_filters[1], 256, 1)

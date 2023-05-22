@@ -72,7 +72,7 @@ if __name__ == "__main__":
             image.save(f"data/cache/image/out/{image_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
 
     # fps检测
-    if str.__contains__(str.lower(mode), "f"):
+    if str.lower(mode) == "f":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
         image = Image.open(fps_image_path)
@@ -80,7 +80,7 @@ if __name__ == "__main__":
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
     # 得到data/cache/anchors.txt、data/cache/k-means.jpg
-    if str.__contains__(str.lower(mode), "k"):
+    elif str.lower(mode) == "k":
         np.random.seed(0)
         data = load_data()
         cluster, near = k_means(data, 9)
@@ -106,7 +106,7 @@ if __name__ == "__main__":
         f.close()
 
     # 得到data/cache/map
-    if str.__contains__(str.lower(mode), "m"):
+    elif str.lower(mode) == "m":
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-truth", exist_ok=True)
         os.makedirs("data/cache/map/result", exist_ok=True)
@@ -138,12 +138,12 @@ if __name__ == "__main__":
         get_map(0.5, 0.5)
 
     # 得到data/cache/model.onnx
-    if str.__contains__(str.lower(mode), "o"):
+    elif str.lower(mode) == "o":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
     # 得到data/cache/summary.txt
-    if str.__contains__(str.lower(mode), "s"):
+    elif str.lower(mode) == "s":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
         model_summary = summary(m, (3, 416, 416))
@@ -158,13 +158,13 @@ if __name__ == "__main__":
         print("data/cache/summary.txt saved.")
 
     # 调用摄像头
-    if str.__contains__(str.lower(mode), "c"):
+    elif str.lower(mode) == "c":
         yolo = Yolo()
         time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
         yolo.detect_video(0, time_str)
 
     # 启动后端服务器，监听2475号端口
-    if mode == "":
+    else:
         yolo = Yolo()
         # 清空训练缓存
         shutil.rmtree("data/cache/loss", ignore_errors=True)
@@ -174,5 +174,5 @@ if __name__ == "__main__":
         # 清空视频缓存
         shutil.rmtree("data/cache/video", ignore_errors=True)
         os.makedirs("data/cache/video/out", exist_ok=True)
-        #局域网访问
+        # 局域网访问
         uvicorn.run(app, host="0.0.0.0", port=2475, workers=0)
