@@ -1,3 +1,4 @@
+import glob
 import os
 import shutil
 from datetime import datetime
@@ -15,21 +16,19 @@ from thop import clever_format, profile
 from tqdm import tqdm
 
 from model import Yolo, YoloBody
-from utils import avg_iou, get_classes, get_map, k_means, load_data, summary
+from utils import avg_iou, get_classes, get_map, get_txt, k_means, summary
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
                    allow_headers=["*"])
 
 
-# 响应检测图像、model.onnx、model.pth、summary.txt
 @app.get("/data/{file_path:path}")
 async def data(file_path):
     filename = file_path.rsplit("/", 1)[-1]
     return FileResponse(f"data/{file_path}", filename=filename)
 
 
-# 请求图像、视频
 @app.post("/file")
 async def image(file: UploadFile):
     if file is None:
@@ -57,32 +56,56 @@ async def image(file: UploadFile):
 
 
 if __name__ == "__main__":
-    mode = input("Input d as directory, f as fps, k as k-means, m as map, o as onnx, s as summary, c as camera: ")
-    # 目录检测
-    if str.__contains__(str.lower(mode), "d"):
+    mode = input("Input mode(app, directory, fps, k-means, map, onnx, summary, camera): ")
+
+    if mode == "app":
+        yolo = Yolo()
+        shutil.rmtree("data/cache/loss", ignore_errors=True)
+        shutil.rmtree("data/cache/image", ignore_errors=True)
+        os.makedirs("data/cache/image/out", exist_ok=True)
+        shutil.rmtree("data/cache/video", ignore_errors=True)
+        os.makedirs("data/cache/video/out", exist_ok=True)
+        uvicorn.run(app, host="0.0.0.0", port=2475, workers=0)
+
+    elif mode == "camera":
+        yolo = Yolo()
+        time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
+        yolo.detect_video(0, time_str)
+
+    elif mode == "directory":
         yolo = Yolo()
         image_dir = input("Input directory path: ")
         image_names = os.listdir(image_dir)
         for image_name in tqdm(image_names):
-            if not image_name.lower().endswith(
-                    [".bmp", ".dib", ".png", ".jpg", ".jpeg", ".pbm", ".pgm", ".ppm", ".tif", ".tiff"]):
+            if not image_name.lower().endswith(["jpeg", "jpg", "png"]):
                 continue
             image = yolo.detect_image(os.path.join(image_dir, image_name))
             os.makedirs("data/cache/image/out", exist_ok=True)
             image.save(f"data/cache/image/out/{image_name.rsplit('.', 1)[0]}.png", quality=95, subsampling=0)
 
-    # fps检测
-    if str.lower(mode) == "f":
+    elif mode == "fps":
         yolo = Yolo()
         fps_image_path = input("Input image path: ")
         image = Image.open(fps_image_path)
         tact_time = yolo.get_fps(image, test_interval=100)
         print(str(tact_time) + " seconds; " + str(1 / tact_time) + " fps; @batch_size 1")
 
-    # 得到data/cache/anchors.txt、data/cache/k-means.jpg
-    elif str.lower(mode) == "k":
+    elif mode == "k-means":
         np.random.seed(0)
-        data = load_data()
+        data = []
+        for xml_file in tqdm(glob.glob("data/VOC/Annotations/*xml")):
+            tree = ElementTree.parse(xml_file)
+            height = int(tree.findtext("./size/height"))
+            width = int(tree.findtext("./size/width"))
+            if height <= 0 or width <= 0:
+                continue
+            for obj in tree.iter("object"):
+                x_min = np.float64(int(float(obj.findtext("bndbox/xmin"))) / width)
+                y_min = np.float64(int(float(obj.findtext("bndbox/ymin"))) / height)
+                x_max = np.float64(int(float(obj.findtext("bndbox/xmax"))) / width)
+                y_max = np.float64(int(float(obj.findtext("bndbox/ymax"))) / height)
+                data.append([x_max - x_min, y_max - y_min])
+        data = np.array(data)
         cluster, near = k_means(data, 9)
         data = data * np.array([416, 416])
         cluster = cluster * np.array([416, 416])
@@ -105,12 +128,13 @@ if __name__ == "__main__":
             f.write(xy)
         f.close()
 
-    # 得到data/cache/map
-    elif str.lower(mode) == "m":
+    elif mode == "map":
+        seed = int(input("Input a seed: "))
+        get_txt(seed, 0.9, 0.9)
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-truth", exist_ok=True)
         os.makedirs("data/cache/map/result", exist_ok=True)
-        class_names, _ = get_classes()
+        class_names, _ = get_classes("data/classes.txt")
         yolo = Yolo(confidence=0.001, nms_iou=0.5)
         for image_id in tqdm(image_ids):
             image = Image.open(f"data/VOC/JPEGImages/{image_id}.jpg")
@@ -137,13 +161,11 @@ if __name__ == "__main__":
                         new_f.write(f"{obj_name} {left} {top} {right} {bottom}\n")
         get_map(0.5, 0.5)
 
-    # 得到data/cache/model.onnx
-    elif str.lower(mode) == "o":
+    elif mode == "onnx":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
-    # 得到data/cache/summary.txt
-    elif str.lower(mode) == "s":
+    elif mode == "summary":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         m = YoloBody(80).to(device)
         model_summary = summary(m, (3, 416, 416))
@@ -157,22 +179,5 @@ if __name__ == "__main__":
         sum_txt.close()
         print("data/cache/summary.txt saved.")
 
-    # 调用摄像头
-    elif str.lower(mode) == "c":
-        yolo = Yolo()
-        time_str = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
-        yolo.detect_video(0, time_str)
-
-    # 启动后端服务器，监听2475号端口
     else:
-        yolo = Yolo()
-        # 清空训练缓存
-        shutil.rmtree("data/cache/loss", ignore_errors=True)
-        # 清空图像缓存
-        shutil.rmtree("data/cache/image", ignore_errors=True)
-        os.makedirs("data/cache/image/out", exist_ok=True)
-        # 清空视频缓存
-        shutil.rmtree("data/cache/video", ignore_errors=True)
-        os.makedirs("data/cache/video/out", exist_ok=True)
-        # 局域网访问
-        uvicorn.run(app, host="0.0.0.0", port=2475, workers=0)
+        print("mode error.")

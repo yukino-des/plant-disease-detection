@@ -7,7 +7,7 @@ import random
 import shutil
 from collections import OrderedDict
 from functools import partial
-from xml.etree import ElementTree as et
+from xml.etree import ElementTree
 
 import matplotlib
 import numpy as np
@@ -75,7 +75,6 @@ def conv_dw(filter_in, filter_out, stride=1):
         nn.ReLU6(inplace=True))  # ReLU6激活
 
 
-# 将输入图像转换为3通道RGB图像
 def cvt_color(image):
     if len(np.shape(image)) != 3 or np.shape(image)[2] != 3:
         image = image.convert("RGB")
@@ -189,24 +188,21 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
     torch.save(model.state_dict(), "data/cache/loss/current.pth")
 
 
-# 获得先验框
-def get_anchors():
-    with open("data/anchors.txt", encoding="utf-8") as f:
+def get_anchors(anchors_txt):
+    with open(anchors_txt, encoding="utf-8") as f:
         anchors = f.readline()
     anchors = [float(x) for x in anchors.split(",")]
     anchors = np.array(anchors).reshape(-1, 2)
     return anchors, len(anchors)
 
 
-# 获得类名
-def get_classes():
-    with open("data/classes.txt", encoding="utf-8") as f:
+def get_classes(classes_txt):
+    with open(classes_txt, encoding="utf-8") as f:
         class_names = f.readlines()
     class_names = [c.strip() for c in class_names]
     return class_names, len(class_names)
 
 
-# 获得学习率
 def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group["lr"]
@@ -509,7 +505,7 @@ def get_map(min_overlap, score_threshold):
 
 def get_txt(seed, train_val_percent, train_percent):
     random.seed(seed)
-    classes, _ = get_classes()
+    classes, _ = get_classes("data/classes.txt")
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
     temp_xml = os.listdir("data/VOC/Annotations")
@@ -546,7 +542,7 @@ def get_txt(seed, train_val_percent, train_percent):
         for image_id in image_ids:
             list_file.write(f"data/VOC/JPEGImages/{image_id}.jpg")
             in_file = open(f"data/VOC/Annotations/{image_id}.xml", encoding="utf-8")
-            tree = et.parse(in_file)
+            tree = ElementTree.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
                 difficult = 0
@@ -601,23 +597,6 @@ def k_means(box, k):
     return cluster, near
 
 
-def load_data():
-    data = []
-    for xml_file in tqdm(glob.glob("data/VOC/Annotations/*xml")):
-        tree = et.parse(xml_file)
-        height = int(tree.findtext("./size/height"))
-        width = int(tree.findtext("./size/width"))
-        if height <= 0 or width <= 0:
-            continue
-        for obj in tree.iter("object"):
-            x_min = np.float64(int(float(obj.findtext("bndbox/xmin"))) / width)
-            y_min = np.float64(int(float(obj.findtext("bndbox/ymin"))) / height)
-            x_max = np.float64(int(float(obj.findtext("bndbox/xmax"))) / width)
-            y_max = np.float64(int(float(obj.findtext("bndbox/ymax"))) / height)
-            data.append([x_max - x_min, y_max - y_min])
-    return np.array(data)
-
-
 def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     if precision.size == 0:
         log_avg_miss_rate = 0
@@ -636,6 +615,7 @@ def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     return log_avg_miss_rate, mr, false_pos_per_image
 
 
+# Logistic分类器
 def logistic(x):
     if np.all(x >= 0):
         return 1.0 / (1 + np.exp(-x))
@@ -681,7 +661,6 @@ def print_table(table_data, col_widths):
     print("-" * (sum(col_widths) + 7))
 
 
-# 调整输入图像尺寸
 def resize_image(image, size):
     w, h = size
     new_image = image.resize((w, h), Image.BICUBIC)

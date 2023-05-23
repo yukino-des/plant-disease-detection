@@ -11,9 +11,9 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
                    weights_init, yolo_dataset_collate)
 
 if __name__ == "__main__":
-    # 如果训练中断，请修改：model_path = "data/cache/loss/current.pth"
+    # 如果训练中断，请修改model_path = "data/cache/loss/current.pth"
     model_path = "data/pretrain.pth"
-    # 如果训练中断，请修改：init_epoch = 已训练的epoch数量
+    # 如果训练中断，请修改init_epoch = 已训练的epoch数
     init_epoch = 0
     get_txt(0, 0.9, 0.9)
     lr_decay_type = "cos"  # "step"
@@ -27,10 +27,9 @@ if __name__ == "__main__":
     optimizer_type, freeze_train, epoch, init_lr, weight_decay = "adam", True, 100, 1e-3, 0
     # 多线程训练
     num_workers = 2  # 4
-    # cpu训练或gpu训练
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    class_names, num_classes = get_classes()
-    anchors, num_anchors = get_anchors()
+    class_names, num_classes = get_classes("data/classes.txt")
+    anchors, num_anchors = get_anchors("data/anchors.txt")
     model = YoloBody(num_classes)
     weights_init(model)
     model_dict = model.state_dict()

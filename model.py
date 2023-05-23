@@ -25,10 +25,6 @@ class Backbone(nn.Module):
     def __init__(self):
         super(Backbone, self).__init__()
         model = MobileNetV2()
-        # state_dict = load_state_dict_from_url(
-        #     url="https://download.pytorch.org/models/mobilenet_v2-b0353104.pth",
-        #     model_dir="data", progress=True)
-        # model.load_state_dict(state_dict)
         self.model = model
 
     def forward(self, x):
@@ -274,14 +270,14 @@ class Spp(nn.Module):
 
 
 # 上采样
-class UpSample(nn.Module):
+class Upsample(nn.Module):
     def __init__(self, in_channels, out_channels):
-        super(UpSample, self).__init__()
-        self.up_sample = nn.Sequential(conv2d(in_channels, out_channels, 1),
-                                       nn.Upsample(scale_factor=2, mode="nearest"))
+        super(Upsample, self).__init__()
+        self.upsample = nn.Sequential(conv2d(in_channels, out_channels, 1),
+                                      nn.Upsample(scale_factor=2, mode="nearest"))
 
     def forward(self, x):
-        return self.up_sample(x)
+        return self.upsample(x)
 
 
 class Yolo(object):
@@ -289,8 +285,8 @@ class Yolo(object):
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.confidence = confidence
         self.nms_iou = nms_iou
-        self.class_names, self.num_classes = get_classes()
-        self.anchors, self.num_anchors = get_anchors()
+        self.class_names, self.num_classes = get_classes("data/classes_zh.txt")
+        self.anchors, self.num_anchors = get_anchors("data/anchors.txt")
         self.bbox_util = DecodeBox(self.anchors, self.num_classes)
         hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
         self.colors = list(map(lambda x: colorsys.hsv_to_rgb(*x), hsv_tuples))
@@ -564,17 +560,17 @@ class YoloBody(nn.Module):
         self.conv1 = make3conv([512, 1024], in_filters[2])
         self.spp = Spp()
         self.conv2 = make3conv([512, 1024], 2048)
-        self.up_sample1 = UpSample(512, 256)
+        self.upsample1 = Upsample(512, 256)
         self.conv_for_p4 = conv2d(in_filters[1], 256, 1)
         self.make5conv1 = make5conv([256, 512], 512)
-        self.up_sample2 = UpSample(256, 128)
+        self.upsample2 = Upsample(256, 128)
         self.conv_for_p3 = conv2d(in_filters[0], 128, 1)
         self.make5conv2 = make5conv([128, 256], 256)
         self.yolo_head3 = yolo_head([256, len(anchors_mask[0]) * (5 + num_classes)], 128)
-        self.down_sample1 = conv_dw(128, 256, stride=2)
+        self.downsample1 = conv_dw(128, 256, stride=2)
         self.make5conv3 = make5conv([256, 512], 512)
         self.yolo_head2 = yolo_head([512, len(anchors_mask[1]) * (5 + num_classes)], 256)
-        self.down_sample2 = conv_dw(256, 512, stride=2)
+        self.downsample2 = conv_dw(256, 512, stride=2)
         self.make5conv4 = make5conv([512, 1024], 1024)
         self.yolo_head1 = yolo_head([1024, len(anchors_mask[2]) * (5 + num_classes)], 512)
 
@@ -583,19 +579,19 @@ class YoloBody(nn.Module):
         p5 = self.conv1(x0)
         p5 = self.spp(p5)
         p5 = self.conv2(p5)
-        p5_up_sample = self.up_sample1(p5)
+        p5_upsample = self.upsample1(p5)
         p4 = self.conv_for_p4(x1)
-        p4 = torch.cat([p4, p5_up_sample], dim=1)
+        p4 = torch.cat([p4, p5_upsample], dim=1)
         p4 = self.make5conv1(p4)
-        p4_up_sample = self.up_sample2(p4)
+        p4_upsample = self.upsample2(p4)
         p3 = self.conv_for_p3(x2)
-        p3 = torch.cat([p3, p4_up_sample], dim=1)
+        p3 = torch.cat([p3, p4_upsample], dim=1)
         p3 = self.make5conv2(p3)
-        p3_down_sample = self.down_sample1(p3)
-        p4 = torch.cat([p3_down_sample, p4], dim=1)
+        p3_downsample = self.downsample1(p3)
+        p4 = torch.cat([p3_downsample, p4], dim=1)
         p4 = self.make5conv3(p4)
-        p4_down_sample = self.down_sample2(p4)
-        p5 = torch.cat([p4_down_sample, p5], dim=1)
+        p4_downsample = self.downsample2(p4)
+        p5 = torch.cat([p4_downsample, p5], dim=1)
         p5 = self.make5conv4(p5)
         out2 = self.yolo_head3(p3)
         out1 = self.yolo_head2(p4)
