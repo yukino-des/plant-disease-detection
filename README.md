@@ -1,6 +1,6 @@
 # 农业病害检测
 
-### 1. 依赖
+### 1. 下载依赖
 
 ```shell
 cd plant-disease-detection
@@ -8,19 +8,14 @@ pip install -r requirements.txt
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 ```
 
-### 2. 训练
+### 2. 训练、预测
 
 ```shell
 python train.py
-```
-
-### 3. 预测
-
-```shell
 python app.py
 ```
 
-### 4. 附录
+### 3. 附录
 
 ##### 调整的PlantDoc数据集
 
