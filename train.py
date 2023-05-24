@@ -55,12 +55,7 @@ if __name__ == "__main__":
         val_lines = f.readlines()
     num_train = len(train_lines)
     num_val = len(val_lines)
-    print_config(classes_path="data/classes.txt",
-                 anchors_path="data/anchors.txt",
-                 save_dir="data/cache",
-                 anchors_mask=[[6, 7, 8], [3, 4, 5], [0, 1, 2]],
-                 model_path=model_path,  # ["", "data/cache/loss/current.pth"]
-                 input_shape=[416, 416],  # [416, 416]
+    print_config(model_path=model_path,  # ["", "data/cache/loss/current.pth"]
                  init_epoch=init_epoch,  # [0, ...]
                  epoch=epoch,  # [300, 500]
                  freeze_train=freeze_train,
