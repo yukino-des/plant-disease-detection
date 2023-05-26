@@ -94,7 +94,7 @@ if __name__ == "__main__":
     elif mode == "k-means":
         np.random.seed(0)
         data = []
-        for xml_file in tqdm(glob.glob("data/VOC/Annotations/*xml")):
+        for xml_file in tqdm(glob.glob("data/VOCdevkit/VOC2007/Annotations/*xml")):
             tree = ElementTree.parse(xml_file)
             height = int(tree.findtext("./size/height"))
             width = int(tree.findtext("./size/width"))
@@ -131,16 +131,16 @@ if __name__ == "__main__":
 
     elif mode == "map":
         get_txt(0, 0.9, 0.9)
-        image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
+        image_ids = open("data/VOCdevkit/VOC2007/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-truth", exist_ok=True)
         os.makedirs("data/cache/map/result", exist_ok=True)
         class_names, _ = get_classes("data/classes.txt")
         yolo = Yolo(confidence=0.001, nms_iou=0.5)
         for image_id in tqdm(image_ids):
-            image = Image.open(f"data/VOC/JPEGImages/{image_id}.jpg")
+            image = Image.open(f"data/VOCdevkit/VOC2007/JPEGImages/{image_id}.jpg")
             yolo.get_map_txt(image_id, image, class_names)
             with open(f"data/cache/map/ground-truth/{image_id}.txt", "w") as new_f:
-                root = ElementTree.parse(f"data/VOC/Annotations/{image_id}.xml").getroot()
+                root = ElementTree.parse(f"data/VOCdevkit/VOC2007/Annotations/{image_id}.xml").getroot()
                 for obj in root.findall("object"):
                     difficult_flag = False
                     if obj.find("difficult") is not None:

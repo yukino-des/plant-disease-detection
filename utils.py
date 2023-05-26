@@ -508,7 +508,7 @@ def get_txt(seed, train_val_percent, train_percent):
     classes, _ = get_classes("data/classes.txt")
     photo_nums = np.zeros(2)
     nums = np.zeros(len(classes))
-    temp_xml = os.listdir("data/VOC/Annotations")
+    temp_xml = os.listdir("data/VOCdevkit/VOC2007/Annotations")
     total_xml = []
     for xml in temp_xml:
         if xml.endswith(".xml"):
@@ -519,11 +519,11 @@ def get_txt(seed, train_val_percent, train_percent):
     tr = int(tv * train_percent)
     train_val = random.sample(num_list, tv)
     train = random.sample(train_val, tr)
-    os.makedirs("data/VOC/ImageSets/Main", exist_ok=True)
-    train_val_txt = open("data/VOC/ImageSets/Main/trainval.txt", "w")
-    test_txt = open("data/VOC/ImageSets/Main/test.txt", "w")
-    train_txt = open("data/VOC/ImageSets/Main/train.txt", "w")
-    val_txt = open("data/VOC/ImageSets/Main/val.txt", "w")
+    os.makedirs("data/VOCdevkit/VOC2007/ImageSets/Main", exist_ok=True)
+    train_val_txt = open("data/VOCdevkit/VOC2007/ImageSets/Main/trainval.txt", "w")
+    test_txt = open("data/VOCdevkit/VOC2007/ImageSets/Main/test.txt", "w")
+    train_txt = open("data/VOCdevkit/VOC2007/ImageSets/Main/train.txt", "w")
+    val_txt = open("data/VOCdevkit/VOC2007/ImageSets/Main/val.txt", "w")
     for i in num_list:
         name = total_xml[i][:-4] + "\n"
         if i in train_val:
@@ -537,11 +537,11 @@ def get_txt(seed, train_val_percent, train_percent):
     test_txt.close()
     type_index = 0
     for image_set in ["train", "val"]:
-        image_ids = open(f"data/VOC/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
+        image_ids = open(f"data/VOCdevkit/VOC2007/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
         list_file = open(f"data/{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
-            list_file.write(f"data/VOC/JPEGImages/{image_id}.jpg")
-            in_file = open(f"data/VOC/Annotations/{image_id}.xml", encoding="utf-8")
+            list_file.write(f"data/VOCdevkit/VOC2007/JPEGImages/{image_id}.jpg")
+            in_file = open(f"data/VOCdevkit/VOC2007/Annotations/{image_id}.xml", encoding="utf-8")
             tree = ElementTree.parse(in_file)
             root = tree.getroot()
             for obj in root.iter("object"):
