@@ -15,11 +15,7 @@ python train.py
 python app.py
 ```
 
-### 3. 附录
-
-##### 调整的PlantDoc数据集
-
-classes.txt
+### 调整后的PlantDoc数据集
 
 ```text
 apple leaf
@@ -51,11 +47,9 @@ tomato mold leaf
 tomato septoria leaf spot
 ```
 
-##### MS COCO数据集
+### Pascal VOC 2007数据集
 
-classes.txt
-
-```
+```text
 aeroplane
 bicycle
 bird
