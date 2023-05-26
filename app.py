@@ -13,10 +13,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from matplotlib import pyplot as plt
 from starlette.responses import FileResponse, JSONResponse
 from thop import clever_format, profile
+from torchsummary import summary
 from tqdm import tqdm
 
-from model import Yolo, YoloBody
-from utils import avg_iou, get_classes, get_map, get_txt, k_means, summary
+from model import Yolo, YoloBody, MobileNetV2
+from utils import avg_iou, get_classes, get_map, get_txt, k_means
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"],
@@ -56,7 +57,7 @@ async def image(file: UploadFile):
 
 
 if __name__ == "__main__":
-    mode = input("Input mode(app, directory, fps, k-means, map, onnx, summary, camera): ")
+    mode = input("Input mode(app, directory, fps, k-means, map, onnx, backbone, summary, camera): ")
 
     if mode == "app":
         yolo = Yolo()
@@ -129,8 +130,7 @@ if __name__ == "__main__":
         f.close()
 
     elif mode == "map":
-        seed = int(input("Input a seed: "))
-        get_txt(seed, 0.9, 0.9)
+        get_txt(0, 0.9, 0.9)
         image_ids = open("data/VOC/ImageSets/Main/test.txt").read().strip().split()
         os.makedirs("data/cache/map/ground-truth", exist_ok=True)
         os.makedirs("data/cache/map/result", exist_ok=True)
@@ -165,19 +165,19 @@ if __name__ == "__main__":
         yolo = Yolo()
         yolo.convert_to_onnx(simplify=False)
 
+    elif mode == "backbone":
+        model = MobileNetV2()
+        summary(model, (3, 416, 416))
+
     elif mode == "summary":
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        m = YoloBody(80).to(device)
-        model_summary = summary(m, (3, 416, 416))
+        m = YoloBody(27).to(device)
+        summary(m, (3, 416, 416))
         dummy_input = torch.randn(1, 3, 416, 416).to(device)
         flops, params = profile(m.to(device), (dummy_input,), verbose=False)
         flops = flops * 2
         flops, params = clever_format([flops, params], "%.3f")
-        model_summary += f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}"
-        sum_txt = open("data/cache/summary.txt", "w")
-        sum_txt.write(model_summary)
-        sum_txt.close()
-        print("data/cache/summary.txt saved.")
+        print(f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}")
 
     else:
         print("mode error.")

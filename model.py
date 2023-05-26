@@ -28,10 +28,10 @@ class Backbone(nn.Module):
         self.model = model
 
     def forward(self, x):
-        out0 = self.model.features[:7](x)
-        out1 = self.model.features[7:14](out0)
-        out2 = self.model.features[14:18](out1)
-        return out0, out1, out2
+        out3 = self.model.features[:7](x)
+        out4 = self.model.features[7:14](out3)
+        out5 = self.model.features[14:18](out4)
+        return out3, out4, out5
 
 
 class ConvBNReLU(nn.Sequential):
@@ -285,7 +285,7 @@ class Yolo(object):
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
         self.confidence = confidence
         self.nms_iou = nms_iou
-        self.class_names, self.num_classes = get_classes("data/classes_zh.txt")
+        self.class_names, self.num_classes = get_classes("data/classes.txt")
         self.anchors, self.num_anchors = get_anchors("data/anchors.txt")
         self.bbox_util = DecodeBox(self.anchors, self.num_classes)
         hsv_tuples = [(x / self.num_classes, 1., 1.) for x in range(self.num_classes)]
@@ -618,7 +618,6 @@ class YoloDataset(Dataset):
     def __len__(self):
         return self.length
 
-    # 训练时进行数据增强，验证时不进行数据增强
     def __getitem__(self, index):
         index = index % self.length
         if self.mosaic and self.rand() < self.mosaic_prob and self.epoch_now < (
@@ -717,7 +716,7 @@ class YoloDataset(Dataset):
             new_image = Image.new("RGB", (w, h), (128, 128, 128))
             new_image.paste(image, (dx, dy))
             image_data = np.array(new_image, np.float32)
-            if len(box) > 0:  # 调整真实框
+            if len(box) > 0:
                 np.random.shuffle(box)
                 box[:, [0, 2]] = box[:, [0, 2]] * nw / iw + dx
                 box[:, [1, 3]] = box[:, [1, 3]] * nh / ih + dy
@@ -726,7 +725,7 @@ class YoloDataset(Dataset):
                 box[:, 3][box[:, 3] > h] = h
                 box_w = box[:, 2] - box[:, 0]
                 box_h = box[:, 3] - box[:, 1]
-                box = box[np.logical_and(box_w > 1, box_h > 1)]  # 丢弃无效框
+                box = box[np.logical_and(box_w > 1, box_h > 1)]
             return image_data, box
         new_ar = iw / ih * self.rand(1 - jitter, 1 + jitter) / self.rand(1 - jitter, 1 + jitter)
         scale = self.rand(0.25, 2)

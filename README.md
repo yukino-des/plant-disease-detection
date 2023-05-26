@@ -49,7 +49,6 @@ tomato leaf mosaic virus
 tomato leaf yellow virus
 tomato mold leaf
 tomato septoria leaf spot
-
 ```
 
 ##### MS COCO数据集
