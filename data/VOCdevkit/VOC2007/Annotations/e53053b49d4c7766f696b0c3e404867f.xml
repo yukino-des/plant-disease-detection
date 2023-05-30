@@ -1,0 +1,105 @@
+<annotation>
+    <folder/>
+    <filename>e53053b49d4c7766f696b0c3e404867f.jpg</filename>
+    <path>e53053b49d4c7766f696b0c3e404867f.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>64</xmin>
+            <xmax>174</xmax>
+            <ymin>3</ymin>
+            <ymax>185</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>192</xmin>
+            <xmax>274</xmax>
+            <ymin>14</ymin>
+            <ymax>193</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>106</xmin>
+            <xmax>223</xmax>
+            <ymin>181</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>1</xmin>
+            <xmax>133</xmax>
+            <ymin>177</ymin>
+            <ymax>334</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>257</xmin>
+            <xmax>310</xmax>
+            <ymin>195</ymin>
+            <ymax>349</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>251</xmin>
+            <xmax>357</xmax>
+            <ymin>20</ymin>
+            <ymax>135</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>358</xmin>
+            <xmax>414</xmax>
+            <ymin>94</ymin>
+            <ymax>179</ymax>
+        </bndbox>
+    </object>
+</annotation>

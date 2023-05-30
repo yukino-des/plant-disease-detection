@@ -1,0 +1,79 @@
+<annotation>
+    <folder/>
+    <filename>acbcde0ac3d71e6ecdf667a7f65a4ba8.jpg</filename>
+    <path>acbcde0ac3d71e6ecdf667a7f65a4ba8.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>bell pepper leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>128</xmin>
+            <xmax>206</xmax>
+            <ymin>230</ymin>
+            <ymax>408</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>236</xmin>
+            <xmax>335</xmax>
+            <ymin>189</ymin>
+            <ymax>277</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>259</xmin>
+            <xmax>311</xmax>
+            <ymin>117</ymin>
+            <ymax>158</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>291</xmin>
+            <xmax>345</xmax>
+            <ymin>264</ymin>
+            <ymax>392</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>176</xmin>
+            <xmax>225</xmax>
+            <ymin>87</ymin>
+            <ymax>109</ymax>
+        </bndbox>
+    </object>
+</annotation>

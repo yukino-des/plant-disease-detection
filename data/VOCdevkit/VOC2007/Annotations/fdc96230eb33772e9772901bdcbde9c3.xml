@@ -1,0 +1,40 @@
+<annotation>
+    <folder/>
+    <filename>fdc96230eb33772e9772901bdcbde9c3.jpg</filename>
+    <path>fdc96230eb33772e9772901bdcbde9c3.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>42</xmin>
+            <xmax>201</xmax>
+            <ymin>67</ymin>
+            <ymax>384</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>204</xmin>
+            <xmax>358</xmax>
+            <ymin>55</ymin>
+            <ymax>383</ymax>
+        </bndbox>
+    </object>
+</annotation>

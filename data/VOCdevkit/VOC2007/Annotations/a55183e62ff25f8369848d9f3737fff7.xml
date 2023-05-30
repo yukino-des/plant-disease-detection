@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>a55183e62ff25f8369848d9f3737fff7.jpg</filename>
+    <path>a55183e62ff25f8369848d9f3737fff7.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>16</xmin>
+            <xmax>144</xmax>
+            <ymin>2</ymin>
+            <ymax>164</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>51</xmin>
+            <xmax>231</xmax>
+            <ymin>191</ymin>
+            <ymax>383</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>240</xmin>
+            <xmax>343</xmax>
+            <ymin>178</ymin>
+            <ymax>261</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>265</xmin>
+            <xmax>415</xmax>
+            <ymin>19</ymin>
+            <ymax>239</ymax>
+        </bndbox>
+    </object>
+</annotation>

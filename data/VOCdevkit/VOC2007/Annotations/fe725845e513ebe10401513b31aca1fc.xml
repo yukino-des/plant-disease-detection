@@ -1,0 +1,79 @@
+<annotation>
+    <folder/>
+    <filename>fe725845e513ebe10401513b31aca1fc.jpg</filename>
+    <path>fe725845e513ebe10401513b31aca1fc.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>18</xmin>
+            <xmax>155</xmax>
+            <ymin>66</ymin>
+            <ymax>169</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>221</xmin>
+            <xmax>400</xmax>
+            <ymin>61</ymin>
+            <ymax>163</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>18</xmin>
+            <xmax>200</xmax>
+            <ymin>244</ymin>
+            <ymax>337</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>213</xmin>
+            <xmax>413</xmax>
+            <ymin>229</ymin>
+            <ymax>341</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>128</xmin>
+            <xmax>267</xmax>
+            <ymin>26</ymin>
+            <ymax>254</ymax>
+        </bndbox>
+    </object>
+</annotation>

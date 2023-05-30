@@ -1,0 +1,105 @@
+<annotation>
+    <folder/>
+    <filename>83553543f229d8197095ba5cd7032a18.jpg</filename>
+    <path>83553543f229d8197095ba5cd7032a18.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>109</xmin>
+            <xmax>150</xmax>
+            <ymin>353</ymin>
+            <ymax>396</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>86</xmin>
+            <xmax>146</xmax>
+            <ymin>285</ymin>
+            <ymax>313</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>160</xmin>
+            <xmax>201</xmax>
+            <ymin>348</ymin>
+            <ymax>380</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>220</xmin>
+            <xmax>265</xmax>
+            <ymin>182</ymin>
+            <ymax>221</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>136</xmin>
+            <xmax>193</xmax>
+            <ymin>188</ymin>
+            <ymax>238</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>57</xmin>
+            <xmax>103</xmax>
+            <ymin>119</ymin>
+            <ymax>171</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>295</xmin>
+            <xmax>340</xmax>
+            <ymin>133</ymin>
+            <ymax>183</ymax>
+        </bndbox>
+    </object>
+</annotation>

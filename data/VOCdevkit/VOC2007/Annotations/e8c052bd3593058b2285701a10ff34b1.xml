@@ -1,0 +1,53 @@
+<annotation>
+    <folder/>
+    <filename>e8c052bd3593058b2285701a10ff34b1.jpg</filename>
+    <path>e8c052bd3593058b2285701a10ff34b1.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>106</xmin>
+            <xmax>257</xmax>
+            <ymin>118</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>195</xmin>
+            <xmax>411</xmax>
+            <ymin>11</ymin>
+            <ymax>173</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>15</xmin>
+            <xmax>197</xmax>
+            <ymin>52</ymin>
+            <ymax>251</ymax>
+        </bndbox>
+    </object>
+</annotation>

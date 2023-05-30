@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>ced831e206389b52affba834af7e8e76.jpg</filename>
+    <path>ced831e206389b52affba834af7e8e76.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>80</xmin>
+            <xmax>239</xmax>
+            <ymin>212</ymin>
+            <ymax>275</ymax>
+        </bndbox>
+    </object>
+</annotation>

@@ -1,0 +1,79 @@
+<annotation>
+    <folder/>
+    <filename>e4d776c39408f45c913e0d21b925f676.jpg</filename>
+    <path>e4d776c39408f45c913e0d21b925f676.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>166</xmin>
+            <xmax>263</xmax>
+            <ymin>13</ymin>
+            <ymax>141</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>104</xmin>
+            <xmax>218</xmax>
+            <ymin>92</ymin>
+            <ymax>208</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>215</xmin>
+            <xmax>346</xmax>
+            <ymin>82</ymin>
+            <ymax>206</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>225</xmin>
+            <xmax>370</xmax>
+            <ymin>179</ymin>
+            <ymax>290</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>51</xmin>
+            <xmax>203</xmax>
+            <ymin>160</ymin>
+            <ymax>281</ymax>
+        </bndbox>
+    </object>
+</annotation>

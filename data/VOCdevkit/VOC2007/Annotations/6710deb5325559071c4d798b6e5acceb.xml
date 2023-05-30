@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>6710deb5325559071c4d798b6e5acceb.jpg</filename>
+    <path>6710deb5325559071c4d798b6e5acceb.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>cherry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>34</xmin>
+            <xmax>169</xmax>
+            <ymin>67</ymin>
+            <ymax>312</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>cherry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>91</xmin>
+            <xmax>218</xmax>
+            <ymin>199</ymin>
+            <ymax>390</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>cherry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>231</xmin>
+            <xmax>360</xmax>
+            <ymin>114</ymin>
+            <ymax>324</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>cherry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>171</xmin>
+            <xmax>290</xmax>
+            <ymin>169</ymin>
+            <ymax>399</ymax>
+        </bndbox>
+    </object>
+</annotation>

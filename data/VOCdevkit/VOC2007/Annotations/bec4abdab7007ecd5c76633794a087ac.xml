@@ -1,0 +1,105 @@
+<annotation>
+    <folder/>
+    <filename>bec4abdab7007ecd5c76633794a087ac.jpg</filename>
+    <path>bec4abdab7007ecd5c76633794a087ac.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>198</xmin>
+            <xmax>298</xmax>
+            <ymin>116</ymin>
+            <ymax>221</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>144</xmin>
+            <xmax>262</xmax>
+            <ymin>199</ymin>
+            <ymax>309</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>218</xmin>
+            <xmax>334</xmax>
+            <ymin>272</ymin>
+            <ymax>402</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>46</xmin>
+            <xmax>112</xmax>
+            <ymin>288</ymin>
+            <ymax>410</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>198</xmin>
+            <xmax>276</xmax>
+            <ymin>62</ymin>
+            <ymax>137</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>86</xmin>
+            <xmax>138</xmax>
+            <ymin>16</ymin>
+            <ymax>86</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>131</xmin>
+            <xmax>205</xmax>
+            <ymin>44</ymin>
+            <ymax>130</ymax>
+        </bndbox>
+    </object>
+</annotation>

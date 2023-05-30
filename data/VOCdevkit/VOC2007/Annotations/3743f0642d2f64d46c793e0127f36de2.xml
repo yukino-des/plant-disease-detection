@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>3743f0642d2f64d46c793e0127f36de2.jpg</filename>
+    <path>3743f0642d2f64d46c793e0127f36de2.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>69</xmin>
+            <xmax>205</xmax>
+            <ymin>102</ymin>
+            <ymax>156</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>122</xmin>
+            <xmax>334</xmax>
+            <ymin>110</ymin>
+            <ymax>333</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>91</xmin>
+            <xmax>191</xmax>
+            <ymin>39</ymin>
+            <ymax>113</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>1</xmin>
+            <xmax>64</xmax>
+            <ymin>43</ymin>
+            <ymax>144</ymax>
+        </bndbox>
+    </object>
+</annotation>

@@ -1,0 +1,92 @@
+<annotation>
+    <folder/>
+    <filename>7faf3487bcb4389d09f9184e20c502ac.jpg</filename>
+    <path>7faf3487bcb4389d09f9184e20c502ac.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>235</xmin>
+            <xmax>361</xmax>
+            <ymin>214</ymin>
+            <ymax>366</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>266</xmin>
+            <xmax>411</xmax>
+            <ymin>132</ymin>
+            <ymax>207</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>124</xmin>
+            <xmax>266</xmax>
+            <ymin>155</ymin>
+            <ymax>245</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>110</xmin>
+            <xmax>190</xmax>
+            <ymin>122</ymin>
+            <ymax>204</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>179</xmin>
+            <xmax>245</xmax>
+            <ymin>108</ymin>
+            <ymax>161</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>107</xmin>
+            <xmax>202</xmax>
+            <ymin>67</ymin>
+            <ymax>125</ymax>
+        </bndbox>
+    </object>
+</annotation>

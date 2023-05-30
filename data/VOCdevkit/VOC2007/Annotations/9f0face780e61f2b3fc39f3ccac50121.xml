@@ -1,0 +1,40 @@
+<annotation>
+    <folder/>
+    <filename>9f0face780e61f2b3fc39f3ccac50121.jpg</filename>
+    <path>9f0face780e61f2b3fc39f3ccac50121.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>grape leaf black rot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>0</xmin>
+            <xmax>176</xmax>
+            <ymin>125</ymin>
+            <ymax>248</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf black rot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>254</xmin>
+            <xmax>362</xmax>
+            <ymin>255</ymin>
+            <ymax>398</ymax>
+        </bndbox>
+    </object>
+</annotation>

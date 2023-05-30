@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>e9f8f1d0627c62be84f69323ecd15dcb.jpg</filename>
+    <path>e9f8f1d0627c62be84f69323ecd15dcb.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>11</xmin>
+            <xmax>219</xmax>
+            <ymin>177</ymin>
+            <ymax>315</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>206</xmin>
+            <xmax>318</xmax>
+            <ymin>197</ymin>
+            <ymax>335</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>85</xmin>
+            <xmax>263</xmax>
+            <ymin>96</ymin>
+            <ymax>210</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>184</xmin>
+            <xmax>271</xmax>
+            <ymin>28</ymin>
+            <ymax>135</ymax>
+        </bndbox>
+    </object>
+</annotation>

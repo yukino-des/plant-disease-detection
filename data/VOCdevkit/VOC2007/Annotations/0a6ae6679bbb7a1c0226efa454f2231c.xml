@@ -1,0 +1,79 @@
+<annotation>
+    <folder/>
+    <filename>0a6ae6679bbb7a1c0226efa454f2231c.jpg</filename>
+    <path>0a6ae6679bbb7a1c0226efa454f2231c.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>145</xmin>
+            <xmax>289</xmax>
+            <ymin>99</ymin>
+            <ymax>319</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>275</xmin>
+            <xmax>415</xmax>
+            <ymin>100</ymin>
+            <ymax>332</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>170</xmin>
+            <xmax>281</xmax>
+            <ymin>1</ymin>
+            <ymax>115</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>14</xmin>
+            <xmax>99</xmax>
+            <ymin>35</ymin>
+            <ymax>197</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>77</xmin>
+            <xmax>159</xmax>
+            <ymin>158</ymin>
+            <ymax>287</ymax>
+        </bndbox>
+    </object>
+</annotation>

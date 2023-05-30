@@ -1,0 +1,105 @@
+<annotation>
+    <folder/>
+    <filename>b2d812dd805a4e7c779a348fa31fc316.jpg</filename>
+    <path>b2d812dd805a4e7c779a348fa31fc316.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>90</xmin>
+            <xmax>174</xmax>
+            <ymin>64</ymin>
+            <ymax>150</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>163</xmin>
+            <xmax>217</xmax>
+            <ymin>68</ymin>
+            <ymax>116</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>146</xmin>
+            <xmax>342</xmax>
+            <ymin>256</ymin>
+            <ymax>389</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>74</xmin>
+            <xmax>136</xmax>
+            <ymin>286</ymin>
+            <ymax>388</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>1</xmin>
+            <xmax>77</xmax>
+            <ymin>254</ymin>
+            <ymax>376</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>37</xmin>
+            <xmax>133</xmax>
+            <ymin>210</ymin>
+            <ymax>274</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>100</xmin>
+            <xmax>181</xmax>
+            <ymin>245</ymin>
+            <ymax>292</ymax>
+        </bndbox>
+    </object>
+</annotation>

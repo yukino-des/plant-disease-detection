@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>6eb4150458c808c5ad8aa9f6855325fd.jpg</filename>
+    <path>6eb4150458c808c5ad8aa9f6855325fd.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>22</xmin>
+            <xmax>213</xmax>
+            <ymin>1</ymin>
+            <ymax>352</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>231</xmin>
+            <xmax>337</xmax>
+            <ymin>1</ymin>
+            <ymax>176</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>214</xmin>
+            <xmax>351</xmax>
+            <ymin>139</ymin>
+            <ymax>398</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>squash powdery mildew leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>317</xmin>
+            <xmax>415</xmax>
+            <ymin>45</ymin>
+            <ymax>362</ymax>
+        </bndbox>
+    </object>
+</annotation>

@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>38ce06f464d130f59de448c1a5bc4df2.jpg</filename>
+    <path>38ce06f464d130f59de448c1a5bc4df2.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>246</xmin>
+            <xmax>405</xmax>
+            <ymin>179</ymin>
+            <ymax>358</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>282</xmin>
+            <xmax>415</xmax>
+            <ymin>136</ymin>
+            <ymax>243</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>254</xmin>
+            <xmax>374</xmax>
+            <ymin>1</ymin>
+            <ymax>163</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>1</xmin>
+            <xmax>67</xmax>
+            <ymin>249</ymin>
+            <ymax>368</ymax>
+        </bndbox>
+    </object>
+</annotation>

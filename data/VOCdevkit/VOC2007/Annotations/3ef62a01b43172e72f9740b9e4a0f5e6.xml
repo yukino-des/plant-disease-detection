@@ -1,0 +1,79 @@
+<annotation>
+    <folder/>
+    <filename>3ef62a01b43172e72f9740b9e4a0f5e6.jpg</filename>
+    <path>3ef62a01b43172e72f9740b9e4a0f5e6.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf bacterial spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>125</xmin>
+            <xmax>145</xmax>
+            <ymin>125</ymin>
+            <ymax>159</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf bacterial spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>92</xmin>
+            <xmax>110</xmax>
+            <ymin>160</ymin>
+            <ymax>208</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf bacterial spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>114</xmin>
+            <xmax>135</xmax>
+            <ymin>285</ymin>
+            <ymax>329</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf bacterial spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>72</xmin>
+            <xmax>89</xmax>
+            <ymin>230</ymin>
+            <ymax>265</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf bacterial spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>147</xmin>
+            <xmax>167</xmax>
+            <ymin>209</ymin>
+            <ymax>256</ymax>
+        </bndbox>
+    </object>
+</annotation>

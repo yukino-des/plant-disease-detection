@@ -1,0 +1,92 @@
+<annotation>
+    <folder/>
+    <filename>38ed1aa90f159fbbc4c9643c10c16447.jpg</filename>
+    <path>38ed1aa90f159fbbc4c9643c10c16447.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>133</xmin>
+            <xmax>308</xmax>
+            <ymin>128</ymin>
+            <ymax>246</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>134</xmin>
+            <xmax>184</xmax>
+            <ymin>67</ymin>
+            <ymax>177</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>270</xmin>
+            <xmax>349</xmax>
+            <ymin>315</ymin>
+            <ymax>388</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>277</xmin>
+            <xmax>357</xmax>
+            <ymin>236</ymin>
+            <ymax>306</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>161</xmin>
+            <xmax>239</xmax>
+            <ymin>244</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>30</xmin>
+            <xmax>121</xmax>
+            <ymin>129</ymin>
+            <ymax>204</ymax>
+        </bndbox>
+    </object>
+</annotation>

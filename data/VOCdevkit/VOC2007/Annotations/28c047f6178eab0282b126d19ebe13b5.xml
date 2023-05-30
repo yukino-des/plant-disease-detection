@@ -1,0 +1,92 @@
+<annotation>
+    <folder/>
+    <filename>28c047f6178eab0282b126d19ebe13b5.jpg</filename>
+    <path>28c047f6178eab0282b126d19ebe13b5.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>strawberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>9</xmin>
+            <xmax>165</xmax>
+            <ymin>42</ymin>
+            <ymax>214</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>strawberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>80</xmin>
+            <xmax>208</xmax>
+            <ymin>154</ymin>
+            <ymax>309</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>strawberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>162</xmin>
+            <xmax>233</xmax>
+            <ymin>1</ymin>
+            <ymax>162</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>strawberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>271</xmin>
+            <xmax>364</xmax>
+            <ymin>276</ymin>
+            <ymax>400</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>strawberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>180</xmin>
+            <xmax>280</xmax>
+            <ymin>261</ymin>
+            <ymax>407</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>strawberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>276</xmin>
+            <xmax>372</xmax>
+            <ymin>186</ymin>
+            <ymax>276</ymax>
+        </bndbox>
+    </object>
+</annotation>

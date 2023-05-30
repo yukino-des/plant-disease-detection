@@ -1,0 +1,92 @@
+<annotation>
+    <folder/>
+    <filename>6adb3f8d6fe6769df7065133b41de7b0.jpg</filename>
+    <path>6adb3f8d6fe6769df7065133b41de7b0.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>148</xmin>
+            <xmax>268</xmax>
+            <ymin>44</ymin>
+            <ymax>170</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>176</xmin>
+            <xmax>251</xmax>
+            <ymin>169</ymin>
+            <ymax>325</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>68</xmin>
+            <xmax>152</xmax>
+            <ymin>234</ymin>
+            <ymax>337</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>264</xmin>
+            <xmax>405</xmax>
+            <ymin>271</ymin>
+            <ymax>397</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>293</xmin>
+            <xmax>415</xmax>
+            <ymin>205</ymin>
+            <ymax>301</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>272</xmin>
+            <xmax>343</xmax>
+            <ymin>89</ymin>
+            <ymax>208</ymax>
+        </bndbox>
+    </object>
+</annotation>

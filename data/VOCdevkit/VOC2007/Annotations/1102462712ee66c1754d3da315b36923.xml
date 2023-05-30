@@ -1,0 +1,53 @@
+<annotation>
+    <folder/>
+    <filename>1102462712ee66c1754d3da315b36923.jpg</filename>
+    <path>1102462712ee66c1754d3da315b36923.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>161</xmin>
+            <xmax>300</xmax>
+            <ymin>188</ymin>
+            <ymax>344</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>209</xmin>
+            <xmax>342</xmax>
+            <ymin>2</ymin>
+            <ymax>126</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>apple leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>213</xmin>
+            <xmax>378</xmax>
+            <ymin>107</ymin>
+            <ymax>238</ymax>
+        </bndbox>
+    </object>
+</annotation>

@@ -1,0 +1,105 @@
+<annotation>
+    <folder/>
+    <filename>d09898502b10409a64439f9d119c74f1.jpg</filename>
+    <path>d09898502b10409a64439f9d119c74f1.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>299</xmin>
+            <xmax>401</xmax>
+            <ymin>55</ymin>
+            <ymax>172</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>209</xmin>
+            <xmax>311</xmax>
+            <ymin>1</ymin>
+            <ymax>164</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>135</xmin>
+            <xmax>245</xmax>
+            <ymin>39</ymin>
+            <ymax>173</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>47</xmin>
+            <xmax>164</xmax>
+            <ymin>116</ymin>
+            <ymax>212</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>149</xmin>
+            <xmax>367</xmax>
+            <ymin>263</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>38</xmin>
+            <xmax>220</xmax>
+            <ymin>217</ymin>
+            <ymax>393</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato mold leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>204</xmin>
+            <xmax>302</xmax>
+            <ymin>202</ymin>
+            <ymax>275</ymax>
+        </bndbox>
+    </object>
+</annotation>

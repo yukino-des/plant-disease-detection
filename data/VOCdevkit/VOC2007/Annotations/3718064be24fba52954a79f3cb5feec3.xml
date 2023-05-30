@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>3718064be24fba52954a79f3cb5feec3.jpg</filename>
+    <path>3718064be24fba52954a79f3cb5feec3.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>corn leaf blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>81</xmin>
+            <xmax>379</xmax>
+            <ymin>186</ymin>
+            <ymax>416</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>corn leaf blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>12</xmin>
+            <xmax>396</xmax>
+            <ymin>1</ymin>
+            <ymax>336</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>corn leaf blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>219</xmin>
+            <xmax>414</xmax>
+            <ymin>71</ymin>
+            <ymax>165</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>corn leaf blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>5</xmin>
+            <xmax>172</xmax>
+            <ymin>29</ymin>
+            <ymax>208</ymax>
+        </bndbox>
+    </object>
+</annotation>

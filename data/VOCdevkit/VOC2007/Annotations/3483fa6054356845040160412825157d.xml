@@ -1,0 +1,79 @@
+<annotation>
+    <folder/>
+    <filename>3483fa6054356845040160412825157d.jpg</filename>
+    <path>3483fa6054356845040160412825157d.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>180</xmin>
+            <xmax>268</xmax>
+            <ymin>32</ymin>
+            <ymax>202</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>72</xmin>
+            <xmax>218</xmax>
+            <ymin>140</ymin>
+            <ymax>235</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>221</xmin>
+            <xmax>357</xmax>
+            <ymin>150</ymin>
+            <ymax>232</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>217</xmin>
+            <xmax>402</xmax>
+            <ymin>229</ymin>
+            <ymax>312</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>raspberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>10</xmin>
+            <xmax>223</xmax>
+            <ymin>241</ymin>
+            <ymax>337</ymax>
+        </bndbox>
+    </object>
+</annotation>

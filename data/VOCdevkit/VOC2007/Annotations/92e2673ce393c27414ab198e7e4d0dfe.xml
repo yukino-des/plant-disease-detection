@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>92e2673ce393c27414ab198e7e4d0dfe.jpg</filename>
+    <path>92e2673ce393c27414ab198e7e4d0dfe.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf mosaic virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>215</xmin>
+            <xmax>399</xmax>
+            <ymin>197</ymin>
+            <ymax>373</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf mosaic virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>273</xmin>
+            <xmax>364</xmax>
+            <ymin>69</ymin>
+            <ymax>126</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf mosaic virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>143</xmin>
+            <xmax>311</xmax>
+            <ymin>13</ymin>
+            <ymax>162</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf mosaic virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>118</xmin>
+            <xmax>270</xmax>
+            <ymin>111</ymin>
+            <ymax>307</ymax>
+        </bndbox>
+    </object>
+</annotation>

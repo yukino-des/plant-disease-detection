@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>97862485b633ab18684898e645b8eb2c.jpg</filename>
+    <path>97862485b633ab18684898e645b8eb2c.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>corn rust leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>56</xmin>
+            <xmax>407</xmax>
+            <ymin>2</ymin>
+            <ymax>357</ymax>
+        </bndbox>
+    </object>
+</annotation>

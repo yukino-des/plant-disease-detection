@@ -1,0 +1,92 @@
+<annotation>
+    <folder/>
+    <filename>f88569633c73e687a3fceb47e57919ef.jpg</filename>
+    <path>f88569633c73e687a3fceb47e57919ef.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>187</xmin>
+            <xmax>252</xmax>
+            <ymin>48</ymin>
+            <ymax>217</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>34</xmin>
+            <xmax>190</xmax>
+            <ymin>166</ymin>
+            <ymax>246</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>252</xmin>
+            <xmax>373</xmax>
+            <ymin>110</ymin>
+            <ymax>219</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>354</xmin>
+            <xmax>415</xmax>
+            <ymin>1</ymin>
+            <ymax>187</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>370</xmin>
+            <xmax>415</xmax>
+            <ymin>244</ymin>
+            <ymax>383</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>143</xmin>
+            <xmax>226</xmax>
+            <ymin>207</ymin>
+            <ymax>349</ymax>
+        </bndbox>
+    </object>
+</annotation>

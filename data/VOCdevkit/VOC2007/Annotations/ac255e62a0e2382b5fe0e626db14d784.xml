@@ -1,0 +1,40 @@
+<annotation>
+    <folder/>
+    <filename>ac255e62a0e2382b5fe0e626db14d784.jpg</filename>
+    <path>ac255e62a0e2382b5fe0e626db14d784.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>108</xmin>
+            <xmax>189</xmax>
+            <ymin>18</ymin>
+            <ymax>71</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato early blight leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>1</xmin>
+            <xmax>415</xmax>
+            <ymin>127</ymin>
+            <ymax>413</ymax>
+        </bndbox>
+    </object>
+</annotation>

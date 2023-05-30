@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>f178f131ff11ad099fb86cdae716b5f0.jpg</filename>
+    <path>f178f131ff11ad099fb86cdae716b5f0.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>39</xmin>
+            <xmax>133</xmax>
+            <ymin>213</ymin>
+            <ymax>335</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>243</xmin>
+            <xmax>323</xmax>
+            <ymin>133</ymin>
+            <ymax>285</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>151</xmin>
+            <xmax>186</xmax>
+            <ymin>125</ymin>
+            <ymax>199</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato leaf yellow virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>167</xmin>
+            <xmax>237</xmax>
+            <ymin>219</ymin>
+            <ymax>321</ymax>
+        </bndbox>
+    </object>
+</annotation>

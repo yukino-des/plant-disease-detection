@@ -1,0 +1,105 @@
+<annotation>
+    <folder/>
+    <filename>0fabc877a97bc33df35359eb3b79a6e7.jpg</filename>
+    <path>0fabc877a97bc33df35359eb3b79a6e7.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>7</xmin>
+            <xmax>111</xmax>
+            <ymin>126</ymin>
+            <ymax>341</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>217</xmin>
+            <xmax>292</xmax>
+            <ymin>76</ymin>
+            <ymax>268</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>292</xmin>
+            <xmax>338</xmax>
+            <ymin>90</ymin>
+            <ymax>333</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>317</xmin>
+            <xmax>373</xmax>
+            <ymin>40</ymin>
+            <ymax>188</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>306</xmin>
+            <xmax>413</xmax>
+            <ymin>222</ymin>
+            <ymax>416</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>158</xmin>
+            <xmax>236</xmax>
+            <ymin>23</ymin>
+            <ymax>88</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>peach leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>369</xmin>
+            <xmax>415</xmax>
+            <ymin>24</ymin>
+            <ymax>206</ymax>
+        </bndbox>
+    </object>
+</annotation>

@@ -1,0 +1,53 @@
+<annotation>
+    <folder/>
+    <filename>1018d532ba7fb56f03d1c915dd36784c.jpg</filename>
+    <path>1018d532ba7fb56f03d1c915dd36784c.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato septoria leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>68</xmin>
+            <xmax>154</xmax>
+            <ymin>93</ymin>
+            <ymax>167</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato septoria leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>99</xmin>
+            <xmax>172</xmax>
+            <ymin>114</ymin>
+            <ymax>210</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>tomato septoria leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>126</xmin>
+            <xmax>194</xmax>
+            <ymin>151</ymin>
+            <ymax>259</ymax>
+        </bndbox>
+    </object>
+</annotation>

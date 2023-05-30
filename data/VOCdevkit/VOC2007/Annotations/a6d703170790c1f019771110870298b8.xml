@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>a6d703170790c1f019771110870298b8.jpg</filename>
+    <path>a6d703170790c1f019771110870298b8.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>corn gray leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>4</xmin>
+            <xmax>414</xmax>
+            <ymin>27</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+</annotation>

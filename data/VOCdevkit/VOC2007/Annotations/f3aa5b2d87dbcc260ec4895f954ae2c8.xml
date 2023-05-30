@@ -1,0 +1,92 @@
+<annotation>
+    <folder/>
+    <filename>f3aa5b2d87dbcc260ec4895f954ae2c8.jpg</filename>
+    <path>f3aa5b2d87dbcc260ec4895f954ae2c8.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>bell pepper leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>98</xmin>
+            <xmax>225</xmax>
+            <ymin>184</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>177</xmin>
+            <xmax>259</xmax>
+            <ymin>148</ymin>
+            <ymax>238</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>223</xmin>
+            <xmax>325</xmax>
+            <ymin>228</ymin>
+            <ymax>415</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>233</xmin>
+            <xmax>325</xmax>
+            <ymin>114</ymin>
+            <ymax>170</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>87</xmin>
+            <xmax>187</xmax>
+            <ymin>101</ymin>
+            <ymax>171</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>bell pepper leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>232</xmin>
+            <xmax>324</xmax>
+            <ymin>113</ymin>
+            <ymax>168</ymax>
+        </bndbox>
+    </object>
+</annotation>

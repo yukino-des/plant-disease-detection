@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>e7d374c4b7c49154b27bf3000d070332.jpg</filename>
+    <path>e7d374c4b7c49154b27bf3000d070332.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>apple scab leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>120</xmin>
+            <xmax>256</xmax>
+            <ymin>110</ymin>
+            <ymax>329</ymax>
+        </bndbox>
+    </object>
+</annotation>

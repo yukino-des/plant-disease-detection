@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>6518628c54ca80ef2a76cb00d58cf5df.jpg</filename>
+    <path>6518628c54ca80ef2a76cb00d58cf5df.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>tomato leaf mosaic virus</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>10</xmin>
+            <xmax>162</xmax>
+            <ymin>178</ymin>
+            <ymax>398</ymax>
+        </bndbox>
+    </object>
+</annotation>

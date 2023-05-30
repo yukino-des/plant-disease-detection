@@ -1,0 +1,66 @@
+<annotation>
+    <folder/>
+    <filename>d4d7287b411a0bd8069845b2ba945e8d.jpg</filename>
+    <path>d4d7287b411a0bd8069845b2ba945e8d.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>158</xmin>
+            <xmax>288</xmax>
+            <ymin>2</ymin>
+            <ymax>119</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>75</xmin>
+            <xmax>159</xmax>
+            <ymin>1</ymin>
+            <ymax>131</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>4</xmin>
+            <xmax>96</xmax>
+            <ymin>1</ymin>
+            <ymax>129</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>blueberry leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>48</xmin>
+            <xmax>118</xmax>
+            <ymin>186</ymin>
+            <ymax>359</ymax>
+        </bndbox>
+    </object>
+</annotation>

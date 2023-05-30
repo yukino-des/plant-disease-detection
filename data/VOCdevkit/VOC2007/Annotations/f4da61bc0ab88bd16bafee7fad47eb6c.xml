@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>f4da61bc0ab88bd16bafee7fad47eb6c.jpg</filename>
+    <path>f4da61bc0ab88bd16bafee7fad47eb6c.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>soybean leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>148</xmin>
+            <xmax>238</xmax>
+            <ymin>34</ymin>
+            <ymax>177</ymax>
+        </bndbox>
+    </object>
+</annotation>

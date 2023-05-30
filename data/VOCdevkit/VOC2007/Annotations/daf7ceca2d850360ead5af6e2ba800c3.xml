@@ -1,0 +1,40 @@
+<annotation>
+    <folder/>
+    <filename>daf7ceca2d850360ead5af6e2ba800c3.jpg</filename>
+    <path>daf7ceca2d850360ead5af6e2ba800c3.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>63</xmin>
+            <xmax>279</xmax>
+            <ymin>165</ymin>
+            <ymax>261</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>potato leaf early blight</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>87</xmin>
+            <xmax>342</xmax>
+            <ymin>102</ymin>
+            <ymax>193</ymax>
+        </bndbox>
+    </object>
+</annotation>

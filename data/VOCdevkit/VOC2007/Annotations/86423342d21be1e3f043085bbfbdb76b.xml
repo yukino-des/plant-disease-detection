@@ -1,0 +1,53 @@
+<annotation>
+    <folder/>
+    <filename>86423342d21be1e3f043085bbfbdb76b.jpg</filename>
+    <path>86423342d21be1e3f043085bbfbdb76b.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>91</xmin>
+            <xmax>234</xmax>
+            <ymin>129</ymin>
+            <ymax>408</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>174</xmin>
+            <xmax>228</xmax>
+            <ymin>111</ymin>
+            <ymax>245</ymax>
+        </bndbox>
+    </object>
+    <object>
+        <name>grape leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>220</xmin>
+            <xmax>326</xmax>
+            <ymin>72</ymin>
+            <ymax>272</ymax>
+        </bndbox>
+    </object>
+</annotation>

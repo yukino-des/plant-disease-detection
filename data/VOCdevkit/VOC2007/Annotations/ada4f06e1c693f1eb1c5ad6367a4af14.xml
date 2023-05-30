@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>ada4f06e1c693f1eb1c5ad6367a4af14.jpg</filename>
+    <path>ada4f06e1c693f1eb1c5ad6367a4af14.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>apple rust leaf</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>2</xmin>
+            <xmax>415</xmax>
+            <ymin>1</ymin>
+            <ymax>416</ymax>
+        </bndbox>
+    </object>
+</annotation>

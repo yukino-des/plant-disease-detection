@@ -1,0 +1,27 @@
+<annotation>
+    <folder/>
+    <filename>a349465bf744fde3a2f9bd1643dc3e8b.jpg</filename>
+    <path>a349465bf744fde3a2f9bd1643dc3e8b.jpg</path>
+    <source>
+        <database>roboflow.ai</database>
+    </source>
+    <size>
+        <width>416</width>
+        <height>416</height>
+        <depth>3</depth>
+    </size>
+    <segmented>0</segmented>
+    <object>
+        <name>bell pepper leaf spot</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <occluded>0</occluded>
+        <bndbox>
+            <xmin>36</xmin>
+            <xmax>351</xmax>
+            <ymin>9</ymin>
+            <ymax>399</ymax>
+        </bndbox>
+    </object>
+</annotation>
