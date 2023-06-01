@@ -20,7 +20,6 @@ from utils import (conv2d, conv_dw, cvt_color, get_anchors, get_classes, logisti
                    resize_image, print_config, yolo_head)
 
 
-# 骨干网络
 class Backbone(nn.Module):
     def __init__(self):
         super(Backbone, self).__init__()
@@ -49,9 +48,6 @@ class DecodeBox:
         self.anchors = anchors
         self.num_classes = num_classes
         self.bbox_attrs = 5 + num_classes
-        # 13x13特征层对应anchor：[[142, 110], [192, 243], [459, 401]]
-        # 26x26特征层对应anchor：[[ 36,  75], [ 76,  55], [ 72, 146]]
-        # 52x52特征层对应anchor：[[ 12,  16], [ 19,  36], [ 40,  28]]
         self.anchors_mask = [[6, 7, 8], [3, 4, 5], [0, 1, 2]]
 
     @staticmethod
@@ -67,31 +63,21 @@ class DecodeBox:
 
     def decode_box(self, inputs):
         outputs = []
-        # 输入shape1 = torch.Size([batch_size, 255, 13, 13])
-        # 输入shape2 = torch.Size([batch_size, 255, 26, 26])
-        # 输入shape1 = torch.Size([batch_size, 255, 52, 52])
         for i, _input in enumerate(inputs):
             batch_size = _input.size(0)
             input_height = _input.size(2)
             input_width = _input.size(3)
-            # 对于416*416的输入，stride_h = stride_w = 416 / 13, 416 / 26, 416 / 52 = 32, 16, 8
             stride_h = 416 / input_height
             stride_w = 416 / input_width
             scaled_anchors = [(anchor_width / stride_w, anchor_height / stride_h) for anchor_width, anchor_height in
                               self.anchors[self.anchors_mask[i]]]  # scaled_anchors相对特征层的大小
-            # 三个输入的shape
-            # 输入shape1 = torch.Size([batch_size, 3, 13, 13， 85])
-            # 输入shape2 = torch.Size([batch_size, 3, 26, 26， 85])
-            # 输入shape1 = torch.Size([batch_size, 3, 52, 52， 85])
             prediction = _input.view(batch_size, len(self.anchors_mask[i]), self.bbox_attrs, input_height,
                                      input_width).permute(0, 1, 3, 4, 2).contiguous()
-            # 先验框中心调整参数
             x = torch.sigmoid(prediction[..., 0])
             y = torch.sigmoid(prediction[..., 1])
-            # 先验框宽高调整参数
             w = prediction[..., 2]
             h = prediction[..., 3]
-            conf = torch.sigmoid(prediction[..., 4])  # 置信度
+            conf = torch.sigmoid(prediction[..., 4])
             pred_cls = torch.sigmoid(prediction[..., 5:])
             float_tensor = torch.cuda.FloatTensor if x.is_cuda else torch.FloatTensor
             long_tensor = torch.cuda.LongTensor if x.is_cuda else torch.LongTensor
@@ -148,7 +134,6 @@ class DecodeBox:
         return output
 
 
-# 倒残差
 class InvertedResidual(nn.Module):
     def __init__(self, inp, oup, stride, expand_ratio):
         super(InvertedResidual, self).__init__()
@@ -198,14 +183,6 @@ class LossHistory:
         plt.figure()
         plt.plot(_iter, self.losses, "red", linewidth=2, label="train loss")
         plt.plot(_iter, self.val_loss, "green", linewidth=2, label="val loss")
-        # num = 5 if len(self.losses) < 25 else 15
-        # try:
-        #     plt.plot(_iter, signal.savgol_filter(self.losses, num, 3), "blue", linestyle="--", linewidth=2,
-        #              label="train loss")
-        #     plt.plot(_iter, signal.savgol_filter(self.val_loss, num, 3), "cyan", linestyle="--", linewidth=2,
-        #              label="val loss")
-        # except ValueError:
-        #     pass
         plt.grid(True)
         plt.xlabel("epoch")
         plt.ylabel("loss")
@@ -225,7 +202,7 @@ class MobileNetV2(nn.Module):
             inverted_residual_setting = [[1, 16, 1, 1], [6, 24, 2, 2], [6, 32, 3, 2], [6, 64, 4, 2], [6, 96, 3, 1],
                                          [6, 160, 3, 2], [6, 320, 1, 1]]
         if len(inverted_residual_setting) == 0 or len(inverted_residual_setting[0]) != 4:
-            raise ValueError("inverted_residual_setting error.")
+            raise ValueError("inverted_residual_setting error")
         input_channel = make_divisible(input_channel * width_multi, round_nearest)
         self.last_channel = make_divisible(last_channel * max(1.0, width_multi), round_nearest)
         features = [ConvBNReLU(3, input_channel, stride=2)]
@@ -256,7 +233,6 @@ class MobileNetV2(nn.Module):
         return self.classifier(x)
 
 
-# 空间金字塔池化
 class Spp(nn.Module):
     def __init__(self, pool_sizes=None):
         super(Spp, self).__init__()
@@ -269,7 +245,6 @@ class Spp(nn.Module):
         return torch.cat(features + [x], dim=1)
 
 
-# 上采样
 class Upsample(nn.Module):
     def __init__(self, in_channels, out_channels):
         super(Upsample, self).__init__()
@@ -419,7 +394,7 @@ class Yolo(object):
         capture = cv2.VideoCapture(video_path)
         out = cv2.VideoWriter(video_out_path, cv2.VideoWriter_fourcc(*"XVID"), 25.0,
                               (int(capture.get(cv2.CAP_PROP_FRAME_WIDTH)), int(capture.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-        if video_path == 0:  # 调用摄像头
+        if video_path == 0:
             ref = False
             while not ref:
                 ref, frame = capture.read()
@@ -702,10 +677,10 @@ class YoloDataset(Dataset):
     def get_random_data(self, annotation_line, jitter=0.3, hue=0.1, sat=0.7, val=0.4, random=True):
         line = annotation_line.split()
         image = Image.open(line[0])
-        image = cvt_color(image)  # 将输入图像（灰度图）转为RGB图像
-        iw, ih = image.size  # 图像宽高
-        h, w = 416, 416  # 目标宽高
-        box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])  # 预测框
+        image = cvt_color(image)
+        iw, ih = image.size
+        h, w = 416, 416
+        box = np.array([np.array(list(map(int, box.split(",")))) for box in line[1:]])
         if not random:
             scale = min(w / iw, h / ih)
             nw = int(iw * scale)

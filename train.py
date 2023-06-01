@@ -11,12 +11,10 @@ from utils import (fit1epoch, get_anchors, get_classes, get_lr_scheduler, get_tx
                    weights_init, yolo_dataset_collate)
 
 if __name__ == "__main__":
-    # 如果训练中断，请修改model_path = "data/cache/loss/current.pth"
     model_path = "data/pretrain.pth"
-    # 如果训练中断，请修改init_epoch = 已训练的epoch数
     init_epoch = 0
     get_txt(0, 0.9, 0.9)
-    lr_decay_type = "cos"  # "step"
+    lr_decay_type = "cos"
     # ---------------------------------------------------------------
     # |  optimizer_type, freeze_train, epoch, init_lr, weight_decay |
     # | "adam" "adam_w",         True,   300,    1e-3,            0 |
@@ -25,7 +23,6 @@ if __name__ == "__main__":
     # |           "sgd",        False,   500,    1e-2,         5e-4 |
     # ---------------------------------------------------------------
     optimizer_type, freeze_train, epoch, init_lr, weight_decay = "adam", True, 100, 1e-3, 0
-    # 多线程训练
     num_workers = 2  # 4
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     class_names, num_classes = get_classes("data/classes.txt")
@@ -69,7 +66,7 @@ if __name__ == "__main__":
     wanted_step = 5e4 if optimizer_type == "sgd" else 1.5e4
     total_step = num_train // 8 * epoch
     if total_step <= wanted_step and num_train // 8 == 0:
-        raise ValueError("数据集不合格")
+        raise ValueError("dataset error")
     unfreeze_flag = False
     if freeze_train:
         for param in model.backbone.parameters():
@@ -97,7 +94,7 @@ if __name__ == "__main__":
     epoch_step = num_train // batch_size
     epoch_step_val = num_val // batch_size
     if epoch_step == 0 or epoch_step_val == 0:
-        raise ValueError("数据集不合格")
+        raise ValueError("dataset error")
     train_dataset = YoloDataset(train_lines, num_classes, epoch, True, True, 0.5, 0.5, True, 0.7)
     val_dataset = YoloDataset(val_lines, num_classes, epoch, False, False, 0, 0, False, 0)
     gen = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers, pin_memory=True,
@@ -118,7 +115,7 @@ if __name__ == "__main__":
             epoch_step = num_train // batch_size
             epoch_step_val = num_val // batch_size
             if epoch_step == 0 or epoch_step_val == 0:
-                raise ValueError("数据集不合格")
+                raise ValueError("dataset error")
             gen = DataLoader(train_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers,
                              pin_memory=True, drop_last=True, collate_fn=yolo_dataset_collate, sampler=None)
             gen_val = DataLoader(val_dataset, shuffle=True, batch_size=batch_size, num_workers=num_workers,

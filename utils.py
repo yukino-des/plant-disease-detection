@@ -46,33 +46,23 @@ def cas_iou(box, cluster):
     return intersection / (area1 + area2 - intersection)
 
 
-# 标准卷积
 def conv2d(filter_in, filter_out, kernel_size, groups=1, stride=1):
     pad = (kernel_size - 1) // 2 if kernel_size else 0
     return nn.Sequential(OrderedDict([
-        ("conv", nn.Conv2d(filter_in, filter_out,
-                           kernel_size=kernel_size,
-                           stride=stride,
-                           padding=pad,
-                           groups=groups, bias=False)),  # 3x3标准卷积
-        ("bn", nn.BatchNorm2d(filter_out)),  # 批量归一化
-        ("relu", nn.ReLU6(inplace=True))]))  # ReLU6激活
+        ("conv", nn.Conv2d(filter_in, filter_out, kernel_size=kernel_size, stride=stride, padding=pad, groups=groups,
+                           bias=False)),
+        ("bn", nn.BatchNorm2d(filter_out)),
+        ("relu", nn.ReLU6(inplace=True))]))
 
 
-# 深度可分离卷积
 def conv_dw(filter_in, filter_out, stride=1):
     return nn.Sequential(
-        nn.Conv2d(filter_in, filter_in,
-                  kernel_size=3,
-                  stride=stride,
-                  padding=1,
-                  groups=filter_in,
-                  bias=False),  # 3x3深度卷积
-        nn.BatchNorm2d(filter_in),  # 批量归一化
-        nn.ReLU6(inplace=True),  # ReLU6激活
-        nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),  # 1x1卷积
-        nn.BatchNorm2d(filter_out),  # 批量归一化
-        nn.ReLU6(inplace=True))  # ReLU6激活
+        nn.Conv2d(filter_in, filter_in, kernel_size=3, stride=stride, padding=1, groups=filter_in, bias=False),
+        nn.BatchNorm2d(filter_in),
+        nn.ReLU6(inplace=True),
+        nn.Conv2d(filter_in, filter_out, 1, 1, 0, bias=False),
+        nn.BatchNorm2d(filter_out),
+        nn.ReLU6(inplace=True))
 
 
 def cvt_color(image):
@@ -134,18 +124,17 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
             if torch.cuda.is_available():
                 images = images.cuda(0)
                 targets = [ann.cuda(0) for ann in targets]
-        optimizer.zero_grad()  # 清零梯度
-        outputs = model_train(images)  # 前向传播
+        optimizer.zero_grad()
+        outputs = model_train(images)
         if torch.cuda.is_available():
             loss_sum_all = torch.tensor(0, dtype=torch.float32, device="cuda")
         else:
             loss_sum_all = torch.tensor(0, dtype=torch.float32)
-        # 计算损失
         for i in range(len(outputs)):
             loss_item = yolo_loss(i, outputs[i], targets)
             loss_sum_all += loss_item
         loss_sum = loss_sum_all
-        loss_sum.backward()  # 反向传播
+        loss_sum.backward()
         optimizer.step()
         loss += loss_sum.item()
         bar.set_postfix(**{"loss": loss / (iteration + 1), "lr": get_lr(optimizer)})
@@ -161,13 +150,12 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
             if torch.cuda.is_available():
                 images = images.cuda(0)
                 targets = [ann.cuda(0) for ann in targets]
-            optimizer.zero_grad()  # 清零梯度
-            outputs = model_train(images)  # 前向传播
+            optimizer.zero_grad()
+            outputs = model_train(images)
             if torch.cuda.is_available():
                 val_loss_sum = torch.tensor(0, dtype=torch.float32, device="cuda")
             else:
                 val_loss_sum = torch.tensor(0, dtype=torch.float32)
-            # 计算损失
             for i in range(len(outputs)):
                 val_loss_item = yolo_loss(i, outputs[i], targets)
                 val_loss_sum += val_loss_item
@@ -178,7 +166,6 @@ def fit1epoch(model_train, model, yolo_loss, loss_history, optimizer, e, epoch_s
     loss_history.append_loss(e + 1, loss / epoch_step, val_loss / epoch_step_val)
     print(f"epoch: {str(e + 1)}/{str(epoch)}")
     print("loss=%.3f; val_loss=%.3f" % (loss / epoch_step, val_loss / epoch_step_val))
-    # 保存权值
     if (e + 1) % period == 0 or e + 1 == epoch:
         torch.save(model.state_dict(), "data/cache/loss/epoch%03d-loss%.3f-val_loss%.3f.pth" % (
             e + 1, loss / epoch_step, val_loss / epoch_step_val))
@@ -214,7 +201,7 @@ def get_lr_scheduler(lr_decay_type, lr, min_lr, total_iter, warmup_iter_ratio=0.
         warmup_total_iter = min(max(warmup_iter_ratio * total_iter, 1), 3)
         warmup_lr_start = max(warmup_lr_ratio * lr, 1e-6)
         no_aug_iter = min(max(no_aug_iter_ratio * total_iter, 1), 15)
-        func = partial(yolo_x_warm_cos_lr, lr, min_lr, total_iter, warmup_total_iter, warmup_lr_start, no_aug_iter)
+        func = partial(warm_cos_lr, lr, min_lr, total_iter, warmup_total_iter, warmup_lr_start, no_aug_iter)
     else:
         decay_rate = (min_lr / lr) ** (1 / (step_num - 1))
         step_size = total_iter / step_num
@@ -326,7 +313,7 @@ def get_map(min_overlap, score_threshold):
         bounding_boxes.sort(key=lambda x: float(x["confidence"]), reverse=True)
         with open(f"data/cache/map/temp/{class_name}_dr.json", "w") as outfile:
             json.dump(bounding_boxes, outfile)
-    sum_ap = 0.0
+    sumAP = 0.0
     ap_dict = {}
     log_avg_miss_rate_dict = {}
     with open("data/cache/map/results.txt", "w") as results_file:
@@ -393,7 +380,7 @@ def get_map(min_overlap, score_threshold):
             ap, m_recall, m_precision = voc_ap(rec[:], precision[:])
             f1 = np.array(rec) * np.array(precision) * 2 / np.where((np.array(precision) + np.array(rec)) == 0, 1,
                                                                     (np.array(precision) + np.array(rec)))
-            sum_ap += ap
+            sumAP += ap
             text = class_name + "\nAP={:.2f}%".format(ap * 100)
             if len(precision) > 0:
                 f1_text = class_name + "\nF1={:.2f}".format(f1[score_threshold_idx])
@@ -451,9 +438,9 @@ def get_map(min_overlap, score_threshold):
             fig.savefig(f"data/cache/map/precision/{class_name}.png")
             plt.cla()
         if n_classes == 0:
-            raise ValueError("data/classes.txt error.")
-        m_ap = sum_ap / n_classes
-        text = "mAP={:.2f}%".format(m_ap * 100)
+            raise ValueError("data/classes.txt error")
+        mAP = sumAP / n_classes
+        text = "mAP={:.2f}%".format(mAP * 100)
         results_file.write(text + "\n")
         print(text)
     shutil.rmtree("data/cache/map/temp")
@@ -494,13 +481,13 @@ def get_map(min_overlap, score_threshold):
     output_path = "data/cache/map/log-average_miss_rate.png"
     plot_color = "royalblue"
     draw_plot(log_avg_miss_rate_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-    window_title = "mAP={:.2f}%".format(m_ap * 100)
+    window_title = "mAP={:.2f}%".format(mAP * 100)
     plot_title = window_title
     x_label = "Average Precision"
     output_path = "data/cache/map/mAP.png"
     plot_color = "royalblue"
     draw_plot(ap_dict, n_classes, window_title, plot_title, x_label, output_path, plot_color)
-    return m_ap
+    return mAP
 
 
 def get_txt(seed, train_val_percent, train_percent):
@@ -537,7 +524,8 @@ def get_txt(seed, train_val_percent, train_percent):
     test_txt.close()
     type_index = 0
     for image_set in ["train", "val"]:
-        image_ids = open(f"data/VOCdevkit/VOC2007/ImageSets/Main/{image_set}.txt", encoding="utf-8").read().strip().split()
+        image_ids = open(f"data/VOCdevkit/VOC2007/ImageSets/Main/{image_set}.txt",
+                         encoding="utf-8").read().strip().split()
         list_file = open(f"data/{image_set}.txt", "w", encoding="utf-8")
         for image_id in image_ids:
             list_file.write(f"data/VOCdevkit/VOC2007/JPEGImages/{image_id}.jpg")
@@ -572,7 +560,7 @@ def get_txt(seed, train_val_percent, train_percent):
     if photo_nums[0] <= 500:
         raise ValueError("Dataset not qualified.")
     if np.sum(nums) == 0:
-        raise ValueError("data/classes.txt error.")
+        raise ValueError("data/classes.txt error")
 
 
 def k_means(box, k):
@@ -615,7 +603,6 @@ def log_average_miss_rate(precision, false_pos_cum_sum, num_images):
     return log_avg_miss_rate, mr, false_pos_per_image
 
 
-# Logistic分类器
 def logistic(x):
     if np.all(x >= 0):
         return 1.0 / (1 + np.exp(-x))
@@ -624,16 +611,13 @@ def logistic(x):
 
 
 def make3conv(filters_list, in_filters):
-    return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
-                         conv_dw(filters_list[0], filters_list[1]),
+    return nn.Sequential(conv2d(in_filters, filters_list[0], 1), conv_dw(filters_list[0], filters_list[1]),
                          conv2d(filters_list[1], filters_list[0], 1))
 
 
 def make5conv(filters_list, in_filters):
-    return nn.Sequential(conv2d(in_filters, filters_list[0], 1),
-                         conv_dw(filters_list[0], filters_list[1]),
-                         conv2d(filters_list[1], filters_list[0], 1),
-                         conv_dw(filters_list[0], filters_list[1]),
+    return nn.Sequential(conv2d(in_filters, filters_list[0], 1), conv_dw(filters_list[0], filters_list[1]),
+                         conv2d(filters_list[1], filters_list[0], 1), conv_dw(filters_list[0], filters_list[1]),
                          conv2d(filters_list[1], filters_list[0], 1))
 
 
@@ -675,7 +659,7 @@ def set_optimizer_lr(optimizer, lr_scheduler_func, epoch):
 
 def step_lr(lr, decay_rate, step_size, _iter):
     if step_size < 1:
-        raise ValueError("step_size error.")
+        raise ValueError("step_size error")
     n = _iter // step_size
     return lr * decay_rate ** n
 
@@ -726,7 +710,7 @@ def yolo_head(filters_list, in_filters):
     return nn.Sequential(conv_dw(in_filters, filters_list[0]), nn.Conv2d(filters_list[0], filters_list[1], 1))
 
 
-def yolo_x_warm_cos_lr(lr, min_lr, total_iter, warmup_total_iter, warmup_lr_start, no_aug_iter, _iter):
+def warm_cos_lr(lr, min_lr, total_iter, warmup_total_iter, warmup_lr_start, no_aug_iter, _iter):
     if _iter <= warmup_total_iter:
         lr = (lr - warmup_lr_start) * pow(_iter / float(warmup_total_iter), 2) + warmup_lr_start
     elif _iter >= total_iter - no_aug_iter:
@@ -735,4 +719,3 @@ def yolo_x_warm_cos_lr(lr, min_lr, total_iter, warmup_total_iter, warmup_lr_star
         lr = min_lr + 0.5 * (lr - min_lr) * (1.0 + math.cos(
             math.pi * (_iter - warmup_total_iter) / (total_iter - warmup_total_iter - no_aug_iter)))
     return lr
-

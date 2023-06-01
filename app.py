@@ -180,4 +180,4 @@ if __name__ == "__main__":
         print(f"Total flops: {flops}\nTotal params: {params}\n{'-' * 95}")
 
     else:
-        print("mode error.")
+        print("mode error")

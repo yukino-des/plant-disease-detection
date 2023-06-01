@@ -1,6 +1,4 @@
-# 农业病害检测
-
-### 1. 下载依赖
+# Plant Disease Detection
 
 ```shell
 cd plant-disease-detection
@@ -8,14 +6,12 @@ pip install -r requirements.txt
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu117
 ```
 
-### 2. 训练、预测
-
 ```shell
 python train.py
 python app.py
 ```
 
-#### 调整后的PlantDoc数据集
+### PlantDoc
 
 ```text
 apple leaf
@@ -47,7 +43,7 @@ tomato mold leaf
 tomato septoria leaf spot
 ```
 
-#### Pascal VOC 2007数据集
+### Pascal VOC 2007
 
 ```text
 aeroplane
