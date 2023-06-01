@@ -1,8 +1,8 @@
-*.ipynb
-.DS_Store
 */.DS_Store
-__pycache__
+*.ipynb
 */__pycache__
-.ipynb_checkpoints
+.DS_Store
 .idea
+.ipynb_checkpoints
+__pycache__
 data/cache
