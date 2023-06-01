@@ -41,8 +41,8 @@ async def image(file: UploadFile):
         with open(image_path, "wb+") as wb:
             shutil.copyfileobj(file.file, wb)
         target_info = yolo.detect_image(image_path)
-        return JSONResponse({"imageUrl": f"http://0.0.0.0:2475/{image_path}",
-                             "imageOutUrl": f"http://0.0.0.0:2475/{image_out_path}",
+        return JSONResponse({"imageUrl": f"http://0.0.0.0:2023/{image_path}",
+                             "imageOutUrl": f"http://0.0.0.0:2023/{image_out_path}",
                              "targetInfo": target_info}, 200)
     elif extend_name.lower() in ["mp4", "mov", "avi"]:
         video_path = f"data/cache/video/{file.filename}"
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         os.makedirs("data/cache/image/out", exist_ok=True)
         shutil.rmtree("data/cache/video", ignore_errors=True)
         os.makedirs("data/cache/video/out", exist_ok=True)
-        uvicorn.run(app, host="0.0.0.0", port=2475, workers=0)
+        uvicorn.run(app, host="0.0.0.0", port=2023, workers=0)
 
     elif mode == "camera":
         yolo = Yolo()
